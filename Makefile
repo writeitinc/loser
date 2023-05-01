@@ -1,6 +1,7 @@
 NAME = loser
 
 CFLAGS = $(WFLAGS) $(OPTIM)
+LFLAGS = -L$(LIB_DIR) -l:lib$(NAME).a
 
 WFLAGS = -Wall -Wextra -pedantic -std=c99
 
@@ -14,22 +15,34 @@ STATIC_OBJ_DIR = $(OBJ_DIR)/static
 SHARED_OBJ_DIR = $(OBJ_DIR)/shared
 
 LIB_DIR = $(BUILD_DIR)/lib
-
 STATIC_LIB = $(LIB_DIR)/lib$(NAME).a
 SHARED_LIB = $(LIB_DIR)/lib$(NAME).so
 LIBRARIES = $(STATIC_LIB) $(SHARED_LIB)
+
+BIN_DIR = $(BUILD_DIR)/bin
+BINARIES = $(BIN_DIR)/test
 
 .PHONY: default
 default: release
 
 .PHONY: release
 release: OPTIM = -O3
-release: dirs headers $(LIBRARIES)
+release: dirs headers $(LIBRARIES) $(BINARIES)
 
 .PHONY: debug
 debug: DEBUG = -fsanitize=address,undefined
 debug: OPTIM = -g
-debug: dirs headers $(LIBRARIES)
+debug: dirs headers $(LIBRARIES) $(BINARIES)
+
+# tests
+
+IFLAGS = -I$(INCLUDE_DIR)
+
+$(BIN_DIR)/test: $(OBJ_DIR)/test.o $(LIBRARIES)
+	$(CC) -o $@ $< $(LFLAGS) $(DEBUG) $(DEFINES)
+
+$(OBJ_DIR)/test.o: tests/test.c $(HEADERS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(IFLAGS) $(DEBUG) $(DEFINES)
 
 # library
 
@@ -65,7 +78,7 @@ $(HEADER_DIR): $(HEADERS)
 # dirs
 
 .PHONY: dirs
-dirs: $(STATIC_OBJ_DIR)/ $(SHARED_OBJ_DIR)/ $(LIB_DIR)/ $(INCLUDE_DIR)/
+dirs: $(STATIC_OBJ_DIR)/ $(SHARED_OBJ_DIR)/ $(LIB_DIR)/ $(BIN_DIR)/ $(INCLUDE_DIR)/
 
 %/:
 	mkdir -p $@

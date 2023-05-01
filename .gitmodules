@@ -1,0 +1,3 @@
+[submodule "tyrant"]
+	path = tyrant
+	url = https://github.com/writeitinc/tyrant.git

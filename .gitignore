@@ -9,3 +9,5 @@
 !/Makefile
 !/src/**
 !/tests/**
+
+!/tyrant/**

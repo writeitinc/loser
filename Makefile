@@ -1,7 +1,7 @@
 NAME = loser
 
 CFLAGS = $(WFLAGS) $(OPTIM)
-LFLAGS = -L$(LIB_DIR) -l:lib$(NAME).a
+LFLAGS = -L$(LIB_DIR) -l:lib$(NAME).a -ltyrant
 
 WFLAGS = -Wall -Wextra -pedantic -std=c99
 
@@ -74,6 +74,15 @@ $(HEADER_DIR): $(HEADERS)
 	mkdir -p $@
 	cp -u $^ $@/
 	touch $@
+
+# deps
+
+.PHONY: deps
+deps: tyrant
+
+.PHONY: tyrant
+tyrant:
+	make -C tyrant BUILD_DIR=../build
 
 # dirs
 

@@ -3,7 +3,14 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
+
+// ###########################
+// ######## Constants ########
+// ###########################
+
+enum { LS_SHORT_STRING_MAX_LEN = 15 };
 
 // #######################
 // ######## Types ########
@@ -23,6 +30,42 @@ typedef struct LSString {
 	size_t len;
 	const LSByte *bytes;
 } LSString;
+
+// A short immutable array of bytes.
+/*
+ * Will always be null-terminated:
+ * - `bytes[len]` can be read from and is set to '\0'
+ *
+ * Has a maximum length of `LS_SHORT_STRING_MAX_LEN`.
+ *
+ * A `len` value greater than `LS_SHORT_STRING_MAX_LEN` indicates an invalid
+ * value.
+ */
+typedef struct LSShortString {
+	size_t len;
+	LSByte bytes[LS_SHORT_STRING_MAX_LEN + 1];
+} LSShortString;
+
+// An small string-optimized immutable array of bytes.
+/*
+ * Will always be null-terminated:
+ * - `bytes[len]` can be read from and is set to '\0'
+ *
+ * Intended to perform better when storing strings short enough to fit in a
+ * `LSShortString`.
+ */
+typedef union LSSSOString {
+	size_t len;
+	LSShortString _short; // <= Please use LS_SSO_STRING_BYTES()
+	LSString _long;       // <= ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} LSSSOString;
+
+// The type of string stored in a `LSSSOString`.
+typedef enum LSSSOStringType {
+	LS_SSO_STRING_INVALID,
+	LS_SSO_STRING_SHORT,
+	LS_SSO_STRING_LONG
+} LSSSOStringType;
 
 // A non-owning range of bytes.
 /*
@@ -47,14 +90,17 @@ typedef struct LSByteBuffer {
 	LSByte *bytes;
 } LSByteBuffer;
 
-// #################################
-// ######## Validity Checks ########
-// #################################
+// ##################################################
+// ######## Macro-like Convenience Functions ########
+// ##################################################
 
-// Convenience functions for checking validity of objects.
 static inline bool LS_STRING_VALID(LSString string);
+static inline bool LS_SHORT_STRING_VALID(LSShortString short_string);
 static inline bool LS_SSPAN_VALID(LSStringSpan sspan);
 static inline bool LS_BBUF_VALID(LSByteBuffer bbuf);
+
+static inline LSSSOStringType LS_SSO_STRING_TYPE(LSSSOString sso_string);
+static inline const LSByte *LS_SSO_STRING_BYTES(const LSSSOString *sso_string);
 
 // ###############################################
 // ######## Base Constructors/Destructors ########
@@ -83,6 +129,47 @@ LSString ls_string_create(const LSByte *bytes, size_t len);
  * - `string` was not previously destroyed
  */
 void ls_string_destroy(LSString *string);
+
+/*
+ * Constraints:
+ * - `bytes` points to a valid array of at least `len` bytes
+ *        OR is `NULL`
+ *
+ * On success:
+ * - returns a valid `LSShortString`
+ * On failure:
+ * - returns an invalid `LSShortString`
+ *
+ * Fails if:
+ * - `len` is greater than `LS_SHORT_STRING_MAX_LEN`
+ * - `bytes` is `NULL`
+ */
+static inline LSShortString ls_short_string_create(const LSByte *bytes,
+		size_t len);
+
+/*
+ * Constraints:
+ * - `bytes` points to a valid array of at least `len` bytes
+ *        OR is `NULL`
+ *
+ * On success:
+ * - returns a valid `LSSSOString`
+ * On failure:
+ * - returns an invalid `LSSSOString`
+ *
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `bytes` is `NULL`
+ */
+static inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len);
+
+/*
+ * Passing an invalid `LSSSOString` is safe.
+ *
+ * Constraints:
+ * - `sso_string` was not previously destroyed
+ */
+static inline void ls_sso_string_destroy(LSSSOString *sso_string);
 
 /*
  * Constraints:
@@ -265,6 +352,11 @@ static inline bool LS_STRING_VALID(LSString string)
 	return string.bytes != NULL;
 }
 
+static inline bool LS_SHORT_STRING_VALID(LSShortString short_string)
+{
+	return short_string.len <= LS_SHORT_STRING_MAX_LEN;
+}
+
 static inline bool LS_SSPAN_VALID(LSStringSpan sspan)
 {
 	return sspan.start != NULL;
@@ -273,6 +365,71 @@ static inline bool LS_SSPAN_VALID(LSStringSpan sspan)
 static inline bool LS_BBUF_VALID(LSByteBuffer bbuf)
 {
 	return bbuf.bytes != NULL;
+}
+
+static inline LSSSOStringType LS_SSO_STRING_TYPE(LSSSOString sso_string)
+{
+	if (LS_SHORT_STRING_VALID(sso_string._short)) {
+		return LS_SSO_STRING_SHORT;
+	}
+
+	if (LS_STRING_VALID(sso_string._long)) {
+		return LS_SSO_STRING_LONG;
+	}
+
+	return LS_SSO_STRING_INVALID;
+}
+
+static inline const LSByte *LS_SSO_STRING_BYTES(const LSSSOString *sso_string)
+{
+	switch (LS_SSO_STRING_TYPE(*sso_string)) {
+	case LS_SSO_STRING_SHORT:
+		return sso_string->_short.bytes;
+	case LS_SSO_STRING_LONG:
+		return sso_string->_long.bytes;
+	default:
+		return NULL;
+	}
+}
+
+static inline LSShortString ls_short_string_create(const LSByte *bytes,
+		size_t len)
+{
+	if (len > LS_SHORT_STRING_MAX_LEN) {
+		return (LSShortString){ .len = SIZE_MAX };
+	}
+
+	LSShortString short_string = { .len = len };
+	memcpy(short_string.bytes, bytes, len);
+	short_string.bytes[len] = '\0';
+
+	return short_string;
+}
+
+static inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
+{
+	if (len <= LS_SHORT_STRING_MAX_LEN) {
+		return (LSSSOString){
+			._short = ls_short_string_create(bytes, len)
+		};
+	}
+
+	LSString string = ls_string_create(bytes, len);
+	if (!LS_STRING_VALID(string)) {
+		goto err_exit;
+	}
+
+	return (LSSSOString){ ._long = string };
+
+err_exit:
+	return (LSSSOString){ ._long.len = SIZE_MAX, ._long.bytes = NULL };
+}
+
+static inline void ls_sso_string_destroy(LSSSOString *sso_string)
+{
+	if (LS_SSO_STRING_TYPE(*sso_string) == LS_SSO_STRING_LONG) {
+		ls_string_destroy(&sso_string->_long);
+	}
 }
 
 static inline LSStringSpan ls_sspan_create(const LSByte *start, size_t len)

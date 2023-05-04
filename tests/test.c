@@ -11,6 +11,7 @@
 static void benchmark_text(const char *cstr);
 
 static LSString strings[NITERATIONS];
+static LSSSOString sso_strings[NITERATIONS];
 static LSStringSpan sspans[NITERATIONS];
 
 #define BENCHMARK(name, expr) \
@@ -86,6 +87,25 @@ void benchmark_text(const char *cstr)
 			strings[i] = ls_string_from_cstr(cstr));
 	BENCHMARK("ls_string_destroy",
 			ls_string_destroy(&strings[i]));
+
+	// ### LSSSOString ###
+
+	// warm up memory
+	DONT_BENCHMARK(sso_strings[i] = ls_sso_string_create(bytes, len));
+	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+
+	DONT_BENCHMARK(sso_strings[i] = ls_sso_string_create(bytes, len));
+	BENCHMARK("LS_SSO_STRING_TYPE",
+			LS_SSO_STRING_TYPE(sso_strings[i]));
+	BENCHMARK("LS_SSO_STRING_BYTES",
+			LS_SSO_STRING_BYTES(&sso_strings[i]));
+	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+
+	BENCHMARK("ls_sso_string_create",
+			sso_strings[i] = ls_sso_string_create(bytes, len));
+
+	BENCHMARK("ls_sso_string_destroy",
+			ls_sso_string_destroy(&sso_strings[i]));
 
 	// ### LSStringSpan
 

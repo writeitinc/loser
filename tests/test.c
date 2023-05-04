@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <time.h>
 
-enum { NITERATIONS = 10000000 };
+#ifndef NITERATIONS
+#define NITERATIONS 10000000
+#endif
 
 static void benchmark_text(const char *cstr);
 

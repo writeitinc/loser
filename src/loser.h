@@ -24,7 +24,7 @@ typedef unsigned char LSByte;
  * Will always be null-terminated:
  * - `bytes[len]` can be read from and is set to '\0'
  *
- * A `bytes` value of `NULL` indicates an invalid value.
+ * Check validity using `LS_STRING_VALID()`.
  */
 typedef struct LSString {
 	size_t len;
@@ -38,8 +38,7 @@ typedef struct LSString {
  *
  * Has a maximum length of `LS_SHORT_STRING_MAX_LEN`.
  *
- * A `len` value greater than `LS_SHORT_STRING_MAX_LEN` indicates an invalid
- * value.
+ * Check validity using `LS_SHORT_STRING_VALID()`.
  */
 typedef struct LSShortString {
 	size_t len;
@@ -53,6 +52,9 @@ typedef struct LSShortString {
  *
  * Intended to perform better when storing strings short enough to fit in a
  * `LSShortString`.
+ *
+ * Check validity/type using `LS_SSO_STRING_TYPE()`.
+ * Get bytes using `LS_SSO_STRING_BYTES()`.
  */
 typedef union LSSSOString {
 	size_t len;
@@ -71,7 +73,7 @@ typedef enum LSSSOStringType {
 /*
  * Might not be null-terminated.
  *
- * A `start` value of `NULL` indicates an invalid value.
+ * Check validity using `LS_SSPAN_VALID()`.
  */
 typedef struct LSStringSpan {
 	size_t len;
@@ -82,7 +84,7 @@ typedef struct LSStringSpan {
 /*
  * Might not be null-terminated.
  *
- * A `bytes` value of `NULL` indicates an invalid value.
+ * Check validity using `LS_BBUF_VALID()`.
  */
 typedef struct LSByteBuffer {
 	size_t len;
@@ -90,9 +92,9 @@ typedef struct LSByteBuffer {
 	LSByte *bytes;
 } LSByteBuffer;
 
-// ##################################################
-// ######## Macro-like Convenience Functions ########
-// ##################################################
+// ######################################
+// ######## Macro-like Functions ########
+// ######################################
 
 static inline bool LS_STRING_VALID(LSString string);
 static inline bool LS_SHORT_STRING_VALID(LSShortString short_string);

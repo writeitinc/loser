@@ -6,6 +6,11 @@
 #include <stdint.h>
 #include <string.h>
 
+/*
+ * NOTE: Library guarantees may not hold true for objects created or modified
+ * manually.
+ */
+
 // ###########################
 // ######## Constants ########
 // ###########################
@@ -21,10 +26,11 @@ typedef unsigned char LSByte;
 
 // An immutable array of bytes.
 /*
- * Will always be null-terminated:
- * - `bytes[len]` can be read from and is set to '\0'
- *
  * Check validity using `LS_STRING_VALID()`.
+ *
+ * If valid:
+ * - `bytes` is null-terminated
+ * - `bytes[len]` can be read from and is set to '\0'
  */
 typedef struct LSString {
 	size_t len;
@@ -33,12 +39,13 @@ typedef struct LSString {
 
 // A short immutable array of bytes.
 /*
- * Will always be null-terminated:
+ * Check validity using `LS_SHORT_STRING_VALID()`.
+ *
+ * If valid:
+ * - `bytes` is null-terminated
  * - `bytes[len]` can be read from and is set to '\0'
  *
  * Has a maximum length of `LS_SHORT_STRING_MAX_LEN`.
- *
- * Check validity using `LS_SHORT_STRING_VALID()`.
  */
 typedef struct LSShortString {
 	size_t len;
@@ -47,14 +54,15 @@ typedef struct LSShortString {
 
 // An small string-optimized immutable array of bytes.
 /*
- * Will always be null-terminated:
- * - `bytes[len]` can be read from and is set to '\0'
+ * Check validity/type using `LS_SSO_STRING_TYPE()`.
+ * Get bytes using `LS_SSO_STRING_BYTES()`.
+ *
+ * If valid:
+ * - `LS_SSO_STRING_BYTES()` is null-terminated
+ * - `LS_SSO_STRING_BYTES()[len]` can be read from and is set to '\0'
  *
  * Intended to perform better when storing strings short enough to fit in a
  * `LSShortString`.
- *
- * Check validity/type using `LS_SSO_STRING_TYPE()`.
- * Get bytes using `LS_SSO_STRING_BYTES()`.
  */
 typedef union LSSSOString {
 	size_t len;
@@ -71,9 +79,9 @@ typedef enum LSSSOStringType {
 
 // A non-owning range of bytes.
 /*
- * Might not be null-terminated.
- *
  * Check validity using `LS_SSPAN_VALID()`.
+ *
+ * Might not be null-terminated.
  */
 typedef struct LSStringSpan {
 	size_t len;
@@ -82,9 +90,9 @@ typedef struct LSStringSpan {
 
 // A mutable array of bytes.
 /*
- * Might not be null-terminated.
- *
  * Check validity using `LS_BBUF_VALID()`.
+ *
+ * Might not be null-terminated.
  */
 typedef struct LSByteBuffer {
 	size_t len;

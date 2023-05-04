@@ -110,7 +110,7 @@ static inline const LSByte *LS_SSO_STRING_BYTES(const LSSSOString *sso_string);
 
 /*
  * Constraints:
- * - `bytes` points to a valid array of at least `len` bytes
+ * - `bytes` points to a array of at least `len` bytes
  *        OR is `NULL`
  *
  * On success:
@@ -134,7 +134,7 @@ void ls_string_destroy(LSString *string);
 
 /*
  * Constraints:
- * - `bytes` points to a valid array of at least `len` bytes
+ * - `bytes` points to an array of at least `len` bytes
  *        OR is `NULL`
  *
  * On success:
@@ -151,7 +151,7 @@ static inline LSShortString ls_short_string_create(const LSByte *bytes,
 
 /*
  * Constraints:
- * - `bytes` points to a valid array of at least `len` bytes
+ * - `bytes` points to an array of at least `len` bytes
  *        OR is `NULL`
  *
  * On success:
@@ -175,7 +175,7 @@ static inline void ls_sso_string_destroy(LSSSOString *sso_string);
 
 /*
  * Constraints:
- * - `start` points to a valid array of at least `len` bytes
+ * - `start` points to an array of at least `len` bytes
  *        OR is `NULL`
  *
  * On success:
@@ -218,7 +218,7 @@ static inline LSString ls_string_from_sspan(LSStringSpan sspan);
 
 /*
  * Constraints:
- * - `chars` points to a valid array of at least `len` `char`s
+ * - `chars` points to an array of at least `len` `char`s
  *        OR is `NULL`
  *
  * On success:
@@ -234,7 +234,7 @@ static inline LSString ls_string_from_chars(const char *chars, size_t len);
 
 /*
  * Constraints:
- * - `cstr` points to a valid null-terminated array of `char`s
+ * - `cstr` points to a null-terminated array of `char`s
  *          OR is `NULL`
  *
  * On success:
@@ -263,7 +263,7 @@ static inline LSStringSpan ls_sspan_from_string(LSString string);
 
 /*
  * Constraints:
- * - `chars` points to a valid array of at least `len` `char`s
+ * - `chars` points to an array of at least `len` `char`s
           OR is `NULL`
  *
  * On success:
@@ -280,7 +280,7 @@ static inline LSStringSpan ls_sspan_from_chars(const char *chars, size_t len);
  * Resulting `LSStringSpan` does not include the null-terminator.
  *
  * Constraints:
- * - `cstr` points to a valid null-terminated array of `char`s
+ * - `cstr` points to a null-terminated array of `char`s
  *       OR is `NULL`
  *
  * On success:

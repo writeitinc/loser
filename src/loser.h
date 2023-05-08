@@ -257,6 +257,75 @@ static inline LSString ls_string_from_chars(const char *chars, size_t len);
 static inline LSString ls_string_from_cstr(const char *cstr);
 
 /*
+ * On success:
+ * - returns a valid `LSSSOString`
+ * On failure:
+ * - returns an invalid `LSSSOString`
+ *
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `sso_string` is invalid
+ */
+static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string);
+
+/*
+ * On success:
+ * - returns a valid `LSSSOString`
+ * On failure:
+ * - returns an invalid `LSSSOString`
+ *
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `string` is invalid
+ */
+static inline LSSSOString ls_sso_string_from_string(LSString string);
+
+/*
+ * On success:
+ * - returns a valid `LSSSOString`
+ * On failure:
+ * - returns an invalid `LSSSOString`
+ *
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `sspan` is invalid
+ */
+static inline LSSSOString ls_sso_string_from_sspan(LSStringSpan sspan);
+
+/*
+ * Constraints:
+ * - `chars` points to an array of at least `len` `char`s
+ *        OR is `NULL`
+ *
+ * On success:
+ * - returns a valid `LSSSOString`
+ * On failure:
+ * - returns an invalid `LSSSOString`
+ *
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `chars` is `NULL`
+ */
+static inline LSSSOString ls_sso_string_from_chars(const char *chars,
+		size_t len);
+
+/*
+ * Constraints:
+ * - `cstr` points to a null-terminated array of `char`s
+ *          OR is `NULL`
+ *
+ * On success:
+ * - returns a valid `LSSSOString`
+ * On failure:
+ * - returns an invalid `LSSSOString`
+ *
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `cstr` is invalid
+ */
+static inline LSSSOString ls_sso_string_from_cstr(const char *cstr);
+
+/*
  * Resulting `LSStringSpan` does not include the final null-terminator.
  *
  * On success:
@@ -472,6 +541,53 @@ static inline LSString ls_string_from_cstr(const char *cstr)
 	}
 
 	return ls_string_from_chars(cstr, strlen(cstr));
+}
+
+static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string)
+{
+	LSSSOStringType type = LS_SSO_STRING_TYPE(sso_string);
+
+	if (type == LS_SSO_STRING_SHORT || type == LS_SSO_STRING_INVALID) {
+		return sso_string;
+	}
+
+	LSString string = ls_string_clone(sso_string._long);
+	if (!LS_STRING_VALID(string)) {
+		goto err_exit;
+	}
+
+	return (LSSSOString){ ._long = string };
+
+err_exit:
+	return (LSSSOString){ ._long.len = SIZE_MAX, ._long.bytes = NULL };
+}
+
+static inline LSSSOString ls_sso_string_from_string(LSString string)
+{
+	return ls_sso_string_create(string.bytes, string.len);
+}
+
+static inline LSSSOString ls_sso_string_from_sspan(LSStringSpan sspan)
+{
+	return ls_sso_string_create(sspan.start, sspan.len);
+}
+
+static inline LSSSOString ls_sso_string_from_chars(const char *chars,
+		size_t len)
+{
+	return ls_sso_string_create((const LSByte *)chars, len);
+}
+
+static inline LSSSOString ls_sso_string_from_cstr(const char *cstr)
+{
+	if (cstr == NULL) {
+		return (LSSSOString){
+			._long.len = SIZE_MAX,
+			._long.bytes = NULL
+		};
+	}
+
+	return ls_sso_string_from_chars(cstr, strlen(cstr));
 }
 
 static inline LSStringSpan ls_sspan_from_string(LSString string)

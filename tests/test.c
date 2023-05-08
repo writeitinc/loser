@@ -53,6 +53,7 @@ void benchmark_text(const char *cstr)
 	const LSByte *bytes = (const LSByte *)cstr;
 	LSStringSpan sspan = ls_sspan_create(bytes, len);
 	LSString string = ls_string_create(bytes, len);
+	LSSSOString sso_string = ls_sso_string_create(bytes, len);
 
 	printf("\"%s\"\n", cstr);
 
@@ -103,6 +104,26 @@ void benchmark_text(const char *cstr)
 
 	BENCHMARK("ls_sso_string_create",
 			sso_strings[i] = ls_sso_string_create(bytes, len));
+	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+
+	BENCHMARK("ls_sso_string_clone",
+			sso_strings[i] = ls_sso_string_clone(sso_string));
+	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+
+	BENCHMARK("ls_sso_string_from_string",
+			sso_strings[i] = ls_sso_string_from_string(string));
+	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+
+	BENCHMARK("ls_sso_string_from_sspan",
+			sso_strings[i] = ls_sso_string_from_sspan(sspan));
+	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+
+	BENCHMARK("ls_sso_string_from_chars",
+			sso_strings[i] = ls_sso_string_from_chars(cstr, len));
+	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+
+	BENCHMARK("ls_sso_string_from_cstr",
+			sso_strings[i] = ls_sso_string_from_cstr(cstr));
 
 	BENCHMARK("ls_sso_string_destroy",
 			ls_sso_string_destroy(&sso_strings[i]));
@@ -131,5 +152,6 @@ void benchmark_text(const char *cstr)
 
 	fflush(stdout);
 
+	ls_sso_string_destroy(&sso_string);
 	ls_string_destroy(&string);
 }

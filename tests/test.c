@@ -12,6 +12,7 @@ static void benchmark_text(const char *cstr);
 
 static union {
 	LSString strings[NITERATIONS];
+	LSShortString short_strings[NITERATIONS];
 	LSSSOString sso_strings[NITERATIONS];
 	LSStringSpan sspans[NITERATIONS];
 } arrays;
@@ -53,9 +54,11 @@ void benchmark_text(const char *cstr)
 {
 	size_t len = strlen(cstr);
 	const LSByte *bytes = (const LSByte *)cstr;
-	LSStringSpan sspan = ls_sspan_create(bytes, len);
-	LSString string = ls_string_create(bytes, len);
+
+	LSShortString short_string = ls_short_string_create(bytes, len);
 	LSSSOString sso_string = ls_sso_string_create(bytes, len);
+	LSString string = ls_string_create(bytes, len);
+	LSStringSpan sspan = ls_sspan_create(bytes, len);
 
 	printf("\"%s\"\n", cstr);
 
@@ -78,6 +81,14 @@ void benchmark_text(const char *cstr)
 			arrays.strings[i] = ls_string_clone(string));
 	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
+	BENCHMARK("ls_string_from_short_string",
+			arrays.strings[i] = ls_string_from_short_string(short_string));
+	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
+
+	BENCHMARK("ls_string_from_sso_string",
+			arrays.strings[i] = ls_string_from_sso_string(sso_string));
+	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
+
 	BENCHMARK("ls_string_from_sspan",
 			arrays.strings[i] = ls_string_from_sspan(sspan));
 	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
@@ -90,6 +101,34 @@ void benchmark_text(const char *cstr)
 			arrays.strings[i] = ls_string_from_cstr(cstr));
 	BENCHMARK("ls_string_destroy",
 			ls_string_destroy(&arrays.strings[i]));
+
+	// ### LSSSOString ###
+
+	// warm up memory
+	DONT_BENCHMARK(arrays.short_strings[i] = ls_short_string_create(bytes, len));
+
+	DONT_BENCHMARK(arrays.short_strings[i] = ls_short_string_create(bytes, len));
+	BENCHMARK("LS_SHORT_STRING_VALID",
+			LS_SHORT_STRING_VALID(arrays.short_strings[i]));
+
+	BENCHMARK("ls_short_string_create",
+			arrays.short_strings[i] = ls_short_string_create(bytes, len));
+
+	BENCHMARK("ls_short_string_from_string",
+			arrays.short_strings[i] = ls_short_string_from_string(string));
+
+	BENCHMARK("ls_short_string_from_sso_string",
+			arrays.short_strings[i] = ls_short_string_from_sso_string(sso_string));
+
+	BENCHMARK("ls_short_string_from_sspan",
+			arrays.short_strings[i] = ls_short_string_from_sspan(sspan));
+
+	BENCHMARK("ls_short_string_from_chars",
+			arrays.short_strings[i] = ls_short_string_from_chars(cstr, len));
+
+	BENCHMARK("ls_short_string_from_cstr",
+			arrays.short_strings[i] = ls_short_string_from_cstr(cstr));
+
 
 	// ### LSSSOString ###
 
@@ -108,12 +147,16 @@ void benchmark_text(const char *cstr)
 			arrays.sso_strings[i] = ls_sso_string_create(bytes, len));
 	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
-	BENCHMARK("ls_sso_string_clone",
-			arrays.sso_strings[i] = ls_sso_string_clone(sso_string));
-	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
-
 	BENCHMARK("ls_sso_string_from_string",
 			arrays.sso_strings[i] = ls_sso_string_from_string(string));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
+
+	BENCHMARK("ls_sso_string_from_short_string",
+			arrays.sso_strings[i] = ls_sso_string_from_short_string(short_string));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
+
+	BENCHMARK("ls_sso_string_clone",
+			arrays.sso_strings[i] = ls_sso_string_clone(sso_string));
 	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	BENCHMARK("ls_sso_string_from_sspan",
@@ -144,6 +187,12 @@ void benchmark_text(const char *cstr)
 	BENCHMARK("ls_sspan_from_string",
 			arrays.sspans[i] = ls_sspan_from_string(string));
 
+	BENCHMARK("ls_sspan_from_short_string",
+			arrays.sspans[i] = ls_sspan_from_short_string(&short_string));
+
+	BENCHMARK("ls_sspan_from_sso_string",
+			arrays.sspans[i] = ls_sspan_from_sso_string(&sso_string));
+
 	BENCHMARK("ls_sspan_from_chars",
 			arrays.sspans[i] = ls_sspan_from_chars(cstr, len));
 
@@ -154,6 +203,6 @@ void benchmark_text(const char *cstr)
 
 	fflush(stdout);
 
-	ls_sso_string_destroy(&sso_string);
 	ls_string_destroy(&string);
+	ls_sso_string_destroy(&sso_string);
 }

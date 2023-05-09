@@ -10,9 +10,11 @@
 
 static void benchmark_text(const char *cstr);
 
-static LSString strings[NITERATIONS];
-static LSSSOString sso_strings[NITERATIONS];
-static LSStringSpan sspans[NITERATIONS];
+static union {
+	LSString strings[NITERATIONS];
+	LSSSOString sso_strings[NITERATIONS];
+	LSStringSpan sspans[NITERATIONS];
+} arrays;
 
 #define BENCHMARK(name, expr) \
 	do { \
@@ -60,93 +62,93 @@ void benchmark_text(const char *cstr)
 	// ### LSString ###
 
 	// warm up memory
-	DONT_BENCHMARK(strings[i] = ls_string_create(bytes, len));
-	DONT_BENCHMARK(ls_string_destroy(&strings[i]));
+	DONT_BENCHMARK(arrays.strings[i] = ls_string_create(bytes, len));
+	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
-	DONT_BENCHMARK(strings[i] = ls_string_create(bytes, len));
+	DONT_BENCHMARK(arrays.strings[i] = ls_string_create(bytes, len));
 	BENCHMARK("LS_STRING_VALID",
-			LS_STRING_VALID(strings[i]));
-	DONT_BENCHMARK(ls_string_destroy(&strings[i]));
+			LS_STRING_VALID(arrays.strings[i]));
+	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
 	BENCHMARK("ls_string_create",
-			strings[i] = ls_string_create(bytes, len));
-	DONT_BENCHMARK(ls_string_destroy(&strings[i]));
+			arrays.strings[i] = ls_string_create(bytes, len));
+	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
 	BENCHMARK("ls_string_clone",
-			strings[i] = ls_string_clone(string));
-	DONT_BENCHMARK(ls_string_destroy(&strings[i]));
+			arrays.strings[i] = ls_string_clone(string));
+	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
 	BENCHMARK("ls_string_from_sspan",
-			strings[i] = ls_string_from_sspan(sspan));
-	DONT_BENCHMARK(ls_string_destroy(&strings[i]));
+			arrays.strings[i] = ls_string_from_sspan(sspan));
+	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
 	BENCHMARK("ls_string_from_chars",
-			strings[i] = ls_string_from_chars(cstr, len));
-	DONT_BENCHMARK(ls_string_destroy(&strings[i]));
+			arrays.strings[i] = ls_string_from_chars(cstr, len));
+	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
 	BENCHMARK("ls_string_from_cstr",
-			strings[i] = ls_string_from_cstr(cstr));
+			arrays.strings[i] = ls_string_from_cstr(cstr));
 	BENCHMARK("ls_string_destroy",
-			ls_string_destroy(&strings[i]));
+			ls_string_destroy(&arrays.strings[i]));
 
 	// ### LSSSOString ###
 
 	// warm up memory
-	DONT_BENCHMARK(sso_strings[i] = ls_sso_string_create(bytes, len));
-	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+	DONT_BENCHMARK(arrays.sso_strings[i] = ls_sso_string_create(bytes, len));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
-	DONT_BENCHMARK(sso_strings[i] = ls_sso_string_create(bytes, len));
+	DONT_BENCHMARK(arrays.sso_strings[i] = ls_sso_string_create(bytes, len));
 	BENCHMARK("LS_SSO_STRING_TYPE",
-			LS_SSO_STRING_TYPE(sso_strings[i]));
+			LS_SSO_STRING_TYPE(arrays.sso_strings[i]));
 	BENCHMARK("LS_SSO_STRING_BYTES",
-			LS_SSO_STRING_BYTES(&sso_strings[i]));
-	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+			LS_SSO_STRING_BYTES(&arrays.sso_strings[i]));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	BENCHMARK("ls_sso_string_create",
-			sso_strings[i] = ls_sso_string_create(bytes, len));
-	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+			arrays.sso_strings[i] = ls_sso_string_create(bytes, len));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	BENCHMARK("ls_sso_string_clone",
-			sso_strings[i] = ls_sso_string_clone(sso_string));
-	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+			arrays.sso_strings[i] = ls_sso_string_clone(sso_string));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	BENCHMARK("ls_sso_string_from_string",
-			sso_strings[i] = ls_sso_string_from_string(string));
-	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+			arrays.sso_strings[i] = ls_sso_string_from_string(string));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	BENCHMARK("ls_sso_string_from_sspan",
-			sso_strings[i] = ls_sso_string_from_sspan(sspan));
-	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+			arrays.sso_strings[i] = ls_sso_string_from_sspan(sspan));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	BENCHMARK("ls_sso_string_from_chars",
-			sso_strings[i] = ls_sso_string_from_chars(cstr, len));
-	DONT_BENCHMARK(ls_sso_string_destroy(&sso_strings[i]));
+			arrays.sso_strings[i] = ls_sso_string_from_chars(cstr, len));
+	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	BENCHMARK("ls_sso_string_from_cstr",
-			sso_strings[i] = ls_sso_string_from_cstr(cstr));
+			arrays.sso_strings[i] = ls_sso_string_from_cstr(cstr));
 
 	BENCHMARK("ls_sso_string_destroy",
-			ls_sso_string_destroy(&sso_strings[i]));
+			ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	// ### LSStringSpan
 
 	// warm up memory
-	DONT_BENCHMARK(sspans[i] = ls_sspan_create(bytes, len));
+	DONT_BENCHMARK(arrays.sspans[i] = ls_sspan_create(bytes, len));
 
 	BENCHMARK("LS_SSPAN_VALID",
-			LS_SSPAN_VALID(sspans[i]));
+			LS_SSPAN_VALID(arrays.sspans[i]));
 
 	BENCHMARK("ls_sspan_create",
-			sspans[i] = ls_sspan_create(bytes, len));
+			arrays.sspans[i] = ls_sspan_create(bytes, len));
 
 	BENCHMARK("ls_sspan_from_string",
-			sspans[i] = ls_sspan_from_string(string));
+			arrays.sspans[i] = ls_sspan_from_string(string));
 
 	BENCHMARK("ls_sspan_from_chars",
-			sspans[i] = ls_sspan_from_chars(cstr, len));
+			arrays.sspans[i] = ls_sspan_from_chars(cstr, len));
 
 	BENCHMARK("ls_sspan_from_cstr",
-			sspans[i] = ls_sspan_from_cstr(cstr));
+			arrays.sspans[i] = ls_sspan_from_cstr(cstr));
 
 	putchar('\n');
 

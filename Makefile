@@ -13,6 +13,7 @@ HEADER_DIR = $(INCLUDE_DIR)/$(NAME)
 OBJ_DIR = $(BUILD_DIR)/obj
 STATIC_OBJ_DIR = $(OBJ_DIR)/static
 SHARED_OBJ_DIR = $(OBJ_DIR)/shared
+TESTS_OBJ_DIR = $(OBJ_DIR)/tests
 
 LIB_DIR = $(BUILD_DIR)/lib
 STATIC_LIB = $(LIB_DIR)/lib$(NAME).a
@@ -20,7 +21,7 @@ SHARED_LIB = $(LIB_DIR)/lib$(NAME).so
 LIBRARIES = $(STATIC_LIB) $(SHARED_LIB)
 
 BIN_DIR = $(BUILD_DIR)/bin
-BINARIES = $(BIN_DIR)/test
+BINARIES = $(BIN_DIR)/test $(BIN_DIR)/benchmark-funcs
 
 .PHONY: default
 default: release
@@ -38,10 +39,10 @@ debug: dirs headers $(LIBRARIES) $(BINARIES)
 
 IFLAGS = -I$(INCLUDE_DIR)
 
-$(BIN_DIR)/test: $(OBJ_DIR)/test.o $(LIBRARIES)
+$(BIN_DIR)/%: $(TESTS_OBJ_DIR)/%.o $(LIBRARIES)
 	$(CC) -o $@ $< $(LFLAGS) $(DEBUG) $(DEFINES)
 
-$(OBJ_DIR)/test.o: tests/test.c $(HEADERS)
+$(TESTS_OBJ_DIR)/%.o: tests/%.c $(HEADERS)
 	$(CC) -c -o $@ $< $(CFLAGS) $(IFLAGS) $(DEBUG) $(DEFINES)
 
 # library
@@ -87,7 +88,7 @@ tyrant:
 # dirs
 
 .PHONY: dirs
-dirs: $(STATIC_OBJ_DIR)/ $(SHARED_OBJ_DIR)/ $(LIB_DIR)/ $(BIN_DIR)/ $(INCLUDE_DIR)/
+dirs: $(STATIC_OBJ_DIR)/ $(SHARED_OBJ_DIR)/ $(TESTS_OBJ_DIR)/ $(LIB_DIR)/ $(BIN_DIR)/ $(INCLUDE_DIR)/
 
 %/:
 	mkdir -p $@

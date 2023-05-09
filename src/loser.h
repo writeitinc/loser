@@ -474,7 +474,7 @@ static inline LSStringSpan ls_sspan_from_string(LSString string);
  * - `short_string` is invalid
  */
 static inline LSStringSpan ls_sspan_from_short_string(
-		LSShortString short_string);
+		LSShortString *short_string);
 
 /*
  * Resulting `LSStringSpan` does not include the final null-terminator.
@@ -487,7 +487,7 @@ static inline LSStringSpan ls_sspan_from_short_string(
  * Fails if:
  * - `sso_string` is invalid
  */
-static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString sso_string);
+static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString *sso_string);
 
 /*
  * Constraints:
@@ -808,25 +808,25 @@ static inline LSStringSpan ls_sspan_from_string(LSString string)
 }
 
 static inline LSStringSpan ls_sspan_from_short_string(
-		LSShortString short_string)
+		LSShortString *short_string)
 {
-	if (!LS_SHORT_STRING_VALID(short_string)) {
+	if (!LS_SHORT_STRING_VALID(*short_string)) {
 		return LS_AN_INVALID_SSPAN;
 	}
 
 	return (LSStringSpan){
-		.start = short_string.bytes,
-		.len = short_string.len
+		.start = short_string->bytes,
+		.len = short_string->len
 	};
 }
 
-static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString sso_string)
+static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString *sso_string)
 {
-	const LSByte *bytes = LS_SSO_STRING_BYTES(&sso_string);
+	const LSByte *bytes = LS_SSO_STRING_BYTES(sso_string);
 
 	return (LSStringSpan){
 		.start = bytes,
-		.len = sso_string.len
+		.len = sso_string->len
 	};
 }
 

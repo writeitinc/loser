@@ -493,7 +493,8 @@ static inline const LSByte *LS_SSO_STRING_BYTES(const LSSSOString *sso_string)
 static inline LSShortString ls_short_string_create(const LSByte *bytes,
 		size_t len)
 {
-	if (len > LS_SHORT_STRING_MAX_LEN) {
+	if (len > LS_SHORT_STRING_MAX_LEN
+			|| bytes == NULL) {
 		return (LSShortString){ .len = SIZE_MAX };
 	}
 

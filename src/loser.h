@@ -100,6 +100,25 @@ typedef struct LSByteBuffer {
 	LSByte *bytes;
 } LSByteBuffer;
 
+// ###################################
+// ######## Invalid Constants ########
+// ###################################
+
+/*
+ * NOTE: As their names imply, the following constants are not the only invalid
+ * values for their respective types but *an* invalid value of that type.
+ * These should not be tested against. Instead, use the provided validity-
+ * checking functions (see section [Macro-like Functions] or type definitions).
+ */
+
+static const LSString LS_AN_INVALID_STRING = { .bytes = NULL };
+static const LSSSOString LS_AN_INVALID_SSO_STRING = {
+	._long.len = SIZE_MAX,
+	._long.bytes = NULL
+};
+static const LSShortString LS_AN_INVALID_SHORT_STRING = { .len = SIZE_MAX };
+static const LSStringSpan LS_AN_INVALID_SSPAN = { .start = NULL };
+
 // ######################################
 // ######## Macro-like Functions ########
 // ######################################
@@ -501,7 +520,7 @@ static inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 	return (LSSSOString){ ._long = string };
 
 err_exit:
-	return (LSSSOString){ ._long.len = SIZE_MAX, ._long.bytes = NULL };
+	return LS_AN_INVALID_SSO_STRING;
 }
 
 static inline void ls_sso_string_destroy(LSSSOString *sso_string)
@@ -537,7 +556,7 @@ static inline LSString ls_string_from_chars(const char *chars, size_t len)
 static inline LSString ls_string_from_cstr(const char *cstr)
 {
 	if (cstr == NULL) {
-		return (LSString){ 0 };
+		return LS_AN_INVALID_STRING;
 	}
 
 	return ls_string_from_chars(cstr, strlen(cstr));
@@ -559,7 +578,7 @@ static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string)
 	return (LSSSOString){ ._long = string };
 
 err_exit:
-	return (LSSSOString){ ._long.len = SIZE_MAX, ._long.bytes = NULL };
+	return LS_AN_INVALID_SSO_STRING;
 }
 
 static inline LSSSOString ls_sso_string_from_string(LSString string)
@@ -581,10 +600,7 @@ static inline LSSSOString ls_sso_string_from_chars(const char *chars,
 static inline LSSSOString ls_sso_string_from_cstr(const char *cstr)
 {
 	if (cstr == NULL) {
-		return (LSSSOString){
-			._long.len = SIZE_MAX,
-			._long.bytes = NULL
-		};
+		return LS_AN_INVALID_SSO_STRING;
 	}
 
 	return ls_sso_string_from_chars(cstr, strlen(cstr));
@@ -609,7 +625,7 @@ static inline LSStringSpan ls_sspan_from_chars(const char *chars, size_t len)
 static inline LSStringSpan ls_sspan_from_cstr(const char *cstr)
 {
 	if (cstr == NULL) {
-		return (LSStringSpan){ 0 };
+		return LS_AN_INVALID_SSPAN;
 	}
 
 	return ls_sspan_from_chars(cstr, strlen(cstr));
@@ -640,7 +656,7 @@ static inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 			|| start > sspan.len
 			|| len > sspan.len
 			|| start > sspan.len - len) {
-		return (LSStringSpan){ 0 };
+		return LS_AN_INVALID_SSPAN;
 	}
 
 	return ls_sspan_create(&sspan.start[start], len);

@@ -12,7 +12,7 @@ LSString ls_string_create(const LSByte *bytes, size_t len)
 		goto err_exit;
 	}
 
-	LSByte *bytes_cpy = TYRANT_ALLOC_ARR(bytes, len + 1);
+	LSByte *bytes_cpy = tyrant_alloc(len + 1);
 	if (!bytes_cpy) {
 		goto err_exit;
 	}

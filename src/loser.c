@@ -34,3 +34,29 @@ void ls_string_destroy(LSString *string)
 	LSByte *bytes_mutable = (LSByte *)string->bytes;
 	tyrant_free(bytes_mutable);
 }
+
+LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap)
+{
+	if (cap == 0) {
+		goto err_exit;
+	}
+
+	LSByte *bytes = tyrant_alloc(cap);
+	if (!bytes) {
+		goto err_exit;
+	}
+
+	return (LSByteBuffer){
+		.cap = cap,
+		.len = 0,
+		.bytes = bytes
+	};
+
+err_exit:
+	return LS_AN_INVALID_BBUF;
+}
+
+void ls_bbuf_destroy(LSByteBuffer *bbuf)
+{
+	tyrant_free(bbuf->bytes);
+}

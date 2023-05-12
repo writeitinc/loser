@@ -123,6 +123,7 @@ static const LSSSOString LS_AN_INVALID_SSO_STRING = {
 };
 static const LSShortString LS_AN_INVALID_SHORT_STRING = { .len = SIZE_MAX };
 static const LSStringSpan LS_AN_INVALID_SSPAN = { .start = NULL };
+static const LSByteBuffer LS_AN_INVALID_BBUF = { .bytes = NULL };
 
 // ######################################
 // ######## Macro-like Functions ########
@@ -219,6 +220,27 @@ static inline void ls_sso_string_destroy(LSSSOString *sso_string);
  * - `start` is `NULL`
  */
 static inline LSStringSpan ls_sspan_create(const LSByte *start, size_t len);
+
+/*
+ * Fails if:
+ *  - allocation fails
+ */
+static inline LSByteBuffer ls_bbuf_create(void);
+
+/*
+ * Fails if:
+ *  - allocation fails
+ *  - `cap` is `0`
+ */
+LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap);
+
+/*
+ * Passing an invalid `LSByteBuffer` is safe.
+ *
+ * Constraints:
+ * - `bbuf` was not previously destroyed
+ */
+void ls_bbuf_destroy(LSByteBuffer *bbuf);
 
 // ##########################################
 // ######## Convenience Constructors ########
@@ -709,6 +731,11 @@ static inline LSStringSpan ls_sspan_create(const LSByte *start, size_t len)
 		.start = start,
 		.len = len
 	};
+}
+
+static inline LSByteBuffer ls_bbuf_create(void)
+{
+	return ls_bbuf_create_with_init_cap(16);
 }
 
 static inline LSString ls_string_clone(LSString string)

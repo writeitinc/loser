@@ -627,7 +627,7 @@ static inline LSShortString ls_short_string_create(const LSByte *bytes,
 {
 	if (len > LS_SHORT_STRING_MAX_LEN
 			|| bytes == NULL) {
-		return (LSShortString){ .len = SIZE_MAX };
+		return LS_AN_INVALID_SHORT_STRING;
 	}
 
 	LSShortString short_string = { .len = len };

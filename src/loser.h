@@ -21,6 +21,11 @@ enum { LS_SHORT_STRING_MAX_LEN = 15 };
 // ######## Types ########
 // #######################
 
+typedef enum LSStatus {
+	LS_SUCCESS = 0,
+	LS_FAILURE = -1
+} LSStatus;
+
 // Just call `unsigned char` what it is--a byte.
 typedef unsigned char LSByte;
 

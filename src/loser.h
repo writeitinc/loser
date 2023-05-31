@@ -600,6 +600,47 @@ static inline LSString ls_sspan_substr(LSStringSpan sspan, size_t start,
 static inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 		size_t len);
 
+// #######################################
+// ######## LSByteBuffer Mutation ########
+// #######################################
+
+/*
+ * Fails if: 
+ * - reallocation is attempted and fails
+ */
+LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len);
+static inline LSStatus ls_bbuf_append_string(LSByteBuffer *bbuf,
+		LSString string);
+static inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
+		LSShortString short_string);
+static inline LSStatus ls_bbuf_append_sso_string(LSByteBuffer *bbuf,
+		LSSSOString sso_string);
+static inline LSStatus ls_bbuf_append_sspan(LSByteBuffer *bbuf,
+		LSStringSpan sspan);
+
+/*
+ * Fails if: 
+ * - `idx` is greater than `bbuf->len`
+ * - reallocation is attempted and fails
+ */
+LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
+		size_t len);
+static inline LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
+		LSString string);
+static inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf,
+		size_t idx, LSShortString short_string);
+static inline LSStatus ls_bbuf_insert_sso_string(LSByteBuffer *bbuf, size_t idx,
+		LSSSOString sso_string);
+static inline LSStatus ls_bbuf_insert_sspan(LSByteBuffer *bbuf, size_t idx,
+		LSStringSpan sspan);
+
+/*
+ * Fails if: 
+ * - `new_cap` is not greater than `bbuf->cap`
+ * - reallocation fails
+ */
+LSStatus ls_bbuf_expand(LSByteBuffer *bbuf, size_t new_cap);
+
 // ####################################
 // ######## Inline Definitions ########
 // ####################################
@@ -908,6 +949,58 @@ static inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 	}
 
 	return ls_sspan_create(&sspan.start[start], len);
+}
+
+static inline LSStatus ls_bbuf_append_string(LSByteBuffer *bbuf,
+		LSString string)
+{
+	return ls_bbuf_append(bbuf, string.bytes, string.len);
+}
+
+static inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
+		LSShortString short_string)
+{
+	return ls_bbuf_append(bbuf, short_string.bytes, short_string.len);
+}
+
+static inline LSStatus ls_bbuf_append_sso_string(LSByteBuffer *bbuf,
+		LSSSOString sso_string)
+{
+	const LSByte *bytes = LS_SSO_STRING_BYTES(&sso_string);
+
+	return ls_bbuf_append(bbuf, bytes, sso_string.len);
+}
+
+static inline LSStatus ls_bbuf_append_sspan(LSByteBuffer *bbuf,
+		LSStringSpan sspan)
+{
+	return ls_bbuf_append(bbuf, sspan.start, sspan.len);
+}
+
+static inline LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
+		LSString string)
+{
+	return ls_bbuf_insert(bbuf, idx, string.bytes, string.len);
+}
+
+static inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf,
+		size_t idx, LSShortString short_string)
+{
+	return ls_bbuf_insert(bbuf, idx, short_string.bytes, short_string.len);
+}
+
+static inline LSStatus ls_bbuf_insert_sso_string(LSByteBuffer *bbuf, size_t idx,
+		LSSSOString sso_string)
+{
+	const LSByte *bytes = LS_SSO_STRING_BYTES(&sso_string);
+
+	return ls_bbuf_insert(bbuf, idx, bytes, sso_string.len);
+}
+
+static inline LSStatus ls_bbuf_insert_sspan(LSByteBuffer *bbuf, size_t idx,
+		LSStringSpan sspan)
+{
+	return ls_bbuf_insert(bbuf, idx, sspan.start, sspan.len);
 }
 
 #endif // loser_h

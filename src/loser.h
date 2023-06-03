@@ -146,11 +146,6 @@ static inline const LSByte *LS_SSO_STRING_BYTES(const LSSSOString *sso_string);
  * - `bytes` points to a array of at least `len` bytes
  *        OR is `NULL`
  *
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - allocation fails
  * - `bytes` is `NULL`
@@ -170,11 +165,6 @@ void ls_string_destroy(LSString *string);
  * - `bytes` points to an array of at least `len` bytes
  *        OR is `NULL`
  *
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
  * Fails if:
  * - `len` is greater than `LS_SHORT_STRING_MAX_LEN`
  * - `bytes` is `NULL`
@@ -186,11 +176,6 @@ static inline LSShortString ls_short_string_create(const LSByte *bytes,
  * Constraints:
  * - `bytes` points to an array of at least `len` bytes
  *        OR is `NULL`
- *
- * On success:
- * - returns a valid `LSSSOString`
- * On failure:
- * - returns an invalid `LSSSOString`
  *
  * Fails if:
  * - allocation is attempted and fails
@@ -210,11 +195,6 @@ static inline void ls_sso_string_destroy(LSSSOString *sso_string);
  * Constraints:
  * - `start` points to an array of at least `len` bytes
  *        OR is `NULL`
- *
- * On success:
- * - returns a valid `LSStringSpan`
- * On failure:
- * - returns an invalid `LSStringSpan`
  *
  * Fails if:
  * - `start` is `NULL`
@@ -247,11 +227,6 @@ void ls_bbuf_destroy(LSByteBuffer *bbuf);
 // ##########################################
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - allocation fails
  * - `string` is invalid
@@ -259,11 +234,6 @@ void ls_bbuf_destroy(LSByteBuffer *bbuf);
 static inline LSString ls_string_clone(LSString string);
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - allocation fails
  * - `short_string` is invalid
@@ -271,11 +241,6 @@ static inline LSString ls_string_clone(LSString string);
 static inline LSString ls_string_from_short_string(LSShortString short_string);
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - allocation fails
  * - `sso_string` is invalid
@@ -283,11 +248,6 @@ static inline LSString ls_string_from_short_string(LSShortString short_string);
 static inline LSString ls_string_from_sso_string(LSSSOString sso_string);
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - allocation fails
  * - `sspan` is invalid
@@ -295,11 +255,6 @@ static inline LSString ls_string_from_sso_string(LSSSOString sso_string);
 static inline LSString ls_string_from_sspan(LSStringSpan sspan);
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - allocation fails
  * - `bbuf` is invalid
@@ -310,11 +265,6 @@ static inline LSString ls_string_from_bbuf(LSByteBuffer bbuf);
  * Constraints:
  * - `chars` points to an array of at least `len` `char`s
  *        OR is `NULL`
- *
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
  *
  * Fails if:
  * - allocation fails
@@ -327,11 +277,6 @@ static inline LSString ls_string_from_chars(const char *chars, size_t len);
  * - `cstr` points to a null-terminated array of `char`s
  *       OR is `NULL`
  *
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - allocation fails
  * - `cstr` is `NULL`
@@ -339,11 +284,6 @@ static inline LSString ls_string_from_chars(const char *chars, size_t len);
 static inline LSString ls_string_from_cstr(const char *cstr);
 
 /*
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
  * Fails if:
  * - `string.len` is greater than `LS_SHORT_STRING_MAX_LEN`
  * - `string` is invalid
@@ -351,11 +291,6 @@ static inline LSString ls_string_from_cstr(const char *cstr);
 static inline LSShortString ls_short_string_from_string(LSString string);
 
 /*
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
  * Fails if:
  * - `LS_SSO_STRING_TYPE(sso_string)` is not LS_SSO_STRING_SHORT
  */
@@ -363,11 +298,6 @@ static inline LSShortString ls_short_string_from_sso_string(
 		LSSSOString sso_string);
 
 /*
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
  * Fails if:
  * - `sspan.len` is greater than `LS_SHORT_STRING_MAX_LEN`
  * - `sspan` is invalid
@@ -375,11 +305,6 @@ static inline LSShortString ls_short_string_from_sso_string(
 static inline LSShortString ls_short_string_from_sspan(LSStringSpan sspan);
 
 /*
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
  * Fails if:
  * - `bbuf.len` is greater than `LS_SHORT_STRING_MAX_LEN`
  * - `bbuf` is invalid
@@ -390,11 +315,6 @@ static inline LSShortString ls_short_string_from_bbuf(LSByteBuffer bbuf);
  * Constraints:
  * - `chars` points to an array of at least `len` chars
  *        OR is `NULL`
- *
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
  *
  * Fails if:
  * - `len` is greater than `LS_SHORT_STRING_MAX_LEN`
@@ -408,11 +328,6 @@ static inline LSShortString ls_short_string_from_chars(const char *chars,
  * - `cstr` points to a null-terminated array of `char`s
  *       OR is `NULL`
  *
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
  * Fails if:
  * - length of `cstr` is greater than `LS_SHORT_STRING_MAX_LEN`
  * - `cstr` is `NULL`
@@ -420,11 +335,6 @@ static inline LSShortString ls_short_string_from_chars(const char *chars,
 static inline LSShortString ls_short_string_from_cstr(const char *cstr);
 
 /*
- * On success:
- * - returns a valid `LSSSOString`
- * On failure:
- * - returns an invalid `LSSSOString`
- *
  * Fails if:
  * - allocation is attempted and fails
  * - `sso_string` is invalid
@@ -432,11 +342,6 @@ static inline LSShortString ls_short_string_from_cstr(const char *cstr);
 static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string);
 
 /*
- * On success:
- * - returns a valid `LSSSOString`
- * On failure:
- * - returns an invalid `LSSSOString`
- *
  * Fails if:
  * - allocation is attempted and fails
  * - `string` is invalid
@@ -444,11 +349,6 @@ static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string);
 static inline LSSSOString ls_sso_string_from_string(LSString string);
 
 /*
- * On success:
- * - returns a valid `LSSSOString`
- * On failure:
- * - returns an invalid `LSSSOString`
- *
  * Fails if:
  * - `short_string` is invalid
  */
@@ -456,11 +356,6 @@ static inline LSSSOString ls_sso_string_from_short_string(
 		LSShortString short_string);
 
 /*
- * On success:
- * - returns a valid `LSSSOString`
- * On failure:
- * - returns an invalid `LSSSOString`
- *
  * Fails if:
  * - allocation is attempted and fails
  * - `sspan` is invalid
@@ -468,11 +363,6 @@ static inline LSSSOString ls_sso_string_from_short_string(
 static inline LSSSOString ls_sso_string_from_sspan(LSStringSpan sspan);
 
 /*
- * On success:
- * - returns a valid `LSSSOString`
- * On failure:
- * - returns an invalid `LSSSOString`
- *
  * Fails if:
  * - allocation is attempted and fails
  * - `bbuf` is invalid
@@ -483,11 +373,6 @@ static inline LSSSOString ls_sso_string_from_bbuf(LSByteBuffer bbuf);
  * Constraints:
  * - `chars` points to an array of at least `len` `char`s
  *        OR is `NULL`
- *
- * On success:
- * - returns a valid `LSSSOString`
- * On failure:
- * - returns an invalid `LSSSOString`
  *
  * Fails if:
  * - allocation is attempted and fails
@@ -501,11 +386,6 @@ static inline LSSSOString ls_sso_string_from_chars(const char *chars,
  * - `cstr` points to a null-terminated array of `char`s
  *       OR is `NULL`
  *
- * On success:
- * - returns a valid `LSSSOString`
- * On failure:
- * - returns an invalid `LSSSOString`
- *
  * Fails if:
  * - allocation is attempted and fails
  * - `cstr` is invalid
@@ -515,11 +395,6 @@ static inline LSSSOString ls_sso_string_from_cstr(const char *cstr);
 /*
  * Resulting `LSStringSpan` does not include the final null-terminator.
  *
- * On success:
- * - returns a valid `LSStringSpan`
- * On failure:
- * - returns an invalid `LSStringSpan`
- *
  * Fails if:
  * - `string` is invalid
  */
@@ -527,11 +402,6 @@ static inline LSStringSpan ls_sspan_from_string(LSString string);
 
 /*
  * Resulting `LSStringSpan` does not include the final null-terminator.
- *
- * On success:
- * - returns a valid `LSStringSpan`
- * On failure:
- * - returns an invalid `LSStringSpan`
  *
  * Fails if:
  * - `short_string` is invalid
@@ -542,22 +412,12 @@ static inline LSStringSpan ls_sspan_from_short_string(
 /*
  * Resulting `LSStringSpan` does not include the final null-terminator.
  *
- * On success:
- * - returns a valid `LSStringSpan`
- * On failure:
- * - returns an invalid `LSStringSpan`
- *
  * Fails if:
  * - `sso_string` is invalid
  */
 static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString *sso_string);
 
 /*
- * On success:
- * - returns a valid `LSStringSpan`
- * On failure:
- * - returns an invalid `LSStringSpan`
- *
  * Fails if:
  * - `bbuf` is invalid
  */
@@ -566,12 +426,7 @@ static inline LSStringSpan ls_sspan_from_bbuf(LSByteBuffer bbuf);
 /*
  * Constraints:
  * - `chars` points to an array of at least `len` `char`s
-          OR is `NULL`
- *
- * On success:
- * - returns a valid `LSStringSpan`
- * On failure:
- * - returns an invalid `LSStringSpan`
+ *        OR is `NULL`
  *
  * Fails if:
  * - `chars` is `NULL`
@@ -585,11 +440,6 @@ static inline LSStringSpan ls_sspan_from_chars(const char *chars, size_t len);
  * - `cstr` points to a null-terminated array of `char`s
  *       OR is `NULL`
  *
- * On success:
- * - returns a valid `LSStringSpan`
- * On failure:
- * - returns an invalid `LSStringSpan`
- *
  * Fails if:
  * - `chars` is `NULL`
  */
@@ -600,11 +450,6 @@ static inline LSStringSpan ls_sspan_from_cstr(const char *cstr);
 // ################################################
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - `string` is invalid
  */
@@ -612,11 +457,6 @@ static inline LSString ls_string_substr(LSString string, size_t start,
 		size_t len);
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - `string` is invalid
  */
@@ -624,11 +464,6 @@ static inline LSStringSpan ls_string_subspan(LSString string, size_t start,
 		size_t len);
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - `sspan` is invalid
  */
@@ -636,11 +471,6 @@ static inline LSString ls_sspan_substr(LSStringSpan sspan, size_t start,
 		size_t len);
 
 /*
- * On success:
- * - returns a valid `LSString`
- * On failure:
- * - returns an invalid `LSString`
- *
  * Fails if:
  * - `sspan` is invalid
  */

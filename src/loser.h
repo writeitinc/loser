@@ -177,75 +177,6 @@ static inline LSShortString ls_short_string_create(const LSByte *bytes,
 		size_t len);
 
 /*
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
- * Fails if:
- * - `string.len` is greater than `LS_SHORT_STRING_MAX_LEN`
- * - `string` is invalid
- */
-static inline LSShortString ls_short_string_from_string(LSString string);
-
-/*
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
- * Fails if:
- * - `LS_SSO_STRING_TYPE(sso_string)` is not LS_SSO_STRING_SHORT
- */
-static inline LSShortString ls_short_string_from_sso_string(
-		LSSSOString sso_string);
-
-/*
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
- * Fails if:
- * - `sspan.len` is greater than `LS_SHORT_STRING_MAX_LEN`
- * - `sspan` is invalid
- */
-static inline LSShortString ls_short_string_from_sspan(LSStringSpan sspan);
-
-/*
- * Constraints:
- * - `chars` points to an array of at least `len` chars
- *        OR is `NULL`
- *
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
- * Fails if:
- * - `len` is greater than `LS_SHORT_STRING_MAX_LEN`
- * - `chars` is `NULL`
- */
-static inline LSShortString ls_short_string_from_chars(const char *chars,
-		size_t len);
-
-/*
- * Constraints:
- * - `cstr` points to a null-terminated array of `char`s
- *       OR is `NULL`
- *
- * On success:
- * - returns a valid `LSShortString`
- * On failure:
- * - returns an invalid `LSShortString`
- *
- * Fails if:
- * - length of `cstr` is greater than `LS_SHORT_STRING_MAX_LEN`
- * - `cstr` is `NULL`
- */
-static inline LSShortString ls_short_string_from_cstr(const char *cstr);
-
-/*
  * Constraints:
  * - `bytes` points to an array of at least `len` bytes
  *        OR is `NULL`
@@ -367,6 +298,75 @@ static inline LSString ls_string_from_chars(const char *chars, size_t len);
  * - `cstr` is `NULL`
  */
 static inline LSString ls_string_from_cstr(const char *cstr);
+
+/*
+ * On success:
+ * - returns a valid `LSShortString`
+ * On failure:
+ * - returns an invalid `LSShortString`
+ *
+ * Fails if:
+ * - `string.len` is greater than `LS_SHORT_STRING_MAX_LEN`
+ * - `string` is invalid
+ */
+static inline LSShortString ls_short_string_from_string(LSString string);
+
+/*
+ * On success:
+ * - returns a valid `LSShortString`
+ * On failure:
+ * - returns an invalid `LSShortString`
+ *
+ * Fails if:
+ * - `LS_SSO_STRING_TYPE(sso_string)` is not LS_SSO_STRING_SHORT
+ */
+static inline LSShortString ls_short_string_from_sso_string(
+		LSSSOString sso_string);
+
+/*
+ * On success:
+ * - returns a valid `LSShortString`
+ * On failure:
+ * - returns an invalid `LSShortString`
+ *
+ * Fails if:
+ * - `sspan.len` is greater than `LS_SHORT_STRING_MAX_LEN`
+ * - `sspan` is invalid
+ */
+static inline LSShortString ls_short_string_from_sspan(LSStringSpan sspan);
+
+/*
+ * Constraints:
+ * - `chars` points to an array of at least `len` chars
+ *        OR is `NULL`
+ *
+ * On success:
+ * - returns a valid `LSShortString`
+ * On failure:
+ * - returns an invalid `LSShortString`
+ *
+ * Fails if:
+ * - `len` is greater than `LS_SHORT_STRING_MAX_LEN`
+ * - `chars` is `NULL`
+ */
+static inline LSShortString ls_short_string_from_chars(const char *chars,
+		size_t len);
+
+/*
+ * Constraints:
+ * - `cstr` points to a null-terminated array of `char`s
+ *       OR is `NULL`
+ *
+ * On success:
+ * - returns a valid `LSShortString`
+ * On failure:
+ * - returns an invalid `LSShortString`
+ *
+ * Fails if:
+ * - length of `cstr` is greater than `LS_SHORT_STRING_MAX_LEN`
+ * - `cstr` is `NULL`
+ */
+static inline LSShortString ls_short_string_from_cstr(const char *cstr);
 
 /*
  * On success:

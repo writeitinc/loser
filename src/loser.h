@@ -295,6 +295,18 @@ static inline LSString ls_string_from_sso_string(LSSSOString sso_string);
 static inline LSString ls_string_from_sspan(LSStringSpan sspan);
 
 /*
+ * On success:
+ * - returns a valid `LSString`
+ * On failure:
+ * - returns an invalid `LSString`
+ *
+ * Fails if:
+ * - allocation fails
+ * - `bbuf` is invalid
+ */
+static inline LSString ls_string_from_bbuf(LSByteBuffer bbuf);
+
+/*
  * Constraints:
  * - `chars` points to an array of at least `len` `char`s
  *        OR is `NULL`
@@ -361,6 +373,18 @@ static inline LSShortString ls_short_string_from_sso_string(
  * - `sspan` is invalid
  */
 static inline LSShortString ls_short_string_from_sspan(LSStringSpan sspan);
+
+/*
+ * On success:
+ * - returns a valid `LSShortString`
+ * On failure:
+ * - returns an invalid `LSShortString`
+ *
+ * Fails if:
+ * - `bbuf.len` is greater than `LS_SHORT_STRING_MAX_LEN`
+ * - `bbuf` is invalid
+ */
+static inline LSShortString ls_short_string_from_bbuf(LSByteBuffer bbuf);
 
 /*
  * Constraints:
@@ -444,6 +468,18 @@ static inline LSSSOString ls_sso_string_from_short_string(
 static inline LSSSOString ls_sso_string_from_sspan(LSStringSpan sspan);
 
 /*
+ * On success:
+ * - returns a valid `LSSSOString`
+ * On failure:
+ * - returns an invalid `LSSSOString`
+ *
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `bbuf` is invalid
+ */
+static inline LSSSOString ls_sso_string_from_bbuf(LSByteBuffer bbuf);
+
+/*
  * Constraints:
  * - `chars` points to an array of at least `len` `char`s
  *        OR is `NULL`
@@ -515,6 +551,17 @@ static inline LSStringSpan ls_sspan_from_short_string(
  * - `sso_string` is invalid
  */
 static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString *sso_string);
+
+/*
+ * On success:
+ * - returns a valid `LSStringSpan`
+ * On failure:
+ * - returns an invalid `LSStringSpan`
+ *
+ * Fails if:
+ * - `bbuf` is invalid
+ */
+static inline LSStringSpan ls_sspan_from_bbuf(LSByteBuffer bbuf);
 
 /*
  * Constraints:
@@ -725,6 +772,11 @@ static inline LSShortString ls_short_string_from_sspan(LSStringSpan sspan)
 	return ls_short_string_create(sspan.start, sspan.len);
 }
 
+static inline LSShortString ls_short_string_from_bbuf(LSByteBuffer bbuf)
+{
+	return ls_short_string_create(bbuf.bytes, bbuf.len);
+}
+
 static inline LSShortString ls_short_string_from_chars(const char *chars,
 		size_t len)
 {
@@ -804,6 +856,11 @@ static inline LSString ls_string_from_sspan(LSStringSpan sspan)
 	return ls_string_create(sspan.start, sspan.len);
 }
 
+static inline LSString ls_string_from_bbuf(LSByteBuffer bbuf)
+{
+	return ls_string_create(bbuf.bytes, bbuf.len);
+}
+
 static inline LSString ls_string_from_chars(const char *chars, size_t len)
 {
 	return ls_string_create((const LSByte *)chars, len);
@@ -857,6 +914,11 @@ static inline LSSSOString ls_sso_string_from_sspan(LSStringSpan sspan)
 	return ls_sso_string_create(sspan.start, sspan.len);
 }
 
+static inline LSSSOString ls_sso_string_from_bbuf(LSByteBuffer bbuf)
+{
+	return ls_sso_string_create(bbuf.bytes, bbuf.len);
+}
+
 static inline LSSSOString ls_sso_string_from_chars(const char *chars,
 		size_t len)
 {
@@ -901,6 +963,11 @@ static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString *sso_string)
 		.start = bytes,
 		.len = sso_string->len
 	};
+}
+
+static inline LSStringSpan ls_sspan_from_bbuf(LSByteBuffer bbuf)
+{
+	return ls_sspan_create(bbuf.bytes, bbuf.len);
 }
 
 static inline LSStringSpan ls_sspan_from_chars(const char *chars, size_t len)

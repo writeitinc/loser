@@ -28,7 +28,7 @@ LSString ls_string_create(const LSByte *bytes, size_t len)
 	};
 
 err_exit:
-	return (LSString){ 0 };
+	return LS_AN_INVALID_STRING;
 }
 
 void ls_string_destroy(LSString *string)

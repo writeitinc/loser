@@ -582,46 +582,6 @@ static inline LSShortString ls_short_string_create(const LSByte *bytes,
 	return short_string;
 }
 
-static inline LSShortString ls_short_string_from_string(LSString string)
-{
-	return ls_short_string_create(string.bytes, string.len);
-}
-
-static inline LSShortString ls_short_string_from_sso_string(
-		LSSSOString sso_string)
-{
-	if (LS_SSO_STRING_TYPE(sso_string) != LS_SSO_STRING_SHORT) {
-		return LS_AN_INVALID_SHORT_STRING;
-	}
-
-	return sso_string._short;
-}
-
-static inline LSShortString ls_short_string_from_sspan(LSStringSpan sspan)
-{
-	return ls_short_string_create(sspan.start, sspan.len);
-}
-
-static inline LSShortString ls_short_string_from_bbuf(LSByteBuffer bbuf)
-{
-	return ls_short_string_create(bbuf.bytes, bbuf.len);
-}
-
-static inline LSShortString ls_short_string_from_chars(const char *chars,
-		size_t len)
-{
-	return ls_short_string_create((const LSByte *)chars, len);
-}
-
-static inline LSShortString ls_short_string_from_cstr(const char *cstr)
-{
-	if (cstr == NULL) {
-		return LS_AN_INVALID_SHORT_STRING;
-	}
-
-	return ls_short_string_from_chars(cstr, strlen(cstr));
-}
-
 static inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 {
 	if (len <= LS_SHORT_STRING_MAX_LEN) {
@@ -703,6 +663,46 @@ static inline LSString ls_string_from_cstr(const char *cstr)
 	}
 
 	return ls_string_from_chars(cstr, strlen(cstr));
+}
+
+static inline LSShortString ls_short_string_from_string(LSString string)
+{
+	return ls_short_string_create(string.bytes, string.len);
+}
+
+static inline LSShortString ls_short_string_from_sso_string(
+		LSSSOString sso_string)
+{
+	if (LS_SSO_STRING_TYPE(sso_string) != LS_SSO_STRING_SHORT) {
+		return LS_AN_INVALID_SHORT_STRING;
+	}
+
+	return sso_string._short;
+}
+
+static inline LSShortString ls_short_string_from_sspan(LSStringSpan sspan)
+{
+	return ls_short_string_create(sspan.start, sspan.len);
+}
+
+static inline LSShortString ls_short_string_from_bbuf(LSByteBuffer bbuf)
+{
+	return ls_short_string_create(bbuf.bytes, bbuf.len);
+}
+
+static inline LSShortString ls_short_string_from_chars(const char *chars,
+		size_t len)
+{
+	return ls_short_string_create((const LSByte *)chars, len);
+}
+
+static inline LSShortString ls_short_string_from_cstr(const char *cstr)
+{
+	if (cstr == NULL) {
+		return LS_AN_INVALID_SHORT_STRING;
+	}
+
+	return ls_short_string_from_chars(cstr, strlen(cstr));
 }
 
 static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string)

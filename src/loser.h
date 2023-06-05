@@ -445,6 +445,13 @@ static inline LSStringSpan ls_sspan_from_chars(const char *chars, size_t len);
  */
 static inline LSStringSpan ls_sspan_from_cstr(const char *cstr);
 
+/*
+ * Fails if:
+ * - `bbuf` is invalid
+ * - allocation fails
+ */
+static inline LSByteBuffer ls_bbuf_clone(LSByteBuffer bbuf);
+
 // ################################################
 // ######## Substring/Subspan Constructors ########
 // ################################################
@@ -815,6 +822,23 @@ static inline LSStringSpan ls_sspan_from_cstr(const char *cstr)
 	}
 
 	return ls_sspan_from_chars(cstr, strlen(cstr));
+}
+
+static inline LSByteBuffer ls_bbuf_clone(LSByteBuffer bbuf)
+{
+	if (!ls_bbuf_is_valid(bbuf)) {
+		return LS_AN_INVALID_BBUF;
+	}
+
+	LSByteBuffer copy = ls_bbuf_create_with_init_cap(bbuf.cap);
+	if (!LS_BBUF_VALID(copy)) {
+		return LS_AN_INVALID_BBUF;
+	}
+
+	LSStringSpan contents = ls_sspan_from_bbuf(bbuf);
+	ls_bbuf_append_sspan(&copy, contents);
+
+	return copy;
 }
 
 static inline LSString ls_string_substr(LSString string, size_t start,

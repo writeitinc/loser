@@ -599,13 +599,10 @@ static inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 
 	LSString string = ls_string_create(bytes, len);
 	if (!LS_STRING_VALID(string)) {
-		goto err_exit;
+		return LS_AN_INVALID_SSO_STRING;
 	}
 
 	return (LSSSOString){ ._long = string };
-
-err_exit:
-	return LS_AN_INVALID_SSO_STRING;
 }
 
 static inline void ls_sso_string_destroy(LSSSOString *sso_string)
@@ -722,13 +719,10 @@ static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string)
 
 	LSString string = ls_string_clone(sso_string._long);
 	if (!LS_STRING_VALID(string)) {
-		goto err_exit;
+		return LS_AN_INVALID_SSO_STRING;
 	}
 
 	return (LSSSOString){ ._long = string };
-
-err_exit:
-	return LS_AN_INVALID_SSO_STRING;
 }
 
 static inline LSSSOString ls_sso_string_from_string(LSString string)

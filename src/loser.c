@@ -11,12 +11,12 @@ static size_t geom_grow_size(size_t cap);
 LSString ls_string_create(const LSByte *bytes, size_t len)
 {
 	if (!bytes) {
-		goto err_exit;
+		return LS_AN_INVALID_STRING;
 	}
 
 	LSByte *bytes_cpy = tyrant_alloc(len + 1);
 	if (!bytes_cpy) {
-		goto err_exit;
+		return LS_AN_INVALID_STRING;
 	}
 
 	memcpy(bytes_cpy, bytes, len);
@@ -26,9 +26,6 @@ LSString ls_string_create(const LSByte *bytes, size_t len)
 		.bytes = bytes_cpy,
 		.len = len
 	};
-
-err_exit:
-	return LS_AN_INVALID_STRING;
 }
 
 void ls_string_destroy(LSString *string)
@@ -40,12 +37,12 @@ void ls_string_destroy(LSString *string)
 LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap)
 {
 	if (cap == 0) {
-		goto err_exit;
+		return LS_AN_INVALID_BBUF;
 	}
 
 	LSByte *bytes = tyrant_alloc(cap);
 	if (!bytes) {
-		goto err_exit;
+		return LS_AN_INVALID_BBUF;
 	}
 
 	return (LSByteBuffer){
@@ -53,9 +50,6 @@ LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap)
 		.len = 0,
 		.bytes = bytes
 	};
-
-err_exit:
-	return LS_AN_INVALID_BBUF;
 }
 
 void ls_bbuf_destroy(LSByteBuffer *bbuf)

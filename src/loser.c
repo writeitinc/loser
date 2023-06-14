@@ -57,6 +57,40 @@ void ls_bbuf_destroy(LSByteBuffer *bbuf)
 	tyrant_free(bbuf->bytes);
 }
 
+LSShortString ls_short_string_from_sso_string(LSSSOString sso_string)
+{
+	if (LS_SSO_STRING_TYPE(sso_string) != LS_SSO_STRING_SHORT) {
+		return LS_AN_INVALID_SHORT_STRING;
+	}
+
+	return sso_string._short;
+}
+
+LSSSOString ls_sso_string_clone(LSSSOString sso_string)
+{
+	LSSSOStringType type = LS_SSO_STRING_TYPE(sso_string);
+
+	if (type == LS_SSO_STRING_SHORT || type == LS_SSO_STRING_INVALID) {
+		return sso_string;
+	}
+
+	LSString string = ls_string_clone(sso_string._long);
+	if (!LS_STRING_VALID(string)) {
+		return LS_AN_INVALID_SSO_STRING;
+	}
+
+	return (LSSSOString){ ._long = string };
+}
+
+LSSSOString ls_sso_string_from_short_string(LSShortString short_string)
+{
+	if (!LS_SHORT_STRING_VALID(short_string)) {
+		return LS_AN_INVALID_SSO_STRING;
+	}
+
+	return (LSSSOString){ ._short = short_string };
+}
+
 LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 {
 	size_t new_len = bbuf->len + len;

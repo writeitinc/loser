@@ -294,8 +294,7 @@ static inline LSShortString ls_short_string_from_string(LSString string);
  * Fails if:
  * - `LS_SSO_STRING_TYPE(sso_string)` is not LS_SSO_STRING_SHORT
  */
-static inline LSShortString ls_short_string_from_sso_string(
-		LSSSOString sso_string);
+LSShortString ls_short_string_from_sso_string(LSSSOString sso_string);
 
 /*
  * Fails if:
@@ -339,7 +338,7 @@ static inline LSShortString ls_short_string_from_cstr(const char *cstr);
  * - allocation is attempted and fails
  * - `sso_string` is invalid
  */
-static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string);
+LSSSOString ls_sso_string_clone(LSSSOString sso_string);
 
 /*
  * Fails if:
@@ -352,8 +351,7 @@ static inline LSSSOString ls_sso_string_from_string(LSString string);
  * Fails if:
  * - `short_string` is invalid
  */
-static inline LSSSOString ls_sso_string_from_short_string(
-		LSShortString short_string);
+LSSSOString ls_sso_string_from_short_string(LSShortString short_string);
 
 /*
  * Fails if:
@@ -577,14 +575,16 @@ static inline const LSByte *LS_SSO_STRING_BYTES(const LSSSOString *sso_string)
 static inline LSShortString ls_short_string_create(const LSByte *bytes,
 		size_t len)
 {
+	// null terminator comes free
+	LSShortString short_string = LS_AN_INVALID_SHORT_STRING;
+
 	if (len > LS_SHORT_STRING_MAX_LEN
 			|| bytes == NULL) {
-		return LS_AN_INVALID_SHORT_STRING;
+		return short_string;
 	}
 
-	LSShortString short_string = { .len = len };
+	short_string.len = len;
 	memcpy(short_string.bytes, bytes, len);
-	short_string.bytes[len] = '\0';
 
 	return short_string;
 }
@@ -674,16 +674,6 @@ static inline LSShortString ls_short_string_from_string(LSString string)
 	return ls_short_string_create(string.bytes, string.len);
 }
 
-static inline LSShortString ls_short_string_from_sso_string(
-		LSSSOString sso_string)
-{
-	if (LS_SSO_STRING_TYPE(sso_string) != LS_SSO_STRING_SHORT) {
-		return LS_AN_INVALID_SHORT_STRING;
-	}
-
-	return sso_string._short;
-}
-
 static inline LSShortString ls_short_string_from_sspan(LSStringSpan sspan)
 {
 	return ls_short_string_create(sspan.start, sspan.len);
@@ -709,35 +699,9 @@ static inline LSShortString ls_short_string_from_cstr(const char *cstr)
 	return ls_short_string_from_chars(cstr, strlen(cstr));
 }
 
-static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string)
-{
-	LSSSOStringType type = LS_SSO_STRING_TYPE(sso_string);
-
-	if (type == LS_SSO_STRING_SHORT || type == LS_SSO_STRING_INVALID) {
-		return sso_string;
-	}
-
-	LSString string = ls_string_clone(sso_string._long);
-	if (!LS_STRING_VALID(string)) {
-		return LS_AN_INVALID_SSO_STRING;
-	}
-
-	return (LSSSOString){ ._long = string };
-}
-
 static inline LSSSOString ls_sso_string_from_string(LSString string)
 {
 	return ls_sso_string_create(string.bytes, string.len);
-}
-
-static inline LSSSOString ls_sso_string_from_short_string(
-		LSShortString short_string)
-{
-	if (!LS_SHORT_STRING_VALID(short_string)) {
-		return LS_AN_INVALID_SSO_STRING;
-	}
-
-	return (LSSSOString){ ._short = short_string };
 }
 
 static inline LSSSOString ls_sso_string_from_sspan(LSStringSpan sspan)

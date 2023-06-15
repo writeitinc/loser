@@ -11,6 +11,16 @@
  * manually.
  */
 
+// ########################
+// ######## Macros ########
+// ########################
+
+#define LS_SHORT_STRING_LITERAL(cstr_lit) \
+	(LSShortString){ \
+		.len = strlen(cstr_lit), \
+		.bytes = cstr_lit "\0" \
+	}
+
 // ###########################
 // ######## Constants ########
 // ###########################

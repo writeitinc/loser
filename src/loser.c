@@ -23,8 +23,8 @@ LSString ls_string_create(const LSByte *bytes, size_t len)
 	bytes_cpy[len] = '\0';
 
 	return (LSString){
-		.bytes = bytes_cpy,
-		.len = len
+		.len = len,
+		.bytes = bytes_cpy
 	};
 }
 
@@ -46,8 +46,8 @@ LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap)
 	}
 
 	return (LSByteBuffer){
-		.cap = cap,
 		.len = 0,
+		.cap = cap,
 		.bytes = bytes
 	};
 }

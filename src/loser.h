@@ -615,8 +615,8 @@ static inline void ls_sso_string_destroy(LSSSOString *sso_string)
 static inline LSStringSpan ls_sspan_create(const LSByte *start, size_t len)
 {
 	return (LSStringSpan){
-		.start = start,
-		.len = len
+		.len = len,
+		.start = start
 	};
 }
 
@@ -768,8 +768,8 @@ static inline LSSSOString ls_sso_string_from_cstr(const char *cstr)
 static inline LSStringSpan ls_sspan_from_string(LSString string)
 {
 	return (LSStringSpan){
-		.start = string.bytes,
-		.len = string.len
+		.len = string.len,
+		.start = string.bytes
 	};
 }
 
@@ -781,8 +781,8 @@ static inline LSStringSpan ls_sspan_from_short_string(
 	}
 
 	return (LSStringSpan){
-		.start = short_string->bytes,
-		.len = short_string->len
+		.len = short_string->len,
+		.start = short_string->bytes
 	};
 }
 
@@ -791,8 +791,8 @@ static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString *sso_string)
 	const LSByte *bytes = LS_SSO_STRING_BYTES(sso_string);
 
 	return (LSStringSpan){
-		.start = bytes,
-		.len = sso_string->len
+		.len = sso_string->len,
+		.start = bytes
 	};
 }
 
@@ -804,8 +804,8 @@ static inline LSStringSpan ls_sspan_from_bbuf(LSByteBuffer bbuf)
 static inline LSStringSpan ls_sspan_from_chars(const char *chars, size_t len)
 {
 	return (LSStringSpan){
-		.start = (const LSByte *)chars,
-		.len = len
+		.len = len,
+		.start = (const LSByte *)chars
 	};
 }
 

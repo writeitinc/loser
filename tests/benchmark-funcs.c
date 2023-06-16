@@ -25,7 +25,7 @@ static union {
 		} \
 		clock_t end = clock(); \
 		clock_t diff = end - start; \
-		printf("%-32s: %8zu\n", name, diff); \
+		printf("%-32s: %8zu\n", name, (size_t)diff); \
 	} while (0)
 
 #define DONT_BENCHMARK(expr) \

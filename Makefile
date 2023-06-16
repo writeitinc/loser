@@ -1,9 +1,10 @@
 NAME = loser
 
-CFLAGS = $(WFLAGS) $(OPTIM)
+CFLAGS = $(WFLAGS) $(OPTIM) $(IFLAGS)
 LFLAGS = -L$(LIB_DIR) -l:lib$(NAME).a -ltyrant
 
 WFLAGS = -Wall -Wextra -pedantic -std=c99 -Winline
+IFLAGS = -I$(INCLUDE_DIR)
 
 BUILD_DIR = build
 
@@ -37,13 +38,11 @@ debug: dirs headers $(LIBRARIES) $(BINARIES)
 
 # tests
 
-IFLAGS = -I$(INCLUDE_DIR)
-
 $(BIN_DIR)/%: $(TESTS_OBJ_DIR)/%.o $(LIBRARIES)
 	$(CC) -o $@ $< $(LFLAGS) $(DEBUG) $(DEFINES)
 
 $(TESTS_OBJ_DIR)/%.o: tests/%.c $(HEADERS)
-	$(CC) -c -o $@ $< $(CFLAGS) $(IFLAGS) $(DEBUG) $(DEFINES)
+	$(CC) -c -o $@ $< $(CFLAGS) $(DEBUG) $(DEFINES)
 
 # library
 

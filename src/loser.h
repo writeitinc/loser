@@ -25,7 +25,7 @@
 // ######## Constants ########
 // ###########################
 
-enum { LS_SHORT_STRING_MAX_LEN = 15 };
+enum { LS_SHORT_STRING_MAX_LEN = 23 };
 
 // #######################
 // ######## Types ########

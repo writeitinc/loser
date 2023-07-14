@@ -84,13 +84,21 @@ $(HEADER_DIR): $(HEADERS)
 # deps
 
 TYRANT_DIR = $(WORKING_DIR)/tyrant
+SEIFU_DIR = $(WORKING_DIR)/seifu
 
 .PHONY: deps
-deps: tyrant
+deps: tyrant seifu
 
 .PHONY: tyrant
 tyrant:
 	make -f $(TYRANT_DIR)/Makefile WORKING_DIR=$(TYRANT_DIR)
+
+.PHONY: seifu
+seifu: $(BUILD_DIR)/include/seifu/seifu.h
+
+$(BUILD_DIR)/include/seifu/seifu.h: $(SEIFU_DIR)/src/seifu/seifu.h
+	mkdir -p $(INCLUDE_DIR)/seifu
+	cp $< $@
 
 # dirs
 

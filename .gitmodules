@@ -1,3 +1,6 @@
 [submodule "tyrant"]
 	path = tyrant
 	url = https://github.com/writeitinc/tyrant.git
+[submodule "seifu"]
+	path = seifu
+	url = https://github.com/writeitinc/seifu.git

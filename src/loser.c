@@ -4,9 +4,10 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <seifu/seifu.h>
 #include <tyrant/tyrant.h>
 
-static size_t geom_grow_size(size_t cap);
+static size_t three_halves_geom_growth(size_t cap);
 
 LSString ls_string_create(const LSByte *bytes, size_t len)
 {
@@ -95,7 +96,7 @@ LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 {
 	size_t new_len = bbuf->len + len;
 	if (new_len > bbuf->cap) {
-		size_t new_cap = geom_grow_size(bbuf->cap);
+		size_t new_cap = three_halves_geom_growth(bbuf->cap);
 		LSStatus status = ls_bbuf_expand(bbuf, new_cap);
 		if (status != LS_SUCCESS) {
 			return LS_FAILURE;
@@ -121,7 +122,7 @@ LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
 
 	size_t new_len = bbuf->len + len;
 	if (new_len > bbuf->cap) {
-		size_t new_cap = geom_grow_size(bbuf->cap);
+		size_t new_cap = three_halves_geom_growth(bbuf->cap);
 		LSStatus status = ls_bbuf_expand(bbuf, new_cap);
 		if (status != LS_SUCCESS) {
 			return LS_FAILURE;
@@ -158,12 +159,7 @@ LSStatus ls_bbuf_expand(LSByteBuffer *bbuf, size_t new_cap)
 	return LS_SUCCESS;
 }
 
-size_t geom_grow_size(size_t cap)
+size_t three_halves_geom_growth(size_t cap)
 {
-	size_t half_cap = cap / 2;
-	size_t half_cap_rounded = half_cap + (cap % 2 == 1);
-	return tyrant_add_size_capped(
-			cap, half_cap_rounded, // 3/2 growth rate
-			SIZE_MAX,              // capped at SIZE_MAX
-			&(bool){ 0 });
+	return seifu_add_bounded(cap, seifu_div_round_bounded(cap, 2));
 }

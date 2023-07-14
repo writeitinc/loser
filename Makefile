@@ -6,6 +6,7 @@ LFLAGS = -L$(LIB_DIR) -l:lib$(NAME).a -ltyrant
 WFLAGS = -Wall -Wextra -pedantic -std=c99 -Winline
 IFLAGS = -I$(INCLUDE_DIR)
 
+WORKING_DIR = .
 BUILD_DIR = build
 
 INCLUDE_DIR = $(BUILD_DIR)/include
@@ -38,18 +39,22 @@ debug: dirs headers $(LIBRARIES) $(BINARIES)
 
 # tests
 
+TESTS_DIR = $(WORKING_DIR)/tests
+
 $(BIN_DIR)/%: $(TESTS_OBJ_DIR)/%.o $(LIBRARIES)
 	$(CC) -o $@ $< $(LFLAGS) $(DEBUG) $(DEFINES)
 
-$(TESTS_OBJ_DIR)/%.o: tests/%.c $(HEADERS)
+$(TESTS_OBJ_DIR)/%.o: $(TESTS_DIR)/%.c $(HEADERS)
 	$(CC) -o $@ $< -c $(CFLAGS) $(DEBUG) $(DEFINES)
 
 # library
 
-SOURCES = $(wildcard src/*.c)
-HEADERS = $(wildcard src/*.h)
-STATIC_OBJS = $(patsubst src/%.c, $(STATIC_OBJ_DIR)/%.o, $(SOURCES))
-SHARED_OBJS = $(patsubst src/%.c, $(SHARED_OBJ_DIR)/%.o, $(SOURCES))
+SRC_DIR = $(WORKING_DIR)/src
+
+SOURCES = $(wildcard $(SRC_DIR)/*.c)
+HEADERS = $(wildcard $(SRC_DIR)/*.h)
+STATIC_OBJS = $(patsubst $(SRC_DIR)/%.c, $(STATIC_OBJ_DIR)/%.o, $(SOURCES))
+SHARED_OBJS = $(patsubst $(SRC_DIR)/%.c, $(SHARED_OBJ_DIR)/%.o, $(SOURCES))
 
 PIC_FLAGS = -fPIC
 RELRO_FLAGS = -Wl,-z,relro,-z,now
@@ -60,10 +65,10 @@ $(STATIC_LIB): $(STATIC_OBJS)
 $(SHARED_LIB): $(SHARED_OBJS)
 	$(CC) -o $@ $^ -shared $(PIC_FLAGS) $(RELRO_FLAGS) $(LFLAGS)
 
-$(STATIC_OBJ_DIR)/%.o: src/%.c $(HEADERS)
+$(STATIC_OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS)
 	$(CC) -o $@ $< -c $(CFLAGS) $(DEBUG) $(DEFINES)
 
-$(SHARED_OBJ_DIR)/%.o: src/%.c $(HEADERS)
+$(SHARED_OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS)
 	$(CC) -o $@ $< -c $(PIC_FLAGS) $(CFLAGS) $(DEBUG) $(DEFINES)
 
 # headers
@@ -78,12 +83,14 @@ $(HEADER_DIR): $(HEADERS)
 
 # deps
 
+TYRANT_DIR = $(WORKING_DIR)/tyrant
+
 .PHONY: deps
 deps: tyrant
 
 .PHONY: tyrant
 tyrant:
-	make -C tyrant BUILD_DIR=../build
+	make -f $(TYRANT_DIR)/Makefile WORKING_DIR=$(TYRANT_DIR)
 
 # dirs
 

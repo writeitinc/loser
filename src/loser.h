@@ -498,7 +498,7 @@ static inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 // #######################################
 
 /*
- * Fails if: 
+ * Fails if:
  * - reallocation is attempted and fails
  */
 LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len);
@@ -512,7 +512,7 @@ static inline LSStatus ls_bbuf_append_sspan(LSByteBuffer *bbuf,
 		LSStringSpan sspan);
 
 /*
- * Fails if: 
+ * Fails if:
  * - `idx` is greater than `bbuf->len`
  * - reallocation is attempted and fails
  */
@@ -528,7 +528,7 @@ static inline LSStatus ls_bbuf_insert_sspan(LSByteBuffer *bbuf, size_t idx,
 		LSStringSpan sspan);
 
 /*
- * Fails if: 
+ * Fails if:
  * - `new_cap` is not greater than `bbuf->cap`
  * - reallocation fails
  */

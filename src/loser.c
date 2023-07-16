@@ -94,6 +94,10 @@ LSSSOString ls_sso_string_from_short_string(LSShortString short_string)
 
 LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 {
+	if (!bytes) {
+		return LS_FAILURE;
+	}
+
 	size_t new_len = bbuf->len + len;
 	if (new_len > bbuf->cap) {
 		size_t new_cap = three_halves_geom_growth(bbuf->cap);

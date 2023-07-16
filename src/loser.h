@@ -41,7 +41,7 @@ typedef unsigned char LSByte;
 
 // An immutable array of bytes.
 /*
- * Check validity using `LS_STRING_VALID()`.
+ * Check validity using `ls_string_is_valid()`.
  *
  * If valid:
  * - `bytes` is null-terminated
@@ -54,7 +54,7 @@ typedef struct LSString {
 
 // A short immutable array of bytes.
 /*
- * Check validity using `LS_SHORT_STRING_VALID()`.
+ * Check validity using `ls_short_string_is_valid()`.
  *
  * If valid:
  * - `bytes` is null-terminated
@@ -69,19 +69,19 @@ typedef struct LSShortString {
 
 // An small string-optimized immutable array of bytes.
 /*
- * Check validity/type using `LS_SSO_STRING_TYPE()`.
- * Get bytes using `LS_SSO_STRING_BYTES()`.
+ * Check validity/type using `ls_sso_string_get_type()`.
+ * Get bytes using `ls_sso_string_get_bytes()`.
  *
  * If valid:
- * - `LS_SSO_STRING_BYTES()` is null-terminated
- * - `LS_SSO_STRING_BYTES()[len]` can be read from and is set to '\0'
+ * - `ls_sso_string_get_bytes()` is null-terminated
+ * - `ls_sso_string_get_bytes()[len]` can be read from and is set to '\0'
  *
  * Intended to perform better when storing strings short enough to fit in a
  * `LSShortString`.
  */
 typedef union LSSSOString {
 	size_t len;
-	LSShortString _short; // <= Please use LS_SSO_STRING_BYTES()
+	LSShortString _short; // <= Please use ls_sso_string_get_bytes()
 	LSString _long;       // <= ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } LSSSOString;
 
@@ -94,7 +94,7 @@ typedef enum LSSSOStringType {
 
 // A non-owning range of bytes.
 /*
- * Check validity using `LS_SSPAN_VALID()`.
+ * Check validity using `ls_sspan_is_valid()`.
  *
  * Might not be null-terminated.
  */
@@ -105,7 +105,7 @@ typedef struct LSStringSpan {
 
 // A mutable array of bytes.
 /*
- * Check validity using `LS_BBUF_VALID()`.
+ * Check validity using `ls_bbuf_is_valid()`.
  *
  * Might not be null-terminated.
  */
@@ -135,17 +135,18 @@ static const LSShortString LS_AN_INVALID_SHORT_STRING = { .len = SIZE_MAX };
 static const LSStringSpan LS_AN_INVALID_SSPAN = { .start = NULL };
 static const LSByteBuffer LS_AN_INVALID_BBUF = { .bytes = NULL };
 
-// ######################################
-// ######## Macro-like Functions ########
-// ######################################
+// #########################
+// ######## Getters ########
+// #########################
 
-static inline bool LS_STRING_VALID(LSString string);
-static inline bool LS_SHORT_STRING_VALID(LSShortString short_string);
-static inline bool LS_SSPAN_VALID(LSStringSpan sspan);
-static inline bool LS_BBUF_VALID(LSByteBuffer bbuf);
+static inline bool ls_string_is_valid(LSString string);
+static inline bool ls_short_string_is_valid(LSShortString short_string);
+static inline bool ls_sspan_is_valid(LSStringSpan sspan);
+static inline bool ls_bbuf_is_valid(LSByteBuffer bbuf);
 
-static inline LSSSOStringType LS_SSO_STRING_TYPE(LSSSOString sso_string);
-static inline const LSByte *LS_SSO_STRING_BYTES(const LSSSOString *sso_string);
+static inline LSSSOStringType ls_sso_string_get_type(LSSSOString sso_string);
+static inline const LSByte *ls_sso_string_get_bytes(
+		const LSSSOString *sso_string);
 
 // ###############################################
 // ######## Base Constructors/Destructors ########
@@ -302,7 +303,7 @@ static inline LSShortString ls_short_string_from_string(LSString string);
 
 /*
  * Fails if:
- * - `LS_SSO_STRING_TYPE(sso_string)` is not LS_SSO_STRING_SHORT
+ * - `ls_sso_string_get_type(sso_string)` is not LS_SSO_STRING_SHORT
  */
 LSShortString ls_short_string_from_sso_string(LSSSOString sso_string);
 
@@ -537,42 +538,43 @@ LSStatus ls_bbuf_expand(LSByteBuffer *bbuf, size_t new_cap);
 // ######## Inline Definitions ########
 // ####################################
 
-static inline bool LS_STRING_VALID(LSString string)
+static inline bool ls_string_is_valid(LSString string)
 {
 	return string.bytes != NULL;
 }
 
-static inline bool LS_SHORT_STRING_VALID(LSShortString short_string)
+static inline bool ls_short_string_is_valid(LSShortString short_string)
 {
 	return short_string.len <= LS_SHORT_STRING_MAX_LEN;
 }
 
-static inline bool LS_SSPAN_VALID(LSStringSpan sspan)
+static inline bool ls_sspan_is_valid(LSStringSpan sspan)
 {
 	return sspan.start != NULL;
 }
 
-static inline bool LS_BBUF_VALID(LSByteBuffer bbuf)
+static inline bool ls_bbuf_is_valid(LSByteBuffer bbuf)
 {
 	return bbuf.bytes != NULL;
 }
 
-static inline LSSSOStringType LS_SSO_STRING_TYPE(LSSSOString sso_string)
+static inline LSSSOStringType ls_sso_string_get_type(LSSSOString sso_string)
 {
-	if (LS_SHORT_STRING_VALID(sso_string._short)) {
+	if (ls_short_string_is_valid(sso_string._short)) {
 		return LS_SSO_STRING_SHORT;
 	}
 
-	if (LS_STRING_VALID(sso_string._long)) {
+	if (ls_string_is_valid(sso_string._long)) {
 		return LS_SSO_STRING_LONG;
 	}
 
 	return LS_SSO_STRING_INVALID;
 }
 
-static inline const LSByte *LS_SSO_STRING_BYTES(const LSSSOString *sso_string)
+static inline const LSByte *ls_sso_string_get_bytes(
+		const LSSSOString *sso_string)
 {
-	switch (LS_SSO_STRING_TYPE(*sso_string)) {
+	switch (ls_sso_string_get_type(*sso_string)) {
 	case LS_SSO_STRING_SHORT:
 		return sso_string->_short.bytes;
 	case LS_SSO_STRING_LONG:
@@ -608,7 +610,7 @@ static inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 	}
 
 	LSString string = ls_string_create(bytes, len);
-	if (!LS_STRING_VALID(string)) {
+	if (!ls_string_is_valid(string)) {
 		return LS_AN_INVALID_SSO_STRING;
 	}
 
@@ -617,7 +619,7 @@ static inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 
 static inline void ls_sso_string_destroy(LSSSOString *sso_string)
 {
-	if (LS_SSO_STRING_TYPE(*sso_string) == LS_SSO_STRING_LONG) {
+	if (ls_sso_string_get_type(*sso_string) == LS_SSO_STRING_LONG) {
 		ls_string_destroy(&sso_string->_long);
 	}
 }
@@ -642,7 +644,7 @@ static inline LSString ls_string_clone(LSString string)
 
 static inline LSString ls_string_from_short_string(LSShortString short_string)
 {
-	if (!LS_SHORT_STRING_VALID(short_string)) {
+	if (!ls_short_string_is_valid(short_string)) {
 		return LS_AN_INVALID_STRING;
 	}
 
@@ -651,7 +653,7 @@ static inline LSString ls_string_from_short_string(LSShortString short_string)
 
 static inline LSString ls_string_from_sso_string(LSSSOString sso_string)
 {
-	const LSByte *bytes = LS_SSO_STRING_BYTES(&sso_string);
+	const LSByte *bytes = ls_sso_string_get_bytes(&sso_string);
 	return ls_string_create(bytes, sso_string.len);
 }
 
@@ -750,7 +752,7 @@ static inline LSStringSpan ls_sspan_from_string(LSString string)
 static inline LSStringSpan ls_sspan_from_short_string(
 		LSShortString *short_string)
 {
-	if (!LS_SHORT_STRING_VALID(*short_string)) {
+	if (!ls_short_string_is_valid(*short_string)) {
 		return LS_AN_INVALID_SSPAN;
 	}
 
@@ -762,7 +764,7 @@ static inline LSStringSpan ls_sspan_from_short_string(
 
 static inline LSStringSpan ls_sspan_from_sso_string(LSSSOString *sso_string)
 {
-	const LSByte *bytes = LS_SSO_STRING_BYTES(sso_string);
+	const LSByte *bytes = ls_sso_string_get_bytes(sso_string);
 
 	return (LSStringSpan){
 		.len = sso_string->len,
@@ -799,7 +801,7 @@ static inline LSByteBuffer ls_bbuf_clone(LSByteBuffer bbuf)
 	}
 
 	LSByteBuffer copy = ls_bbuf_create_with_init_cap(bbuf.cap);
-	if (!LS_BBUF_VALID(copy)) {
+	if (!ls_bbuf_is_valid(copy)) {
 		return LS_AN_INVALID_BBUF;
 	}
 
@@ -830,7 +832,7 @@ static inline LSString ls_sspan_substr(LSStringSpan sspan, size_t start,
 static inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 		size_t len)
 {
-	if (!LS_SSPAN_VALID(sspan)
+	if (!ls_sspan_is_valid(sspan)
 			|| start > sspan.len
 			|| len > sspan.len
 			|| start > sspan.len - len) {
@@ -855,7 +857,7 @@ static inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
 static inline LSStatus ls_bbuf_append_sso_string(LSByteBuffer *bbuf,
 		LSSSOString sso_string)
 {
-	const LSByte *bytes = LS_SSO_STRING_BYTES(&sso_string);
+	const LSByte *bytes = ls_sso_string_get_bytes(&sso_string);
 
 	return ls_bbuf_append(bbuf, bytes, sso_string.len);
 }
@@ -881,7 +883,7 @@ static inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf,
 static inline LSStatus ls_bbuf_insert_sso_string(LSByteBuffer *bbuf, size_t idx,
 		LSSSOString sso_string)
 {
-	const LSByte *bytes = LS_SSO_STRING_BYTES(&sso_string);
+	const LSByte *bytes = ls_sso_string_get_bytes(&sso_string);
 
 	return ls_bbuf_insert(bbuf, idx, bytes, sso_string.len);
 }

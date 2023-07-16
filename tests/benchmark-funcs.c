@@ -69,8 +69,8 @@ void benchmark_text(const char *cstr)
 	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
 	DONT_BENCHMARK(arrays.strings[i] = ls_string_create(bytes, len));
-	BENCHMARK("LS_STRING_VALID",
-			LS_STRING_VALID(arrays.strings[i]));
+	BENCHMARK("ls_string_is_valid",
+			ls_string_is_valid(arrays.strings[i]));
 	DONT_BENCHMARK(ls_string_destroy(&arrays.strings[i]));
 
 	BENCHMARK("ls_string_create",
@@ -108,8 +108,8 @@ void benchmark_text(const char *cstr)
 	DONT_BENCHMARK(arrays.short_strings[i] = ls_short_string_create(bytes, len));
 
 	DONT_BENCHMARK(arrays.short_strings[i] = ls_short_string_create(bytes, len));
-	BENCHMARK("LS_SHORT_STRING_VALID",
-			LS_SHORT_STRING_VALID(arrays.short_strings[i]));
+	BENCHMARK("ls_short_string_is_valid",
+			ls_short_string_is_valid(arrays.short_strings[i]));
 
 	BENCHMARK("ls_short_string_create",
 			arrays.short_strings[i] = ls_short_string_create(bytes, len));
@@ -137,10 +137,10 @@ void benchmark_text(const char *cstr)
 	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	DONT_BENCHMARK(arrays.sso_strings[i] = ls_sso_string_create(bytes, len));
-	BENCHMARK("LS_SSO_STRING_TYPE",
-			LS_SSO_STRING_TYPE(arrays.sso_strings[i]));
-	BENCHMARK("LS_SSO_STRING_BYTES",
-			LS_SSO_STRING_BYTES(&arrays.sso_strings[i]));
+	BENCHMARK("ls_sso_string_get_type",
+			ls_sso_string_get_type(arrays.sso_strings[i]));
+	BENCHMARK("ls_sso_string_get_bytes",
+			ls_sso_string_get_bytes(&arrays.sso_strings[i]));
 	DONT_BENCHMARK(ls_sso_string_destroy(&arrays.sso_strings[i]));
 
 	BENCHMARK("ls_sso_string_create",
@@ -178,8 +178,8 @@ void benchmark_text(const char *cstr)
 	// warm up memory
 	DONT_BENCHMARK(arrays.sspans[i] = ls_sspan_create(bytes, len));
 
-	BENCHMARK("LS_SSPAN_VALID",
-			LS_SSPAN_VALID(arrays.sspans[i]));
+	BENCHMARK("ls_sspan_is_valid",
+			ls_sspan_is_valid(arrays.sspans[i]));
 
 	BENCHMARK("ls_sspan_create",
 			arrays.sspans[i] = ls_sspan_create(bytes, len));

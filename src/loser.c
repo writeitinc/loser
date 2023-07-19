@@ -7,12 +7,22 @@
 #include <seifu/seifu.h>
 #include <tyrant/tyrant.h>
 
+static const LSByte EMPTY_STRING_BYTES[] = "";
+static const LSString EMPTY_STRING = {
+	.len = 0,
+	.bytes = EMPTY_STRING_BYTES
+};
+
 static size_t three_halves_geom_growth(size_t cap);
 
 LSString ls_string_create(const LSByte *bytes, size_t len)
 {
 	if (!bytes) {
 		return LS_AN_INVALID_STRING;
+	}
+
+	if (len == 0) {
+		return EMPTY_STRING;
 	}
 
 	LSByte *bytes_cpy = tyrant_alloc(len + 1);
@@ -31,6 +41,10 @@ LSString ls_string_create(const LSByte *bytes, size_t len)
 
 void ls_string_destroy(LSString *string)
 {
+	if (string->bytes == EMPTY_STRING_BYTES) {
+		return;
+	}
+
 	LSByte *bytes_mutable = (LSByte *)string->bytes;
 	tyrant_free(bytes_mutable);
 }

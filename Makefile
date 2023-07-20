@@ -41,10 +41,12 @@ debug: dirs headers $(LIBRARIES) $(BINARIES)
 
 TESTS_DIR = $(WORKING_DIR)/tests
 
+TESTS_HEADERS = $(wildcard $(TESTS_DIR)/*.h)
+
 $(BIN_DIR)/%: $(TESTS_OBJ_DIR)/%.o $(LIBRARIES)
 	$(CC) -o $@ $< $(LFLAGS) $(DEBUG) $(DEFINES)
 
-$(TESTS_OBJ_DIR)/%.o: $(TESTS_DIR)/%.c $(HEADERS)
+$(TESTS_OBJ_DIR)/%.o: $(TESTS_DIR)/%.c $(HEADERS) $(TESTS_HEADERS)
 	$(CC) -o $@ $< -c $(CFLAGS) $(DEBUG) $(DEFINES)
 
 # library

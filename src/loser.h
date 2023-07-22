@@ -360,7 +360,7 @@ static inline LSShortString ls_short_string_from_cstr(const char *cstr);
  * - allocation is attempted and fails
  * - `sso_string` is invalid
  */
-LSSSOString ls_sso_string_clone(LSSSOString sso_string);
+static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string);
 
 /*
  * Fails if:
@@ -735,6 +735,22 @@ static inline LSShortString ls_short_string_from_cstr(const char *cstr)
 	}
 
 	return ls_short_string_from_chars(cstr, strlen(cstr));
+}
+
+static inline LSSSOString ls_sso_string_clone(LSSSOString sso_string)
+{
+	LSSSOStringType type = ls_sso_string_get_type(sso_string);
+
+	if (type == LS_SSO_STRING_SHORT || type == LS_SSO_STRING_INVALID) {
+		return sso_string;
+	}
+
+	LSString string = ls_string_clone(sso_string._long);
+	if (!ls_string_is_valid(string)) {
+		return LS_AN_INVALID_SSO_STRING;
+	}
+
+	return (LSSSOString){ ._long = string };
 }
 
 static inline LSSSOString ls_sso_string_from_string(LSString string)

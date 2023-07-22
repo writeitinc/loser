@@ -73,22 +73,6 @@ LSShortString ls_short_string_from_sso_string(LSSSOString sso_string)
 	return sso_string._short;
 }
 
-LSSSOString ls_sso_string_clone(LSSSOString sso_string)
-{
-	LSSSOStringType type = ls_sso_string_get_type(sso_string);
-
-	if (type == LS_SSO_STRING_SHORT || type == LS_SSO_STRING_INVALID) {
-		return sso_string;
-	}
-
-	LSString string = ls_string_clone(sso_string._long);
-	if (!ls_string_is_valid(string)) {
-		return LS_AN_INVALID_SSO_STRING;
-	}
-
-	return (LSSSOString){ ._long = string };
-}
-
 LSSSOString ls_sso_string_from_short_string(LSShortString short_string)
 {
 	if (!ls_short_string_is_valid(short_string)) {

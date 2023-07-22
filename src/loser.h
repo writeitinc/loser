@@ -168,6 +168,10 @@ static inline const LSByte *ls_sso_string_get_bytes(
  * - `bytes` is `NULL`
  */
 static inline LSString ls_string_create(const LSByte *bytes, size_t len);
+
+/*
+ * Don't call this function directly.
+ */
 LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len);
 
 /*

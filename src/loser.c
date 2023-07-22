@@ -8,23 +8,15 @@
 #include <tyrant/tyrant.h>
 
 static const LSByte EMPTY_STRING_BYTES[] = "";
-static const LSString EMPTY_STRING = {
+const LSString LS_EMPTY_STRING = {
 	.len = 0,
 	.bytes = EMPTY_STRING_BYTES
 };
 
 static size_t three_halves_geom_growth(size_t cap);
 
-LSString ls_string_create(const LSByte *bytes, size_t len)
+LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len)
 {
-	if (!bytes) {
-		return LS_AN_INVALID_STRING;
-	}
-
-	if (len == 0) {
-		return EMPTY_STRING;
-	}
-
 	LSByte *bytes_cpy = tyrant_alloc(len + 1);
 	if (!bytes_cpy) {
 		return LS_AN_INVALID_STRING;

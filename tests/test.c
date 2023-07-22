@@ -4,8 +4,7 @@
 
 int main(void)
 {
-	volatile LSShortString short_string = LS_SHORT_STRING_LITERAL("0123456789abcde");
-	(void)short_string;
+	volatile LSString string = ls_string_create((LSByte *)"", 0);
 
 	return 0;
 }

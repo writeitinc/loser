@@ -135,6 +135,12 @@ static const LSShortString LS_AN_INVALID_SHORT_STRING = { .len = SIZE_MAX };
 static const LSStringSpan LS_AN_INVALID_SSPAN = { .start = NULL };
 static const LSByteBuffer LS_AN_INVALID_BBUF = { .bytes = NULL };
 
+// #######################################
+// ######## External Declarations ########
+// #######################################
+
+extern const LSString LS_EMPTY_STRING;
+
 // #########################
 // ######## Getters ########
 // #########################
@@ -161,7 +167,8 @@ static inline const LSByte *ls_sso_string_get_bytes(
  * - allocation fails
  * - `bytes` is `NULL`
  */
-LSString ls_string_create(const LSByte *bytes, size_t len);
+static inline LSString ls_string_create(const LSByte *bytes, size_t len);
+LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len);
 
 /*
  * Passing an invalid `LSString` is safe.
@@ -582,6 +589,19 @@ static inline const LSByte *ls_sso_string_get_bytes(
 	default:
 		return NULL;
 	}
+}
+
+static inline LSString ls_string_create(const LSByte *bytes, size_t len)
+{
+	if (!bytes) {
+		return LS_AN_INVALID_STRING;
+	}
+
+	if (len == 0) {
+		return LS_EMPTY_STRING;
+	}
+
+	return ls__intern_string_create_unchecked(bytes, len);
 }
 
 static inline LSShortString ls_short_string_create(const LSByte *bytes,

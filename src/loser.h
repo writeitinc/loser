@@ -633,7 +633,9 @@ static inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 		};
 	}
 
-	LSString string = ls_string_create(bytes, len);
+	LSString string = bytes == NULL
+			? LS_AN_INVALID_STRING
+			: ls__intern_string_create_unchecked(bytes, len);
 	if (!ls_string_is_valid(string)) {
 		return LS_AN_INVALID_SSO_STRING;
 	}

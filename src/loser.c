@@ -13,6 +13,10 @@ const LSString LS_EMPTY_STRING = {
 	.bytes = EMPTY_STRING_BYTES
 };
 
+#define LS_LINKAGE extern
+#include "loser-inline-decls.h"
+#undef LS_LINKAGE
+
 static size_t three_halves_geom_growth(size_t cap);
 
 LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len)

@@ -11,25 +11,13 @@
  * manually.
  */
 
-// ########################
-// ######## Macros ########
-// ########################
-
 #define LS_SHORT_STRING_LITERAL(cstr_lit) \
 	(LSShortString){ \
 		.len = strlen(cstr_lit), \
 		.bytes = cstr_lit "\0" \
 	}
 
-// ###########################
-// ######## Constants ########
-// ###########################
-
 enum { LS_SHORT_STRING_MAX_LEN = 23 };
-
-// #######################
-// ######## Types ########
-// #######################
 
 typedef enum LSStatus {
 	LS_SUCCESS = 0,
@@ -115,17 +103,14 @@ typedef struct LSByteBuffer {
 	LSByte *bytes;
 } LSByteBuffer;
 
-// ###################################
-// ######## Invalid Constants ########
-// ###################################
+extern const LSString LS_EMPTY_STRING;
 
 /*
  * NOTE: As their names imply, the following constants are not the only invalid
  * values for their respective types but *an* invalid value of that type.
  * These should not be tested against. Instead, use the provided validity-
- * checking functions (see section [Macro-like Functions] or type definitions).
+ * checking functions.
  */
-
 static const LSString LS_AN_INVALID_STRING = { .bytes = NULL };
 static const LSSSOString LS_AN_INVALID_SSO_STRING = {
 	._long.len = SIZE_MAX,
@@ -135,16 +120,6 @@ static const LSShortString LS_AN_INVALID_SHORT_STRING = { .len = SIZE_MAX };
 static const LSStringSpan LS_AN_INVALID_SSPAN = { .start = NULL };
 static const LSByteBuffer LS_AN_INVALID_BBUF = { .bytes = NULL };
 
-// #######################################
-// ######## External Declarations ########
-// #######################################
-
-extern const LSString LS_EMPTY_STRING;
-
-// #########################
-// ######## Getters ########
-// #########################
-
 static inline bool ls_string_is_valid(LSString string);
 static inline bool ls_short_string_is_valid(LSShortString short_string);
 static inline bool ls_sspan_is_valid(LSStringSpan sspan);
@@ -153,10 +128,6 @@ static inline bool ls_bbuf_is_valid(LSByteBuffer bbuf);
 static inline LSSSOStringType ls_sso_string_get_type(LSSSOString sso_string);
 static inline const LSByte *ls_sso_string_get_bytes(
 		const LSSSOString *sso_string);
-
-// ###############################################
-// ######## Base Constructors/Destructors ########
-// ###############################################
 
 /*
  * Constraints:
@@ -243,10 +214,6 @@ LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap);
  * - `bbuf` was not previously destroyed
  */
 void ls_bbuf_destroy(LSByteBuffer *bbuf);
-
-// ##########################################
-// ######## Convenience Constructors ########
-// ##########################################
 
 /*
  * Fails if:
@@ -472,10 +439,6 @@ static inline LSStringSpan ls_sspan_from_cstr(const char *cstr);
  */
 static inline LSByteBuffer ls_bbuf_clone(LSByteBuffer bbuf);
 
-// ################################################
-// ######## Substring/Subspan Constructors ########
-// ################################################
-
 /*
  * Fails if:
  * - `string` is invalid
@@ -503,10 +466,6 @@ static inline LSString ls_sspan_substr(LSStringSpan sspan, size_t start,
  */
 static inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 		size_t len);
-
-// #######################################
-// ######## LSByteBuffer Mutation ########
-// #######################################
 
 /*
  * Fails if:
@@ -544,10 +503,6 @@ static inline LSStatus ls_bbuf_insert_sspan(LSByteBuffer *bbuf, size_t idx,
  * - reallocation fails
  */
 LSStatus ls_bbuf_expand(LSByteBuffer *bbuf, size_t new_cap);
-
-// ####################################
-// ######## Inline Definitions ########
-// ####################################
 
 static inline bool ls_string_is_valid(LSString string)
 {

@@ -5,6 +5,7 @@ LS_LINK(bool) ls_short_string_is_valid(LSShortString short_string);
 LS_LINK(bool) ls_sspan_is_valid(LSStringSpan sspan);
 LS_LINK(bool) ls_bbuf_is_valid(LSByteBuffer bbuf);
 LS_LINK(LSSSOStringType) ls_sso_string_get_type(LSSSOString sso_string);
+LS_LINK(bool) ls_sso_string_is_valid(LSSSOString sso_string);
 LS_LINK(const LSByte *)ls_sso_string_get_bytes(const LSSSOString *sso_string);
 LS_LINK(LSString) ls_string_create(const LSByte *bytes, size_t len);
 LS_LINK(LSShortString) ls_short_string_create(const LSByte *bytes, size_t len);

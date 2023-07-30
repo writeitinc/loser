@@ -185,6 +185,11 @@ inline LSSSOStringType ls_sso_string_get_type(LSSSOString sso_string)
 	return LS_SSO_STRING_INVALID;
 }
 
+inline bool ls_sso_string_is_valid(LSSSOString sso_string)
+{
+	return ls_sso_string_get_type(sso_string) != LS_SSO_STRING_INVALID;
+}
+
 inline const LSByte *ls_sso_string_get_bytes(const LSSSOString *sso_string)
 {
 	switch (ls_sso_string_get_type(*sso_string)) {

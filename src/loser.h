@@ -27,27 +27,14 @@ typedef enum LSStatus {
 // Just call `unsigned char` what it is--a byte.
 typedef unsigned char LSByte;
 
-// An immutable array of bytes.
-/*
- * Check validity using `ls_string_is_valid()`.
- *
- * If valid:
- * - `bytes` is null-terminated
- * - `bytes[len]` can be read from and is set to '\0'
- */
+// A (null-terminated) immutable array of bytes.
 typedef struct LSString {
 	size_t len;
 	const LSByte *bytes;
 } LSString;
 
-// A short array of bytes.
+// A (null-terminated) short array of bytes.
 /*
- * Check validity using `ls_short_string_is_valid()`.
- *
- * If valid:
- * - `bytes` is null-terminated
- * - `bytes[len]` can be read from and is set to '\0'
- *
  * Has a maximum length of `LS_SHORT_STRING_MAX_LEN`.
  */
 typedef struct LSShortString {
@@ -55,25 +42,14 @@ typedef struct LSShortString {
 	LSByte bytes[LS_SHORT_STRING_MAX_LEN + 1];
 } LSShortString;
 
-// An small string-optimized immutable array of bytes.
-/*
- * Check validity/type using `ls_sso_string_get_type()`.
- * Get bytes using `ls_sso_string_get_bytes()`.
- *
- * If valid:
- * - `ls_sso_string_get_bytes()` is null-terminated
- * - `ls_sso_string_get_bytes()[len]` can be read from and is set to '\0'
- *
- * Intended to perform better when storing strings short enough to fit in a
- * `LSShortString`.
- */
+// A (null-terminated) small string-optimized immutable array of bytes.
 typedef union LSSSOString {
 	size_t len;
-	LSShortString _short; // <= Please use ls_sso_string_get_bytes()
-	LSString _long;       // <= ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	LSShortString _short;
+	LSString _long;
 } LSSSOString;
 
-// The type of string stored in a `LSSSOString`.
+// Indicates the contents of an `LSSSOString`.
 typedef enum LSSSOStringType {
 	LS_SSO_STRING_INVALID,
 	LS_SSO_STRING_SHORT,
@@ -82,8 +58,6 @@ typedef enum LSSSOStringType {
 
 // A non-owning range of bytes.
 /*
- * Check validity using `ls_sspan_is_valid()`.
- *
  * Might not be null-terminated.
  */
 typedef struct LSStringSpan {
@@ -93,8 +67,6 @@ typedef struct LSStringSpan {
 
 // A mutable array of bytes.
 /*
- * Check validity using `ls_bbuf_is_valid()`.
- *
  * Might not be null-terminated.
  */
 typedef struct LSByteBuffer {
@@ -103,13 +75,14 @@ typedef struct LSByteBuffer {
 	LSByte *bytes;
 } LSByteBuffer;
 
+// The empty string constant.
 extern const LSString LS_EMPTY_STRING;
 
 /*
  * NOTE: As their names imply, the following constants are not the only invalid
  * values for their respective types but *an* invalid value of that type.
- * These should not be tested against. Instead, use the provided validity-
- * checking functions.
+ * Thus, these should not be tested against. Instead, use the appropriate
+ * validity-checking functions.
  */
 #define LS_AN_INVALID_STRING (LSString){ .bytes = NULL }
 #define LS_AN_INVALID_SSO_STRING \
@@ -128,8 +101,6 @@ extern const LSString LS_EMPTY_STRING;
 LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len);
 
 /*
- * Passing an invalid `LSString` is safe.
- *
  * Constraints:
  * - `string` was not previously destroyed
  */
@@ -143,8 +114,6 @@ void ls_string_destroy(LSString *string);
 LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap);
 
 /*
- * Passing an invalid `LSByteBuffer` is safe.
- *
  * Constraints:
  * - `bbuf` was not previously destroyed
  */
@@ -152,7 +121,7 @@ void ls_bbuf_destroy(LSByteBuffer *bbuf);
 
 /*
  * Fails if:
- * - `ls_sso_string_get_type(sso_string)` is not LS_SSO_STRING_SHORT
+ * - `sso_string` doesn't contain a short string
  */
 LSShortString ls_short_string_from_sso_string(LSSSOString sso_string);
 
@@ -303,8 +272,6 @@ inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 }
 
 /*
- * Passing an invalid `LSSSOString` is safe.
- *
  * Constraints:
  * - `sso_string` was not previously destroyed
  */
@@ -459,7 +426,7 @@ inline LSShortString ls_short_string_from_bbuf(LSByteBuffer bbuf)
 
 /*
  * Constraints:
- * - `chars` points to an array of at least `len` chars
+ * - `chars` points to an array of at least `len` `char`s
  *        OR is `NULL`
  *
  * Fails if:
@@ -716,6 +683,7 @@ inline LSString ls_sspan_substr(LSStringSpan sspan, size_t start, size_t len)
 /*
  * Fails if:
  * - `sspan` is invalid
+ * - the given range doesn't make sense
  */
 inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 		size_t len)
@@ -786,7 +754,8 @@ inline LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
  * - `idx` is greater than `bbuf->len`
  * - reallocation is attempted and fails
  */
-inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf, size_t idx, LSShortString short_string)
+inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf, size_t idx,
+		LSShortString short_string)
 {
 	return ls_bbuf_insert(bbuf, idx, short_string.bytes, short_string.len);
 }

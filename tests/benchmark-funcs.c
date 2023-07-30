@@ -60,6 +60,7 @@ enum Function {
 	LS_SHORT_STRING_FROM_CHARS,
 	LS_SHORT_STRING_FROM_CSTR,
 	LS_SSO_STRING_GET_TYPE,
+	LS_SSO_STRING_IS_VALID,
 	LS_SSO_STRING_GET_BYTES,
 	LS_SSO_STRING_CREATE,
 	LS_SSO_STRING_FROM_STRING,
@@ -98,6 +99,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_SHORT_STRING_FROM_CHARS]      = "ls_short_string_from_chars",
 	[LS_SHORT_STRING_FROM_CSTR]       = "ls_short_string_from_cstr",
 	[LS_SSO_STRING_GET_TYPE]          = "ls_sso_string_get_type",
+	[LS_SSO_STRING_IS_VALID]          = "ls_sso_string_is_valid",
 	[LS_SSO_STRING_GET_BYTES]         = "ls_sso_string_get_bytes",
 	[LS_SSO_STRING_CREATE]            = "ls_sso_string_create",
 	[LS_SSO_STRING_FROM_STRING]       = "ls_sso_string_from_string",
@@ -345,6 +347,10 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	BENCHMARK(LS_SSO_STRING_GET_TYPE, len_tag_idx,
 			FOREACH (LSSSOString, iter, arrays.sso_strings) {
 				ls_sso_string_get_type(*iter);
+			});
+	BENCHMARK(LS_SSO_STRING_IS_VALID, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.sso_strings) {
+				ls_sso_string_is_valid(*iter);
 			});
 	BENCHMARK(LS_SSO_STRING_GET_BYTES, len_tag_idx,
 			FOREACH (LSSSOString, iter, arrays.sso_strings) {

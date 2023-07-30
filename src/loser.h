@@ -40,7 +40,7 @@ typedef struct LSString {
 	const LSByte *bytes;
 } LSString;
 
-// A short immutable array of bytes.
+// A short array of bytes.
 /*
  * Check validity using `ls_short_string_is_valid()`.
  *

@@ -17,6 +17,7 @@ const LSString LS_EMPTY_STRING = {
 #include "loser-inline-decls.h"
 #undef LS_LINKAGE
 
+static LSStatus bbuf_reserve_space(LSByteBuffer *bbuf, size_t len);
 static size_t three_halves_geom_growth(size_t cap);
 static size_t size_max(size_t a, size_t b);
 
@@ -93,21 +94,14 @@ LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 		return LS_FAILURE;
 	}
 
-	size_t new_len = bbuf->len + len;
-	if (new_len > bbuf->cap) {
-		size_t geom_growth = three_halves_geom_growth(bbuf->cap);
-		size_t new_cap = size_max(geom_growth, new_len);
-
-		LSStatus status = ls_bbuf_expand_to(bbuf, new_cap);
-		if (status != LS_SUCCESS) {
-			return LS_FAILURE;
-		}
+	if (bbuf_reserve_space(bbuf, len) != LS_SUCCESS) {
+		return LS_FAILURE;
 	}
 
 	LSByte *bytes_dest = &bbuf->bytes[bbuf->len];
 	memcpy(bytes_dest, bytes, len);
 
-	bbuf->len = new_len;
+	bbuf->len += len;
 
 	return LS_SUCCESS;
 }
@@ -121,15 +115,8 @@ LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
 
 	// TODO check for append case?
 
-	size_t new_len = bbuf->len + len;
-	if (new_len > bbuf->cap) {
-		size_t geom_growth = three_halves_geom_growth(bbuf->cap);
-		size_t new_cap = size_max(geom_growth, new_len);
-
-		LSStatus status = ls_bbuf_expand_to(bbuf, new_cap);
-		if (status != LS_SUCCESS) {
-			return LS_FAILURE;
-		}
+	if (bbuf_reserve_space(bbuf, len) != LS_SUCCESS) {
+		return LS_FAILURE;
 	}
 
 	LSByte *moving_bytes = &bbuf->bytes[idx];
@@ -140,7 +127,7 @@ LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
 	LSByte *bytes_dest = &bbuf->bytes[idx];
 	memcpy(bytes_dest, bytes, len);
 
-	bbuf->len = new_len;
+	bbuf->len += len;
 
 	return LS_SUCCESS;
 }
@@ -175,6 +162,22 @@ LSStatus ls_bbuf_expand_by(LSByteBuffer *bbuf, size_t add_cap)
 	}
 
 	return ls_bbuf_expand_to(bbuf, new_cap);
+}
+
+LSStatus bbuf_reserve_space(LSByteBuffer *bbuf, size_t len)
+{
+	size_t new_len = bbuf->len + len;
+	if (new_len > bbuf->cap) {
+		size_t geom_growth = three_halves_geom_growth(bbuf->cap);
+		size_t new_cap = size_max(geom_growth, new_len);
+
+		LSStatus status = ls_bbuf_expand_to(bbuf, new_cap);
+		if (status != LS_SUCCESS) {
+			return LS_FAILURE;
+		}
+	}
+
+	return LS_SUCCESS;
 }
 
 size_t three_halves_geom_growth(size_t cap)

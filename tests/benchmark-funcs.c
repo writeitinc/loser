@@ -208,6 +208,9 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	LSString string = ls_string_create(bytes, len);
 	LSStringSpan sspan = ls_sspan_create(bytes, len);
 
+	volatile int vol_int;
+	(void)vol_int;
+
 	// ### LSString ###
 
 	// warm up memory
@@ -223,7 +226,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	}
 	BENCHMARK(LS_STRING_IS_VALID, len_tag_idx,
 			FOREACH (LSString, iter, arrays.strings){
-				ls_string_is_valid(*iter);
+				vol_int = ls_string_is_valid(*iter);
 			});
 	FOREACH (LSString, iter, arrays.strings) {
 		ls_string_destroy(iter);
@@ -298,7 +301,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	}
 	BENCHMARK(LS_SHORT_STRING_IS_VALID, len_tag_idx,
 			FOREACH (LSShortString, iter, arrays.short_strings){
-				ls_short_string_is_valid(*iter);
+				vol_int = ls_short_string_is_valid(*iter);
 			});
 
 	BENCHMARK(LS_SHORT_STRING_CREATE, len_tag_idx,
@@ -346,11 +349,11 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	}
 	BENCHMARK(LS_SSO_STRING_GET_TYPE, len_tag_idx,
 			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				ls_sso_string_get_type(*iter);
+				vol_int = ls_sso_string_get_type(*iter);
 			});
 	BENCHMARK(LS_SSO_STRING_IS_VALID, len_tag_idx,
 			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				ls_sso_string_is_valid(*iter);
+				vol_int = ls_sso_string_is_valid(*iter);
 			});
 	BENCHMARK(LS_SSO_STRING_GET_BYTES, len_tag_idx,
 			FOREACH (LSSSOString, iter, arrays.sso_strings) {
@@ -427,7 +430,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 
 	BENCHMARK(LS_SSPAN_IS_VALID, len_tag_idx,
 			FOREACH (LSStringSpan, iter, arrays.sspans) {
-				ls_sspan_is_valid(*iter);
+				vol_int = ls_sspan_is_valid(*iter);
 			});
 
 	BENCHMARK(LS_SSPAN_CREATE, len_tag_idx,

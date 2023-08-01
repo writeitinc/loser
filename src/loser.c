@@ -95,7 +95,7 @@ LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 	size_t new_len = bbuf->len + len;
 	if (new_len > bbuf->cap) {
 		size_t new_cap = three_halves_geom_growth(bbuf->cap);
-		LSStatus status = ls_bbuf_expand(bbuf, new_cap);
+		LSStatus status = ls_bbuf_expand_to(bbuf, new_cap);
 		if (status != LS_SUCCESS) {
 			return LS_FAILURE;
 		}
@@ -121,7 +121,7 @@ LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
 	size_t new_len = bbuf->len + len;
 	if (new_len > bbuf->cap) {
 		size_t new_cap = three_halves_geom_growth(bbuf->cap);
-		LSStatus status = ls_bbuf_expand(bbuf, new_cap);
+		LSStatus status = ls_bbuf_expand_to(bbuf, new_cap);
 		if (status != LS_SUCCESS) {
 			return LS_FAILURE;
 		}
@@ -140,7 +140,7 @@ LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
 	return LS_SUCCESS;
 }
 
-LSStatus ls_bbuf_expand(LSByteBuffer *bbuf, size_t new_cap)
+LSStatus ls_bbuf_expand_to(LSByteBuffer *bbuf, size_t new_cap)
 {
 	if (new_cap <= bbuf->cap) {
 		return LS_FAILURE;
@@ -155,6 +155,21 @@ LSStatus ls_bbuf_expand(LSByteBuffer *bbuf, size_t new_cap)
 	bbuf->cap = new_cap;
 
 	return LS_SUCCESS;
+}
+
+LSStatus ls_bbuf_expand_by(LSByteBuffer *bbuf, size_t add_cap)
+{
+	if (add_cap == 0) {
+		return 0;
+	}
+
+	size_t new_cap;
+	SeifuStatus status = seifu_add(bbuf->cap, add_cap, &new_cap);
+	if (status != SEIFU_OK) {
+		return LS_FAILURE;
+	}
+
+	return ls_bbuf_expand_to(bbuf, new_cap);
 }
 
 size_t three_halves_geom_growth(size_t cap)

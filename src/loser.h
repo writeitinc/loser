@@ -133,12 +133,16 @@ LSSSOString ls_sso_string_from_short_string(LSShortString short_string);
 
 /*
  * Fails if:
+ * - `bbuf` is invalid
+ * - `bytes` is `NULL`
  * - reallocation is attempted and fails
  */
 LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len);
 
 /*
  * Fails if:
+ * - `bbuf` is invalid
+ * - `bytes` is `NULL`
  * - `idx` is greater than `bbuf->len`
  * - reallocation is attempted and fails
  */

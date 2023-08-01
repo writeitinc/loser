@@ -90,7 +90,8 @@ LSSSOString ls_sso_string_from_short_string(LSShortString short_string)
 
 LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 {
-	if (!bytes) {
+	if (!ls_bbuf_is_valid(*bbuf)
+			|| !bytes) {
 		return LS_FAILURE;
 	}
 
@@ -109,7 +110,9 @@ LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
 		size_t len)
 {
-	if (idx > bbuf->len) {
+	if (!ls_bbuf_is_valid(*bbuf)
+			|| !bytes
+			|| idx > bbuf->len) {
 		return LS_FAILURE;
 	}
 

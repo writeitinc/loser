@@ -88,6 +88,24 @@ LSSSOString ls_sso_string_from_short_string(LSShortString short_string)
 	return (LSSSOString){ ._short = short_string };
 }
 
+LSByteBuffer ls_bbuf_from_sspan(LSStringSpan sspan)
+{
+	if (!ls_sspan_is_valid(sspan)) {
+		return LS_AN_INVALID_BBUF;
+	}
+
+	size_t cap = size_max(8, sspan.len);
+	LSByteBuffer bbuf = ls_bbuf_create_with_init_cap(cap);
+	if (!ls_bbuf_is_valid(bbuf)) {
+		return LS_AN_INVALID_BBUF;
+	}
+
+	memcpy(bbuf.bytes, sspan.start, sspan.len);
+	bbuf.len = sspan.len;
+
+	return bbuf;
+}
+
 LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 {
 	if (!ls_bbuf_is_valid(*bbuf)

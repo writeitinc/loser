@@ -133,6 +133,13 @@ LSSSOString ls_sso_string_from_short_string(LSShortString short_string);
 
 /*
  * Fails if:
+ * - `sspan` is invalid
+ * - allocation fails
+ */
+LSByteBuffer ls_bbuf_from_sspan(LSStringSpan sspan);
+
+/*
+ * Fails if:
  * - `bbuf` is invalid
  * - `bytes` is `NULL`
  * - reallocation is attempted and fails
@@ -654,19 +661,9 @@ inline LSStringSpan ls_sspan_from_cstr(const char *cstr)
  */
 inline LSByteBuffer ls_bbuf_clone(LSByteBuffer bbuf)
 {
-	if (!ls_bbuf_is_valid(bbuf)) {
-		return LS_AN_INVALID_BBUF;
-	}
-
-	LSByteBuffer copy = ls_bbuf_create_with_init_cap(bbuf.cap);
-	if (!ls_bbuf_is_valid(copy)) {
-		return LS_AN_INVALID_BBUF;
-	}
-
 	LSStringSpan contents = ls_sspan_from_bbuf(bbuf);
-	ls_bbuf_append_sspan(&copy, contents);
 
-	return copy;
+	return ls_bbuf_from_sspan(contents);
 }
 
 /*

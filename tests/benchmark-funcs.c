@@ -40,6 +40,7 @@ static union {
 	LSShortString short_strings[NITERATIONS];
 	LSSSOString sso_strings[NITERATIONS];
 	LSStringSpan sspans[NITERATIONS];
+	LSByteBuffer bbufs[NITERATIONS];
 } arrays;
 
 enum Function {
@@ -77,6 +78,18 @@ enum Function {
 	LS_SSPAN_FROM_SSO_STRING,
 	LS_SSPAN_FROM_CHARS,
 	LS_SSPAN_FROM_CSTR,
+	LS_BBUF_CREATE_WITH_INIT_CAP,
+	LS_BBUF_FROM_SSPAN,
+	LS_BBUF_CLONE,
+	CREATE_THEN_APPEND,
+	CREATE_WIC_THEN_APPEND,
+	CREATE_THEN_INSERT,
+	CREATE_WIC_THEN_INSERT,
+	CREATE_AND_APPEND,
+	CREATE_WIC_AND_APPEND,
+	CREATE_AND_INSERT,
+	CREATE_WIC_AND_INSERT,
+	LS_BBUF_DESTROY,
 
 	NFUNCTIONS
 };
@@ -116,6 +129,18 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_SSPAN_FROM_SSO_STRING]        = "ls_sspan_from_sso_string",
 	[LS_SSPAN_FROM_CHARS]             = "ls_sspan_from_chars",
 	[LS_SSPAN_FROM_CSTR]              = "ls_sspan_from_cstr",
+	[LS_BBUF_CREATE_WITH_INIT_CAP]    = "ls_bbuf_create_with_init_cap",
+	[LS_BBUF_FROM_SSPAN]              = "ls_bbuf_from_sspan",
+	[LS_BBUF_CLONE]                   = "ls_bbuf_clone",
+	[CREATE_THEN_APPEND]              = "(create bbuf), append",
+	[CREATE_WIC_THEN_APPEND]          = "(create bbuf w/ init cap), append",
+	[CREATE_THEN_INSERT]              = "(create bbuf), insert",
+	[CREATE_WIC_THEN_INSERT]          = "(create bbuf w/ init cap), insert",
+	[CREATE_AND_APPEND]               = "create bbuf + append",
+	[CREATE_WIC_AND_APPEND]           = "create bbuf w/ init cap + append",
+	[CREATE_AND_INSERT]               = "create bbuf + insert",
+	[CREATE_WIC_AND_INSERT]           = "create bbuf w/ init cap + insert",
+	[LS_BBUF_DESTROY]                 = "ls_bbuf_destroy",
 };
 
 #define MAX_LEN 32
@@ -207,6 +232,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	LSSSOString sso_string = ls_sso_string_create(bytes, len);
 	LSString string = ls_string_create(bytes, len);
 	LSStringSpan sspan = ls_sspan_create(bytes, len);
+	LSByteBuffer bbuf = ls_bbuf_from_sspan(sspan);
 
 	volatile int vol_int;
 	(void)vol_int;
@@ -463,8 +489,121 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*iter = ls_sspan_from_cstr(cstr);
 			});
 
+	BENCHMARK(LS_BBUF_CREATE_WITH_INIT_CAP, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				*iter = ls_bbuf_create_with_init_cap(len);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	BENCHMARK(LS_BBUF_FROM_SSPAN, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				*iter = ls_bbuf_from_sspan(sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	BENCHMARK(LS_BBUF_CLONE, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				*iter = ls_bbuf_clone(bbuf);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		*iter = ls_bbuf_create();
+	}
+	BENCHMARK(CREATE_THEN_APPEND, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				ls_bbuf_append_sspan(iter, sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		*iter = ls_bbuf_create_with_init_cap(sspan.len);
+	}
+	BENCHMARK(CREATE_WIC_THEN_APPEND, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				ls_bbuf_append_sspan(iter, sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		*iter = ls_bbuf_create();
+	}
+	BENCHMARK(CREATE_THEN_INSERT, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				ls_bbuf_insert_sspan(iter, 0, sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		*iter = ls_bbuf_create_with_init_cap(sspan.len);
+	}
+	BENCHMARK(CREATE_WIC_THEN_INSERT, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				ls_bbuf_insert_sspan(iter, 0, sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	BENCHMARK(CREATE_AND_APPEND, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				*iter = ls_bbuf_create();
+				ls_bbuf_append_sspan(iter, sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	BENCHMARK(CREATE_WIC_AND_APPEND, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				*iter = ls_bbuf_create_with_init_cap(sspan.len);
+				ls_bbuf_append_sspan(iter, sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	BENCHMARK(CREATE_AND_INSERT, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				*iter = ls_bbuf_create();
+				ls_bbuf_insert_sspan(iter, 0, sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	BENCHMARK(CREATE_WIC_AND_INSERT, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				*iter = ls_bbuf_create_with_init_cap(sspan.len);
+				ls_bbuf_insert_sspan(iter, 0, sspan);
+			});
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
+
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		*iter = ls_bbuf_clone(bbuf);
+	}
+	BENCHMARK(LS_BBUF_DESTROY, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				ls_bbuf_destroy(iter);
+			});
+
 	ls_string_destroy(&string);
 	ls_sso_string_destroy(&sso_string);
+	ls_bbuf_destroy(&bbuf);
 }
 
 size_t size_max(size_t a, size_t b)

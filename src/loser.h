@@ -750,9 +750,11 @@ inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 
 /*
  * Constraints:
- *  - `bbuf` is not `NULL`
+ * - `bbuf` is not `NULL`
  *
  * Fails if:
+ * - `bbuf` is invalid
+ * - `string` is invalid
  * - reallocation is attempted and fails
  */
 inline LSStatus ls_bbuf_append_string(LSByteBuffer *bbuf, LSString string)
@@ -762,9 +764,11 @@ inline LSStatus ls_bbuf_append_string(LSByteBuffer *bbuf, LSString string)
 
 /*
  * Constraints:
- *  - `bbuf` is not `NULL`
+ * - `bbuf` is not `NULL`
  *
  * Fails if:
+ * - `bbuf` is invalid
+ * - `short_string` is invalid
  * - reallocation is attempted and fails
  */
 inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
@@ -776,9 +780,11 @@ inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
 
 /*
  * Constraints:
- *  - `bbuf` is not `NULL`
+ * - `bbuf` is not `NULL`
  *
  * Fails if:
+ * - `bbuf` is invalid
+ * - `sso_string` is invalid
  * - reallocation is attempted and fails
  */
 inline LSStatus ls_bbuf_append_sso_string(LSByteBuffer *bbuf,
@@ -791,9 +797,11 @@ inline LSStatus ls_bbuf_append_sso_string(LSByteBuffer *bbuf,
 
 /*
  * Constraints:
- *  - `bbuf` is not `NULL`
+ * - `bbuf` is not `NULL`
  *
  * Fails if:
+ * - `bbuf` is invalid
+ * - `sspan` is invalid
  * - reallocation is attempted and fails
  */
 inline LSStatus ls_bbuf_append_sspan(LSByteBuffer *bbuf, LSStringSpan sspan)
@@ -803,9 +811,11 @@ inline LSStatus ls_bbuf_append_sspan(LSByteBuffer *bbuf, LSStringSpan sspan)
 
 /*
  * Constraints:
- *  - `bbuf` is not `NULL`
+ * - `bbuf` is not `NULL`
  *
  * Fails if:
+ * - `bbuf` is invalid
+ * - `string` is invalid
  * - `idx` is greater than `bbuf->len`
  * - reallocation is attempted and fails
  */
@@ -817,9 +827,11 @@ inline LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
 
 /*
  * Constraints:
- *  - `bbuf` is not `NULL`
+ * - `bbuf` is not `NULL`
  *
  * Fails if:
+ * - `bbuf` is invalid
+ * - `short_string` is invalid
  * - `idx` is greater than `bbuf->len`
  * - reallocation is attempted and fails
  */
@@ -833,9 +845,11 @@ inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf, size_t idx,
 
 /*
  * Constraints:
- *  - `bbuf` is not `NULL`
+ * - `bbuf` is not `NULL`
  *
  * Fails if:
+ * - `bbuf` is invalid
+ * - `sso_string` is invalid
  * - `idx` is greater than `bbuf->len`
  * - reallocation is attempted and fails
  */
@@ -849,9 +863,11 @@ inline LSStatus ls_bbuf_insert_sso_string(LSByteBuffer *bbuf, size_t idx,
 
 /*
  * Constraints:
- *  - `bbuf` is not `NULL`
+ * - `bbuf` is not `NULL`
  *
  * Fails if:
+ * - `bbuf` is invalid
+ * - `sspan` is invalid
  * - `idx` is greater than `bbuf->len`
  * - reallocation is attempted and fails
  */

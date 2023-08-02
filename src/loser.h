@@ -770,7 +770,8 @@ inline LSStatus ls_bbuf_append_string(LSByteBuffer *bbuf, LSString string)
 inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
 		LSShortString short_string)
 {
-	return ls_bbuf_append(bbuf, short_string._mut_bytes, short_string.len);
+	return ls_bbuf_append(bbuf, ls_short_string_get_bytes(&short_string),
+			short_string.len);
 }
 
 /*
@@ -825,7 +826,8 @@ inline LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
 inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf, size_t idx,
 		LSShortString short_string)
 {
-	return ls_bbuf_insert(bbuf, idx, short_string._mut_bytes,
+	return ls_bbuf_insert(bbuf, idx,
+			ls_short_string_get_bytes(&short_string),
 			short_string.len);
 }
 

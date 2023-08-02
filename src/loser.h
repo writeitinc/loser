@@ -14,7 +14,7 @@
 #define LS_SHORT_STRING_LITERAL(cstr_lit) \
 	(LSShortString){ \
 		.len = strlen(cstr_lit), \
-		.bytes = cstr_lit "\0" \
+		._mut_bytes = cstr_lit "\0" \
 	}
 
 enum { LS_SHORT_STRING_MAX_LEN = 23 };
@@ -39,7 +39,7 @@ typedef struct LSString {
  */
 typedef struct LSShortString {
 	size_t len;
-	LSByte bytes[LS_SHORT_STRING_MAX_LEN + 1];
+	LSByte _mut_bytes[LS_SHORT_STRING_MAX_LEN + 1];
 } LSShortString;
 
 // A (null-terminated) small string-optimized immutable array of bytes.
@@ -180,6 +180,12 @@ inline bool ls_short_string_is_valid(LSShortString short_string)
 	return short_string.len <= LS_SHORT_STRING_MAX_LEN;
 }
 
+inline const LSByte *ls_short_string_get_bytes(
+		const LSShortString *short_string)
+{
+	return short_string->_mut_bytes;
+}
+
 inline bool ls_sspan_is_valid(LSStringSpan sspan)
 {
 	return sspan.start != NULL;
@@ -212,7 +218,7 @@ inline const LSByte *ls_sso_string_get_bytes(const LSSSOString *sso_string)
 {
 	switch (ls_sso_string_get_type(*sso_string)) {
 	case LS_SSO_STRING_SHORT:
-		return sso_string->_short.bytes;
+		return sso_string->_short._mut_bytes;
 	case LS_SSO_STRING_LONG:
 		return sso_string->_long.bytes;
 	default:
@@ -262,7 +268,7 @@ inline LSShortString ls_short_string_create(const LSByte *bytes, size_t len)
 	}
 
 	short_string.len = len;
-	memcpy(short_string.bytes, bytes, len);
+	memcpy(short_string._mut_bytes, bytes, len);
 
 	return short_string;
 }
@@ -351,7 +357,7 @@ inline LSString ls_string_from_short_string(LSShortString short_string)
 		return LS_AN_INVALID_STRING;
 	}
 
-	return ls_string_create(short_string.bytes, short_string.len);
+	return ls_string_create(short_string._mut_bytes, short_string.len);
 }
 
 /*
@@ -590,7 +596,7 @@ inline LSStringSpan ls_sspan_from_short_string(LSShortString *short_string)
 
 	return (LSStringSpan){
 		.len = short_string->len,
-		.start = short_string->bytes
+		.start = short_string->_mut_bytes
 	};
 }
 
@@ -727,7 +733,7 @@ inline LSStatus ls_bbuf_append_string(LSByteBuffer *bbuf, LSString string)
 inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
 		LSShortString short_string)
 {
-	return ls_bbuf_append(bbuf, short_string.bytes, short_string.len);
+	return ls_bbuf_append(bbuf, short_string._mut_bytes, short_string.len);
 }
 
 /*
@@ -770,7 +776,8 @@ inline LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
 inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf, size_t idx,
 		LSShortString short_string)
 {
-	return ls_bbuf_insert(bbuf, idx, short_string.bytes, short_string.len);
+	return ls_bbuf_insert(bbuf, idx, short_string._mut_bytes,
+			short_string.len);
 }
 
 /*

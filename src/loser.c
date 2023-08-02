@@ -155,6 +155,10 @@ LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
 
 LSStatus ls_bbuf_expand_to(LSByteBuffer *bbuf, size_t new_cap)
 {
+	if (!ls_bbuf_is_valid(*bbuf)) {
+		return LS_FAILURE;
+	}
+
 	if (new_cap <= bbuf->cap) {
 		return LS_FAILURE;
 	}
@@ -172,6 +176,10 @@ LSStatus ls_bbuf_expand_to(LSByteBuffer *bbuf, size_t new_cap)
 
 LSStatus ls_bbuf_expand_by(LSByteBuffer *bbuf, size_t add_cap)
 {
+	if (!ls_bbuf_is_valid(*bbuf)) {
+		return LS_FAILURE;
+	}
+
 	if (add_cap == 0) {
 		return 0;
 	}

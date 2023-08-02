@@ -158,6 +158,7 @@ LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
 
 /*
  * Fails if:
+ * - `bbuf` is invalid
  * - `new_cap` is not greater than `bbuf->cap`
  * - reallocation fails
  */
@@ -165,6 +166,7 @@ LSStatus ls_bbuf_expand_to(LSByteBuffer *bbuf, size_t new_cap);
 
 /*
  * Fails if:
+ * - `bbuf` is invalid
  * - resulting capacity would exceed `SIZE_MAX`
  * - reallocation fails
  */

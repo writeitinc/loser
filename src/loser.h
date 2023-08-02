@@ -199,6 +199,10 @@ inline bool ls_short_string_is_valid(LSShortString short_string)
 inline const LSByte *ls_short_string_get_bytes(
 		const LSShortString *short_string)
 {
+	if (!ls_short_string_is_valid(*short_string)) {
+		return NULL;
+	}
+
 	return short_string->_mut_bytes;
 }
 

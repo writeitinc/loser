@@ -75,8 +75,19 @@ typedef struct LSByteBuffer {
 	LSByte *bytes;
 } LSByteBuffer;
 
-// The empty string constant.
+// The empty string constant (there can only be one).
 extern const LSString LS_EMPTY_STRING;
+
+// Other empty constants.
+static const LSByte LS_EMPTY_BYTES[] = "";
+static const LSShortString LS_EMPTY_SHORT_STRING = { 0 };
+static const LSSSOString LS_EMPTY_SSO_STRING = {
+	._short = LS_EMPTY_SHORT_STRING
+};
+static const LSStringSpan LS_EMPTY_SSPAN = {
+	.len = 0,
+	.start = LS_EMPTY_BYTES
+};
 
 /*
  * NOTE: As their names imply, the following constants are not the only invalid

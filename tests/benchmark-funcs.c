@@ -54,6 +54,7 @@ enum Function {
 	LS_STRING_FROM_CSTR,
 	LS_STRING_DESTROY,
 	LS_SHORT_STRING_IS_VALID,
+	LS_SHORT_STRING_GET_BYTES,
 	LS_SHORT_STRING_CREATE,
 	LS_SHORT_STRING_FROM_STRING,
 	LS_SHORT_STRING_FROM_SSO_STRING,
@@ -105,6 +106,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_STRING_FROM_CSTR]             = "ls_string_from_cstr",
 	[LS_STRING_DESTROY]               = "ls_string_destroy",
 	[LS_SHORT_STRING_IS_VALID]        = "ls_short_string_is_valid",
+	[LS_SHORT_STRING_GET_BYTES]       = "ls_short_string_get_bytes",
 	[LS_SHORT_STRING_CREATE]          = "ls_short_string_create",
 	[LS_SHORT_STRING_FROM_STRING]     = "ls_short_string_from_string",
 	[LS_SHORT_STRING_FROM_SSO_STRING] = "ls_short_string_from_sso_string",
@@ -328,6 +330,11 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	BENCHMARK(LS_SHORT_STRING_IS_VALID, len_tag_idx,
 			FOREACH (LSShortString, iter, arrays.short_strings){
 				vol_int = ls_short_string_is_valid(*iter);
+			});
+
+	BENCHMARK(LS_SHORT_STRING_GET_BYTES, len_tag_idx,
+			FOREACH (LSShortString, iter, arrays.short_strings){
+				ls_short_string_get_bytes(iter);
 			});
 
 	BENCHMARK(LS_SHORT_STRING_CREATE, len_tag_idx,

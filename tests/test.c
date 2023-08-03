@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <loser/loser.h>
 
@@ -28,6 +29,9 @@ void test_constructors(void)
 		assert(ls_string_is_valid(from_nonempty));
 		assert(!ls_string_is_valid(from_null));
 
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
 		ls_string_destroy(&from_empty);
 		ls_string_destroy(&from_nonempty);
 	}
@@ -39,6 +43,9 @@ void test_constructors(void)
 		assert(ls_short_string_is_valid(from_empty));
 		assert(ls_short_string_is_valid(from_nonempty));
 		assert(!ls_short_string_is_valid(from_null));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty._mut_bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 	{
 		LSSSOString from_empty = ls_sso_string_create(LS_EMPTY_BYTES, 0);
@@ -49,6 +56,9 @@ void test_constructors(void)
 		assert(ls_sso_string_is_valid(from_nonempty));
 		assert(!ls_sso_string_is_valid(from_null));
 
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
 		ls_sso_string_destroy(&from_empty);
 		ls_sso_string_destroy(&from_nonempty);
 	}
@@ -56,6 +66,9 @@ void test_constructors(void)
 		LSStringSpan from_empty = ls_sspan_create(LS_EMPTY_BYTES, 0);
 		LSStringSpan from_nonempty = ls_sspan_create(NONEMPTY_BYTES, NONEMPTY_LEN);
 		LSStringSpan from_null = ls_sspan_create(NULL, 0);
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.start, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 
 		assert(ls_sspan_is_valid(from_empty));
 		assert(ls_sspan_is_valid(from_nonempty));
@@ -85,6 +98,9 @@ void test_conversions(void)
 		assert(ls_string_is_valid(from_nonempty));
 		assert(!ls_string_is_valid(from_invalid));
 
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
 		ls_string_destroy(&from_empty);
 		ls_string_destroy(&from_nonempty);
 	}
@@ -96,6 +112,9 @@ void test_conversions(void)
 		assert(ls_string_is_valid(from_empty));
 		assert(ls_string_is_valid(from_nonempty));
 		assert(!ls_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 
 		ls_string_destroy(&from_empty);
 		ls_string_destroy(&from_nonempty);
@@ -109,6 +128,9 @@ void test_conversions(void)
 		assert(ls_string_is_valid(from_nonempty));
 		assert(!ls_string_is_valid(from_invalid));
 
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
 		ls_string_destroy(&from_empty);
 		ls_string_destroy(&from_nonempty);
 	}
@@ -120,6 +142,9 @@ void test_conversions(void)
 		assert(ls_string_is_valid(from_empty));
 		assert(ls_string_is_valid(from_nonempty));
 		assert(!ls_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 
 		ls_string_destroy(&from_empty);
 		ls_string_destroy(&from_nonempty);
@@ -133,6 +158,9 @@ void test_conversions(void)
 		assert(ls_string_is_valid(from_nonempty));
 		assert(!ls_string_is_valid(from_invalid));
 
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
 		ls_string_destroy(&from_empty);
 		ls_string_destroy(&from_nonempty);
 	}
@@ -145,6 +173,9 @@ void test_conversions(void)
 		assert(ls_short_string_is_valid(from_empty));
 		assert(ls_short_string_is_valid(from_nonempty));
 		assert(!ls_short_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty._mut_bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 	{
 		LSShortString from_empty = ls_short_string_from_sso_string(LS_EMPTY_SSO_STRING);
@@ -154,6 +185,9 @@ void test_conversions(void)
 		assert(ls_short_string_is_valid(from_empty));
 		assert(ls_short_string_is_valid(from_nonempty));
 		assert(!ls_short_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty._mut_bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 	{
 		LSShortString from_empty = ls_short_string_from_sspan(LS_EMPTY_SSPAN);
@@ -163,6 +197,9 @@ void test_conversions(void)
 		assert(ls_short_string_is_valid(from_empty));
 		assert(ls_short_string_is_valid(from_nonempty));
 		assert(!ls_short_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty._mut_bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 	{
 		LSShortString from_empty = ls_short_string_from_bbuf(empty_bbuf);
@@ -172,6 +209,9 @@ void test_conversions(void)
 		assert(ls_short_string_is_valid(from_empty));
 		assert(ls_short_string_is_valid(from_nonempty));
 		assert(!ls_short_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty._mut_bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 
 	{
@@ -182,6 +222,9 @@ void test_conversions(void)
 		assert(ls_sso_string_is_valid(from_empty));
 		assert(ls_sso_string_is_valid(from_nonempty));
 		assert(!ls_sso_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 
 		ls_sso_string_destroy(&from_empty);
 		ls_sso_string_destroy(&from_nonempty);
@@ -195,6 +238,9 @@ void test_conversions(void)
 		assert(ls_sso_string_is_valid(from_nonempty));
 		assert(!ls_sso_string_is_valid(from_invalid));
 
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
 		ls_sso_string_destroy(&from_empty);
 		ls_sso_string_destroy(&from_nonempty);
 	}
@@ -206,6 +252,9 @@ void test_conversions(void)
 		assert(ls_sso_string_is_valid(from_empty));
 		assert(ls_sso_string_is_valid(from_nonempty));
 		assert(!ls_sso_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 
 		ls_sso_string_destroy(&from_empty);
 		ls_sso_string_destroy(&from_nonempty);
@@ -219,6 +268,9 @@ void test_conversions(void)
 		assert(ls_sso_string_is_valid(from_nonempty));
 		assert(!ls_sso_string_is_valid(from_invalid));
 
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
 		ls_sso_string_destroy(&from_empty);
 		ls_sso_string_destroy(&from_nonempty);
 	}
@@ -229,6 +281,9 @@ void test_conversions(void)
 		assert(ls_sso_string_is_valid(from_empty));
 		assert(ls_sso_string_is_valid(from_nonempty));
 		assert(!ls_sso_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 
 		ls_sso_string_destroy(&from_empty);
 		ls_sso_string_destroy(&from_nonempty);
@@ -242,6 +297,9 @@ void test_conversions(void)
 		assert(ls_sspan_is_valid(from_empty));
 		assert(ls_sspan_is_valid(from_nonempty));
 		assert(!ls_sspan_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.start, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 	{
 		LSStringSpan from_empty = ls_sspan_from_short_string(&LS_EMPTY_SHORT_STRING);
@@ -251,6 +309,9 @@ void test_conversions(void)
 		assert(ls_sspan_is_valid(from_empty));
 		assert(ls_sspan_is_valid(from_nonempty));
 		assert(!ls_sspan_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.start, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 	{
 		LSStringSpan from_empty = ls_sspan_from_sso_string(&LS_EMPTY_SSO_STRING);
@@ -260,6 +321,9 @@ void test_conversions(void)
 		assert(ls_sspan_is_valid(from_empty));
 		assert(ls_sspan_is_valid(from_nonempty));
 		assert(!ls_sspan_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.start, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 	{
 		LSStringSpan from_empty = ls_sspan_from_bbuf(empty_bbuf);
@@ -269,6 +333,9 @@ void test_conversions(void)
 		assert(ls_sspan_is_valid(from_empty));
 		assert(ls_sspan_is_valid(from_nonempty));
 		assert(!ls_sspan_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.start, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 	}
 
 	{
@@ -279,6 +346,9 @@ void test_conversions(void)
 		assert(ls_bbuf_is_valid(from_empty));
 		assert(ls_bbuf_is_valid(from_nonempty));
 		assert(!ls_bbuf_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 		
 		ls_bbuf_destroy(&from_empty);
 		ls_bbuf_destroy(&from_nonempty);
@@ -291,6 +361,9 @@ void test_conversions(void)
 		assert(ls_bbuf_is_valid(from_empty));
 		assert(ls_bbuf_is_valid(from_nonempty));
 		assert(!ls_bbuf_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
 
 		ls_bbuf_destroy(&from_empty);
 		ls_bbuf_destroy(&from_nonempty);

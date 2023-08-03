@@ -627,7 +627,8 @@ inline LSStringSpan ls_sspan_from_string(LSString string)
  * Fails if:
  * - `short_string` is invalid
  */
-inline LSStringSpan ls_sspan_from_short_string(LSShortString *short_string)
+inline LSStringSpan ls_sspan_from_short_string(
+		const LSShortString *short_string)
 {
 	if (!ls_short_string_is_valid(*short_string)) {
 		return LS_AN_INVALID_SSPAN;
@@ -648,7 +649,7 @@ inline LSStringSpan ls_sspan_from_short_string(LSShortString *short_string)
  * Fails if:
  * - `sso_string` is invalid
  */
-inline LSStringSpan ls_sspan_from_sso_string(LSSSOString *sso_string)
+inline LSStringSpan ls_sspan_from_sso_string(const LSSSOString *sso_string)
 {
 	const LSByte *bytes = ls_sso_string_get_bytes(sso_string);
 

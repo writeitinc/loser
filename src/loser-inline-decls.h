@@ -35,8 +35,9 @@ LS_LINK(LSSSOString) ls_sso_string_from_bbuf(LSByteBuffer bbuf);
 LS_LINK(LSSSOString) ls_sso_string_from_chars(const char *chars, size_t len);
 LS_LINK(LSSSOString) ls_sso_string_from_cstr(const char *cstr);
 LS_LINK(LSStringSpan) ls_sspan_from_string(LSString string);
-LS_LINK(LSStringSpan) ls_sspan_from_short_string(LSShortString *short_string);
-LS_LINK(LSStringSpan) ls_sspan_from_sso_string(LSSSOString *sso_string);
+LS_LINK(LSStringSpan) ls_sspan_from_short_string(
+		const LSShortString *short_string);
+LS_LINK(LSStringSpan) ls_sspan_from_sso_string(const LSSSOString *sso_string);
 LS_LINK(LSStringSpan) ls_sspan_from_bbuf(LSByteBuffer bbuf);
 LS_LINK(LSStringSpan) ls_sspan_from_chars(const char *chars, size_t len);
 LS_LINK(LSStringSpan) ls_sspan_from_cstr(const char *cstr);

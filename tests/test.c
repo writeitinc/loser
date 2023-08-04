@@ -11,6 +11,8 @@ static void test_insert_funcs(void);
 
 static void test_append_big(void);
 static void test_insert_big(void);
+static void test_append_many(void);
+static void test_insert_many(void);
 
 static const LSByte NONEMPTY_BYTES[] = "deadbeef";
 static size_t NONEMPTY_LEN = sizeof(NONEMPTY_BYTES) - 1;
@@ -24,6 +26,8 @@ int main(void)
 
 	test_append_big();
 	test_insert_big();
+	test_append_many();
+	test_insert_many();
 
 	return 0;
 }
@@ -722,6 +726,48 @@ void test_insert_big(void)
 
 	assert(bbuf.len == long_sspan.len);
 	assert(memcmp(bbuf.bytes, long_sspan.start, long_sspan.len) == 0);
+
+	ls_bbuf_destroy(&bbuf);
+}
+
+void test_append_many(void)
+{
+	enum { NAPPENDS = 8 };
+
+	LSByteBuffer bbuf = ls_bbuf_create();
+
+	LSStringSpan sspan = ls_sspan_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	for (size_t i = 0; i < NAPPENDS; ++i) {
+		LSStatus status = ls_bbuf_append_sspan(&bbuf, sspan);
+		assert(status == LS_SUCCESS);
+	}
+
+	assert(bbuf.len == sspan.len * NAPPENDS);
+
+	for (size_t i = 0; i < NAPPENDS; ++i) {
+		assert(memcmp(&bbuf.bytes[i * sspan.len], sspan.start, sspan.len) == 0);
+	}
+
+	ls_bbuf_destroy(&bbuf);
+}
+
+void test_insert_many(void)
+{
+	enum { NINSERTIONS = 8 };
+
+	LSByteBuffer bbuf = ls_bbuf_create();
+
+	LSStringSpan sspan = ls_sspan_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	for (size_t i = 0; i < NINSERTIONS; ++i) {
+		LSStatus status = ls_bbuf_insert_sspan(&bbuf, 0, sspan);
+		assert(status == LS_SUCCESS);
+	}
+
+	assert(bbuf.len == sspan.len * NINSERTIONS);
+
+	for (size_t i = 0; i < NINSERTIONS; ++i) {
+		assert(memcmp(&bbuf.bytes[i * sspan.len], sspan.start, sspan.len) == 0);
+	}
 
 	ls_bbuf_destroy(&bbuf);
 }

@@ -164,6 +164,36 @@ void test_conversions(void)
 		ls_string_destroy(&from_empty);
 		ls_string_destroy(&from_nonempty);
 	}
+	{
+		LSString from_empty = ls_string_from_chars((const char *)LS_EMPTY_BYTES, 0);
+		LSString from_nonempty = ls_string_from_chars((const char *)NONEMPTY_BYTES, NONEMPTY_LEN);
+		LSString from_null = ls_string_from_chars(NULL, 0);
+
+		assert(ls_string_is_valid(from_empty));
+		assert(ls_string_is_valid(from_nonempty));
+		assert(!ls_string_is_valid(from_null));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_string_destroy(&from_empty);
+		ls_string_destroy(&from_nonempty);
+	}
+	{
+		LSString from_empty = ls_string_from_cstr((const char *)LS_EMPTY_BYTES);
+		LSString from_nonempty = ls_string_from_cstr((const char *)NONEMPTY_BYTES);
+		LSString from_null = ls_string_from_cstr(NULL);
+
+		assert(ls_string_is_valid(from_empty));
+		assert(ls_string_is_valid(from_nonempty));
+		assert(!ls_string_is_valid(from_null));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_string_destroy(&from_empty);
+		ls_string_destroy(&from_nonempty);
+	}
 
 	{
 		LSShortString from_empty = ls_short_string_from_string(LS_EMPTY_STRING);
@@ -209,6 +239,30 @@ void test_conversions(void)
 		assert(ls_short_string_is_valid(from_empty));
 		assert(ls_short_string_is_valid(from_nonempty));
 		assert(!ls_short_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty._mut_bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+	}
+	{
+		LSShortString from_empty = ls_short_string_from_chars((const char *)LS_EMPTY_BYTES, 0);
+		LSShortString from_nonempty = ls_short_string_from_chars((const char *)NONEMPTY_BYTES, NONEMPTY_LEN);
+		LSShortString from_null = ls_short_string_from_chars(NULL, 0);
+
+		assert(ls_short_string_is_valid(from_empty));
+		assert(ls_short_string_is_valid(from_nonempty));
+		assert(!ls_short_string_is_valid(from_null));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty._mut_bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+	}
+	{
+		LSShortString from_empty = ls_short_string_from_cstr((const char *)LS_EMPTY_BYTES);
+		LSShortString from_nonempty = ls_short_string_from_cstr((const char *)NONEMPTY_BYTES);
+		LSShortString from_null = ls_short_string_from_cstr(NULL);
+
+		assert(ls_short_string_is_valid(from_empty));
+		assert(ls_short_string_is_valid(from_nonempty));
+		assert(!ls_short_string_is_valid(from_null));
 
 		assert(from_nonempty.len == NONEMPTY_LEN);
 		assert(memcmp(from_nonempty._mut_bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
@@ -281,6 +335,36 @@ void test_conversions(void)
 		assert(ls_sso_string_is_valid(from_empty));
 		assert(ls_sso_string_is_valid(from_nonempty));
 		assert(!ls_sso_string_is_valid(from_invalid));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_sso_string_destroy(&from_empty);
+		ls_sso_string_destroy(&from_nonempty);
+	}
+	{
+		LSSSOString from_empty = ls_sso_string_from_chars((const char *)LS_EMPTY_BYTES, 0);
+		LSSSOString from_nonempty = ls_sso_string_from_chars((const char *)NONEMPTY_BYTES, NONEMPTY_LEN);
+		LSSSOString from_null = ls_sso_string_from_chars(NULL, 0);
+
+		assert(ls_sso_string_is_valid(from_empty));
+		assert(ls_sso_string_is_valid(from_nonempty));
+		assert(!ls_sso_string_is_valid(from_null));
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_sso_string_destroy(&from_empty);
+		ls_sso_string_destroy(&from_nonempty);
+	}
+	{
+		LSSSOString from_empty = ls_sso_string_from_cstr((const char *)LS_EMPTY_BYTES);
+		LSSSOString from_nonempty = ls_sso_string_from_cstr((const char *)NONEMPTY_BYTES);
+		LSSSOString from_null = ls_sso_string_from_cstr(NULL);
+
+		assert(ls_sso_string_is_valid(from_empty));
+		assert(ls_sso_string_is_valid(from_nonempty));
+		assert(!ls_sso_string_is_valid(from_null));
 
 		assert(from_nonempty.len == NONEMPTY_LEN);
 		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), NONEMPTY_BYTES, NONEMPTY_LEN) == 0);

@@ -7,6 +7,7 @@
 static void test_constructors(void);
 static void test_conversions(void);
 static void test_append_funcs(void);
+static void test_insert_funcs(void);
 
 static const LSByte NONEMPTY_BYTES[] = "deadbeef";
 static size_t NONEMPTY_LEN = sizeof(NONEMPTY_BYTES) - 1;
@@ -16,6 +17,7 @@ int main(void)
 	test_constructors();
 	test_conversions();
 	test_append_funcs();
+	test_insert_funcs();
 
 	return 0;
 }
@@ -557,6 +559,118 @@ void test_append_funcs(void)
 		LSStatus empty_status = ls_bbuf_append_sspan(&from_empty, LS_EMPTY_SSPAN);
 		LSStatus nonempty_status = ls_bbuf_append_sspan(&from_nonempty, nonempty_sspan);
 		LSStatus invalid_status = ls_bbuf_append_sspan(&from_invalid, LS_AN_INVALID_SSPAN);
+
+		assert(empty_status == LS_SUCCESS);
+		assert(nonempty_status == LS_SUCCESS);
+		assert(invalid_status == LS_FAILURE);
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_bbuf_destroy(&from_empty);
+		ls_bbuf_destroy(&from_nonempty);
+		ls_bbuf_destroy(&from_invalid);
+	}
+
+	ls_string_destroy(&nonempty_string);
+	ls_sso_string_destroy(&nonempty_sso_string);
+}
+
+void test_insert_funcs(void)
+{
+	LSString nonempty_string = ls_string_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	LSShortString nonempty_short_string = ls_short_string_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	LSSSOString nonempty_sso_string = ls_sso_string_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	LSStringSpan nonempty_sspan = ls_sspan_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+
+	{
+		LSByteBuffer from_empty = ls_bbuf_create();
+		LSByteBuffer from_nonempty = ls_bbuf_create();
+		LSByteBuffer from_null = ls_bbuf_create();
+
+		LSStatus empty_status = ls_bbuf_insert(&from_empty, 0, LS_EMPTY_BYTES, 0);
+		LSStatus nonempty_status = ls_bbuf_insert(&from_nonempty, 0, NONEMPTY_BYTES, NONEMPTY_LEN);
+		LSStatus null_status = ls_bbuf_insert(&from_null, 0, NULL, 0);
+
+		assert(empty_status == LS_SUCCESS);
+		assert(nonempty_status == LS_SUCCESS);
+		assert(null_status == LS_FAILURE);
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_bbuf_destroy(&from_empty);
+		ls_bbuf_destroy(&from_nonempty);
+		ls_bbuf_destroy(&from_null);
+	}
+	{
+		LSByteBuffer from_empty = ls_bbuf_create();
+		LSByteBuffer from_nonempty = ls_bbuf_create();
+		LSByteBuffer from_invalid = ls_bbuf_create();
+
+		LSStatus empty_status = ls_bbuf_insert_string(&from_empty, 0, LS_EMPTY_STRING);
+		LSStatus nonempty_status = ls_bbuf_insert_string(&from_nonempty, 0, nonempty_string);
+		LSStatus invalid_status = ls_bbuf_insert_string(&from_invalid, 0, LS_AN_INVALID_STRING);
+
+		assert(empty_status == LS_SUCCESS);
+		assert(nonempty_status == LS_SUCCESS);
+		assert(invalid_status == LS_FAILURE);
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_bbuf_destroy(&from_empty);
+		ls_bbuf_destroy(&from_nonempty);
+		ls_bbuf_destroy(&from_invalid);
+	}
+	{
+		LSByteBuffer from_empty = ls_bbuf_create();
+		LSByteBuffer from_nonempty = ls_bbuf_create();
+		LSByteBuffer from_invalid = ls_bbuf_create();
+
+		LSStatus empty_status = ls_bbuf_insert_short_string(&from_empty, 0, LS_EMPTY_SHORT_STRING);
+		LSStatus nonempty_status = ls_bbuf_insert_short_string(&from_nonempty, 0, nonempty_short_string);
+		LSStatus invalid_status = ls_bbuf_insert_short_string(&from_invalid, 0, LS_AN_INVALID_SHORT_STRING);
+
+		assert(empty_status == LS_SUCCESS);
+		assert(nonempty_status == LS_SUCCESS);
+		assert(invalid_status == LS_FAILURE);
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_bbuf_destroy(&from_empty);
+		ls_bbuf_destroy(&from_nonempty);
+		ls_bbuf_destroy(&from_invalid);
+	}
+	{
+		LSByteBuffer from_empty = ls_bbuf_create();
+		LSByteBuffer from_nonempty = ls_bbuf_create();
+		LSByteBuffer from_invalid = ls_bbuf_create();
+
+		LSStatus empty_status = ls_bbuf_insert_sso_string(&from_empty, 0, LS_EMPTY_SSO_STRING);
+		LSStatus nonempty_status = ls_bbuf_insert_sso_string(&from_nonempty, 0, nonempty_sso_string);
+		LSStatus invalid_status = ls_bbuf_insert_sso_string(&from_invalid, 0, LS_AN_INVALID_SSO_STRING);
+
+		assert(empty_status == LS_SUCCESS);
+		assert(nonempty_status == LS_SUCCESS);
+		assert(invalid_status == LS_FAILURE);
+
+		assert(from_nonempty.len == NONEMPTY_LEN);
+		assert(memcmp(from_nonempty.bytes, NONEMPTY_BYTES, NONEMPTY_LEN) == 0);
+
+		ls_bbuf_destroy(&from_empty);
+		ls_bbuf_destroy(&from_nonempty);
+		ls_bbuf_destroy(&from_invalid);
+	}
+	{
+		LSByteBuffer from_empty = ls_bbuf_create();
+		LSByteBuffer from_nonempty = ls_bbuf_create();
+		LSByteBuffer from_invalid = ls_bbuf_create();
+
+		LSStatus empty_status = ls_bbuf_insert_sspan(&from_empty, 0, LS_EMPTY_SSPAN);
+		LSStatus nonempty_status = ls_bbuf_insert_sspan(&from_nonempty, 0, nonempty_sspan);
+		LSStatus invalid_status = ls_bbuf_insert_sspan(&from_invalid, 0, LS_AN_INVALID_SSPAN);
 
 		assert(empty_status == LS_SUCCESS);
 		assert(nonempty_status == LS_SUCCESS);

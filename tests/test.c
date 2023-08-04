@@ -9,6 +9,9 @@ static void test_conversions(void);
 static void test_append_funcs(void);
 static void test_insert_funcs(void);
 
+static void test_append_big(void);
+static void test_insert_big(void);
+
 static const LSByte NONEMPTY_BYTES[] = "deadbeef";
 static size_t NONEMPTY_LEN = sizeof(NONEMPTY_BYTES) - 1;
 
@@ -18,6 +21,9 @@ int main(void)
 	test_conversions();
 	test_append_funcs();
 	test_insert_funcs();
+
+	test_append_big();
+	test_insert_big();
 
 	return 0;
 }
@@ -686,4 +692,36 @@ void test_insert_funcs(void)
 
 	ls_string_destroy(&nonempty_string);
 	ls_sso_string_destroy(&nonempty_sso_string);
+}
+
+void test_append_big(void)
+{
+	LSByteBuffer bbuf = ls_bbuf_create();
+
+	static const char *long_cstr = "################################################################";
+	LSStringSpan long_sspan = ls_sspan_from_cstr(long_cstr);
+
+	LSStatus status = ls_bbuf_append_sspan(&bbuf, long_sspan);
+	assert(status == LS_SUCCESS);
+
+	assert(bbuf.len == long_sspan.len);
+	assert(memcmp(bbuf.bytes, long_sspan.start, long_sspan.len) == 0);
+
+	ls_bbuf_destroy(&bbuf);
+}
+
+void test_insert_big(void)
+{
+	LSByteBuffer bbuf = ls_bbuf_create();
+
+	static const char *long_cstr = "################################################################";
+	LSStringSpan long_sspan = ls_sspan_from_cstr(long_cstr);
+
+	LSStatus status = ls_bbuf_insert_sspan(&bbuf, 0, long_sspan);
+	assert(status == LS_SUCCESS);
+
+	assert(bbuf.len == long_sspan.len);
+	assert(memcmp(bbuf.bytes, long_sspan.start, long_sspan.len) == 0);
+
+	ls_bbuf_destroy(&bbuf);
 }

@@ -285,6 +285,15 @@ inline LSString ls_string_create(const LSByte *bytes, size_t len)
 
 /*
  * Constraints:
+ * - `string` is not `NULL`
+ */
+inline void ls_string_invalidate(LSString *string)
+{
+	string->bytes = NULL;
+}
+
+/*
+ * Constraints:
  * - `bytes` points to an array of at least `len` bytes
  *        OR is `NULL`
  *
@@ -306,6 +315,15 @@ inline LSShortString ls_short_string_create(const LSByte *bytes, size_t len)
 	memcpy(short_string._mut_bytes, bytes, len);
 
 	return short_string;
+}
+
+/*
+ * Constraints:
+ * - `short_string` is not `NULL`
+ */
+inline void ls_short_string_invalidate(LSShortString *short_string)
+{
+	short_string->len = SIZE_MAX;
 }
 
 /*
@@ -349,6 +367,18 @@ inline void ls_sso_string_destroy(LSSSOString *sso_string)
 
 /*
  * Constraints:
+ * - `sso_string` is not `NULL`
+ */
+inline void ls_sso_string_invalidate(LSSSOString *sso_string)
+{
+	sso_string->_long = (LSString){
+		.len = SIZE_MAX,
+		.bytes = NULL
+	};
+}
+
+/*
+ * Constraints:
  * - `start` points to an array of at least `len` bytes
  *        OR is `NULL`
  *
@@ -364,12 +394,30 @@ inline LSStringSpan ls_sspan_create(const LSByte *start, size_t len)
 }
 
 /*
+ * Constraints:
+ * - `sspan` is not `NULL`
+ */
+inline void ls_sspan_invalidate(LSStringSpan *sspan)
+{
+	sspan->start = NULL;
+}
+
+/*
  * Fails if:
  *  - allocation fails
  */
 inline LSByteBuffer ls_bbuf_create(void)
 {
 	return ls_bbuf_create_with_init_cap(16);
+}
+
+/*
+ * Constraints:
+ * - `bbuf` is not `NULL`
+ */
+inline void ls_bbuf_invalidate(LSByteBuffer *bbuf)
+{
+	bbuf->bytes = NULL;
 }
 
 /*

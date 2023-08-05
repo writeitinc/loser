@@ -6,6 +6,7 @@
 
 static void test_constructors(void);
 static void test_conversions(void);
+static void test_invalidate_funcs(void);
 static void test_append_funcs(void);
 static void test_insert_funcs(void);
 
@@ -21,6 +22,7 @@ int main(void)
 {
 	test_constructors();
 	test_conversions();
+	test_invalidate_funcs();
 	test_append_funcs();
 	test_insert_funcs();
 
@@ -472,6 +474,37 @@ void test_conversions(void)
 
 	ls_bbuf_destroy(&empty_bbuf);
 	ls_bbuf_destroy(&nonempty_bbuf);
+}
+
+void test_invalidate_funcs(void)
+{
+	LSString string = ls_string_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	LSShortString short_string = ls_short_string_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	LSSSOString sso_string = ls_sso_string_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	LSStringSpan sspan = ls_sspan_create(NONEMPTY_BYTES, NONEMPTY_LEN);
+	LSByteBuffer bbuf = ls_bbuf_create();
+
+	assert(ls_string_is_valid(string));
+	assert(ls_short_string_is_valid(short_string));
+	assert(ls_sso_string_is_valid(sso_string));
+	assert(ls_sspan_is_valid(sspan));
+	assert(ls_bbuf_is_valid(bbuf));
+
+	ls_string_destroy(&string);
+	ls_sso_string_destroy(&sso_string);
+	ls_bbuf_destroy(&bbuf);
+
+	ls_string_invalidate(&string);
+	ls_short_string_invalidate(&short_string);
+	ls_sso_string_invalidate(&sso_string);
+	ls_sspan_invalidate(&sspan);
+	ls_bbuf_invalidate(&bbuf);
+
+	assert(!ls_string_is_valid(string));
+	assert(!ls_short_string_is_valid(short_string));
+	assert(!ls_sso_string_is_valid(sso_string));
+	assert(!ls_sspan_is_valid(sspan));
+	assert(!ls_bbuf_is_valid(bbuf));
 }
 
 void test_append_funcs(void)

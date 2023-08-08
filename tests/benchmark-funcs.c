@@ -53,6 +53,7 @@ enum Function {
 	LS_STRING_FROM_CHARS,
 	LS_STRING_FROM_CSTR,
 	LS_STRING_DESTROY,
+	LS_STRING_INVALIDATE,
 	LS_SHORT_STRING_IS_VALID,
 	LS_SHORT_STRING_GET_BYTES,
 	LS_SHORT_STRING_CREATE,
@@ -61,6 +62,7 @@ enum Function {
 	LS_SHORT_STRING_FROM_SSPAN,
 	LS_SHORT_STRING_FROM_CHARS,
 	LS_SHORT_STRING_FROM_CSTR,
+	LS_SHORT_STRING_INVALIDATE,
 	LS_SSO_STRING_GET_TYPE,
 	LS_SSO_STRING_IS_VALID,
 	LS_SSO_STRING_GET_BYTES,
@@ -72,6 +74,7 @@ enum Function {
 	LS_SSO_STRING_FROM_CHARS,
 	LS_SSO_STRING_FROM_CSTR,
 	LS_SSO_STRING_DESTROY,
+	LS_SSO_STRING_INVALIDATE,
 	LS_SSPAN_IS_VALID,
 	LS_SSPAN_CREATE,
 	LS_SSPAN_FROM_STRING,
@@ -79,6 +82,7 @@ enum Function {
 	LS_SSPAN_FROM_SSO_STRING,
 	LS_SSPAN_FROM_CHARS,
 	LS_SSPAN_FROM_CSTR,
+	LS_SSPAN_INVALIDATE,
 	LS_BBUF_CREATE_WITH_INIT_CAP,
 	LS_BBUF_FROM_SSPAN,
 	LS_BBUF_CLONE,
@@ -91,6 +95,7 @@ enum Function {
 	CREATE_AND_INSERT,
 	CREATE_WIC_AND_INSERT,
 	LS_BBUF_DESTROY,
+	LS_BBUF_INVALIDATE,
 
 	NFUNCTIONS
 };
@@ -105,6 +110,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_STRING_FROM_CHARS]            = "ls_string_from_chars",
 	[LS_STRING_FROM_CSTR]             = "ls_string_from_cstr",
 	[LS_STRING_DESTROY]               = "ls_string_destroy",
+	[LS_STRING_INVALIDATE]            = "ls_string_invalidate",
 	[LS_SHORT_STRING_IS_VALID]        = "ls_short_string_is_valid",
 	[LS_SHORT_STRING_GET_BYTES]       = "ls_short_string_get_bytes",
 	[LS_SHORT_STRING_CREATE]          = "ls_short_string_create",
@@ -113,6 +119,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_SHORT_STRING_FROM_SSPAN]      = "ls_short_string_from_sspan",
 	[LS_SHORT_STRING_FROM_CHARS]      = "ls_short_string_from_chars",
 	[LS_SHORT_STRING_FROM_CSTR]       = "ls_short_string_from_cstr",
+	[LS_SHORT_STRING_INVALIDATE]      = "ls_short_string_invalidate",
 	[LS_SSO_STRING_GET_TYPE]          = "ls_sso_string_get_type",
 	[LS_SSO_STRING_IS_VALID]          = "ls_sso_string_is_valid",
 	[LS_SSO_STRING_GET_BYTES]         = "ls_sso_string_get_bytes",
@@ -124,6 +131,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_SSO_STRING_FROM_CHARS]        = "ls_sso_string_from_chars",
 	[LS_SSO_STRING_FROM_CSTR]         = "ls_sso_string_from_cstr",
 	[LS_SSO_STRING_DESTROY]           = "ls_sso_string_destroy",
+	[LS_SSO_STRING_INVALIDATE]        = "ls_sso_string_invalidate",
 	[LS_SSPAN_IS_VALID]               = "ls_sspan_is_valid",
 	[LS_SSPAN_CREATE]                 = "ls_sspan_create",
 	[LS_SSPAN_FROM_STRING]            = "ls_sspan_from_string",
@@ -131,6 +139,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_SSPAN_FROM_SSO_STRING]        = "ls_sspan_from_sso_string",
 	[LS_SSPAN_FROM_CHARS]             = "ls_sspan_from_chars",
 	[LS_SSPAN_FROM_CSTR]              = "ls_sspan_from_cstr",
+	[LS_SSPAN_INVALIDATE]             = "ls_sspan_invalidate",
 	[LS_BBUF_CREATE_WITH_INIT_CAP]    = "ls_bbuf_create_with_init_cap",
 	[LS_BBUF_FROM_SSPAN]              = "ls_bbuf_from_sspan",
 	[LS_BBUF_CLONE]                   = "ls_bbuf_clone",
@@ -143,6 +152,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[CREATE_AND_INSERT]               = "create bbuf + insert",
 	[CREATE_WIC_AND_INSERT]           = "create bbuf w/ init cap + insert",
 	[LS_BBUF_DESTROY]                 = "ls_bbuf_destroy",
+	[LS_BBUF_INVALIDATE]              = "ls_bbuf_invalidate",
 };
 
 #define MAX_LEN 32
@@ -317,6 +327,11 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				ls_string_destroy(iter);
 			});
 
+	BENCHMARK(LS_STRING_INVALIDATE, len_tag_idx,
+			FOREACH (LSString, iter, arrays.strings){
+				ls_string_invalidate(iter);
+			});
+
 	// ### LSShortString ###
 
 	// warm up memory
@@ -365,6 +380,11 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	BENCHMARK(LS_SHORT_STRING_FROM_CSTR, len_tag_idx,
 			FOREACH (LSShortString, iter, arrays.short_strings){
 				*iter = ls_short_string_from_cstr(cstr);
+			});
+
+	BENCHMARK(LS_SHORT_STRING_INVALIDATE, len_tag_idx,
+			FOREACH (LSShortString, iter, arrays.short_strings){
+				ls_short_string_invalidate(iter);
 			});
 
 	// ### LSSSOString ###
@@ -454,6 +474,11 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				ls_sso_string_destroy(iter);
 			});
 
+	BENCHMARK(LS_SSO_STRING_INVALIDATE, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.sso_strings) {
+				ls_sso_string_invalidate(iter);
+			});
+
 	// ### LSStringSpan
 
 	// warm up memory
@@ -494,6 +519,11 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	BENCHMARK(LS_SSPAN_FROM_CSTR, len_tag_idx,
 			FOREACH (LSStringSpan, iter, arrays.sspans) {
 				*iter = ls_sspan_from_cstr(cstr);
+			});
+
+	BENCHMARK(LS_SSPAN_INVALIDATE, len_tag_idx,
+			FOREACH (LSStringSpan, iter, arrays.sspans) {
+				ls_sspan_invalidate(iter);
 			});
 
 	BENCHMARK(LS_BBUF_CREATE_WITH_INIT_CAP, len_tag_idx,
@@ -606,6 +636,11 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	BENCHMARK(LS_BBUF_DESTROY, len_tag_idx,
 			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
 				ls_bbuf_destroy(iter);
+			});
+
+	BENCHMARK(LS_BBUF_INVALIDATE, len_tag_idx,
+			FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+				ls_bbuf_invalidate(iter);
 			});
 
 	ls_string_destroy(&string);

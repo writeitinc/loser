@@ -510,7 +510,7 @@ inline LSString ls_bbuf_finalize(LSByteBuffer *bbuf)
  * Constraints:
  * `bbuf` is not `NULL`
  */
-inline LSSSOString ls_bbuf_finalize_sso(LSByteBuffer *bbuf)
+inline LSSSOString ls_bbuf_finalize_as_sso(LSByteBuffer *bbuf)
 {
 	if (bbuf->len <= LS_SHORT_STRING_MAX_LEN) {
 		LSSSOString copy = ls_sso_from_bbuf(*bbuf);

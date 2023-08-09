@@ -980,9 +980,9 @@ void test_move_to_funcs(void)
 		LSByteBuffer big_bbuf = ls_bbuf_create();
 		LSByteBuffer invalid_bbuf = LS_AN_INVALID_BBUF;
 
-		LSSSOString small_mv = ls_bbuf_finalize_sso(&small_bbuf);
-		LSSSOString big_mv = ls_bbuf_finalize_sso(&big_bbuf);
-		LSSSOString invalid_mv = ls_bbuf_finalize_sso(&invalid_bbuf);
+		LSSSOString small_mv = ls_bbuf_finalize_as_sso(&small_bbuf);
+		LSSSOString big_mv = ls_bbuf_finalize_as_sso(&big_bbuf);
+		LSSSOString invalid_mv = ls_bbuf_finalize_as_sso(&invalid_bbuf);
 
 		assert(!ls_bbuf_is_valid(small_bbuf));
 		assert(!ls_bbuf_is_valid(big_bbuf));

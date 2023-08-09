@@ -30,7 +30,7 @@ LS_LINK(LSSSOString) ls_string_move_to_sso(LSString *string);
 LS_LINK(LSString) ls_sso_move_to_string(LSSSOString *sso);
 
 LS_LINK(LSString) ls_bbuf_finalize(LSByteBuffer *bbuf);
-LS_LINK(LSSSOString) ls_bbuf_finalize_sso(LSByteBuffer *bbuf);
+LS_LINK(LSSSOString) ls_bbuf_finalize_as_sso(LSByteBuffer *bbuf);
 
 LS_LINK(LSString) ls_string_clone(LSString string);
 LS_LINK(LSString) ls_string_from_short_string(LSShortString short_string);

@@ -421,6 +421,42 @@ inline void ls_bbuf_invalidate(LSByteBuffer *bbuf)
 }
 
 /*
+ * Constraints:
+ * `string` is not `NULL`
+ */
+inline LSString ls_string_move(LSString *string)
+{
+	LSString mv = *string;
+	ls_string_invalidate(string);
+
+	return mv;
+}
+
+/*
+ * Constraints:
+ * `sso_string` is not `NULL`
+ */
+inline LSSSOString ls_sso_string_move(LSSSOString *sso_string)
+{
+	LSSSOString mv = *sso_string;
+	ls_sso_string_invalidate(sso_string);
+
+	return mv;
+}
+
+/*
+ * Constraints:
+ * `bbuf` is not `NULL`
+ */
+inline LSByteBuffer ls_bbuf_move(LSByteBuffer *bbuf)
+{
+	LSByteBuffer mv = *bbuf;
+	ls_bbuf_invalidate(bbuf);
+
+	return mv;
+}
+
+/*
  * Fails if:
  * - allocation fails
  * - `string` is invalid

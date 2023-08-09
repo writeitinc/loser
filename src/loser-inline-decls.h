@@ -22,6 +22,10 @@ LS_LINK(void) ls_sspan_invalidate(LSStringSpan *sspan);
 LS_LINK(LSByteBuffer) ls_bbuf_create(void);
 LS_LINK(void) ls_bbuf_invalidate(LSByteBuffer *bbuf);
 
+LS_LINK(LSString) ls_string_move(LSString *string);
+LS_LINK(LSSSOString) ls_sso_string_move(LSSSOString *sso_string);
+LS_LINK(LSByteBuffer) ls_bbuf_move(LSByteBuffer *bbuf);
+
 LS_LINK(LSString) ls_string_clone(LSString string);
 LS_LINK(LSString) ls_string_from_short_string(LSShortString short_string);
 LS_LINK(LSString) ls_string_from_sso_string(LSSSOString sso_string);

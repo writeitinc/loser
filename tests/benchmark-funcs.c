@@ -37,7 +37,7 @@ static size_t size_max(size_t a, size_t b);
 static union {
 	LSString strings[NITERATIONS];
 	LSShortString short_strings[NITERATIONS];
-	LSSSOString sso_strings[NITERATIONS];
+	LSSSOString ssos[NITERATIONS];
 	LSStringSpan sspans[NITERATIONS];
 	LSByteBuffer bbufs[NITERATIONS];
 } arrays;
@@ -47,7 +47,7 @@ enum Function {
 	LS_STRING_CREATE,
 	LS_STRING_CLONE,
 	LS_STRING_FROM_SHORT_STRING,
-	LS_STRING_FROM_SSO_STRING,
+	LS_STRING_FROM_SSO,
 	LS_STRING_FROM_SSPAN,
 	LS_STRING_FROM_CHARS,
 	LS_STRING_FROM_CSTR,
@@ -57,28 +57,28 @@ enum Function {
 	LS_SHORT_STRING_GET_BYTES,
 	LS_SHORT_STRING_CREATE,
 	LS_SHORT_STRING_FROM_STRING,
-	LS_SHORT_STRING_FROM_SSO_STRING,
+	LS_SHORT_STRING_FROM_SSO,
 	LS_SHORT_STRING_FROM_SSPAN,
 	LS_SHORT_STRING_FROM_CHARS,
 	LS_SHORT_STRING_FROM_CSTR,
 	LS_SHORT_STRING_INVALIDATE,
-	LS_SSO_STRING_GET_TYPE,
-	LS_SSO_STRING_IS_VALID,
-	LS_SSO_STRING_GET_BYTES,
-	LS_SSO_STRING_CREATE,
-	LS_SSO_STRING_FROM_STRING,
-	LS_SSO_STRING_FROM_SHORT_STRING,
-	LS_SSO_STRING_CLONE,
-	LS_SSO_STRING_FROM_SSPAN,
-	LS_SSO_STRING_FROM_CHARS,
-	LS_SSO_STRING_FROM_CSTR,
-	LS_SSO_STRING_DESTROY,
-	LS_SSO_STRING_INVALIDATE,
+	LS_SSO_GET_TYPE,
+	LS_SSO_IS_VALID,
+	LS_SSO_GET_BYTES,
+	LS_SSO_CREATE,
+	LS_SSO_FROM_STRING,
+	LS_SSO_FROM_SHORT_STRING,
+	LS_SSO_CLONE,
+	LS_SSO_FROM_SSPAN,
+	LS_SSO_FROM_CHARS,
+	LS_SSO_FROM_CSTR,
+	LS_SSO_DESTROY,
+	LS_SSO_INVALIDATE,
 	LS_SSPAN_IS_VALID,
 	LS_SSPAN_CREATE,
 	LS_SSPAN_FROM_STRING,
 	LS_SSPAN_FROM_SHORT_STRING,
-	LS_SSPAN_FROM_SSO_STRING,
+	LS_SSPAN_FROM_SSO,
 	LS_SSPAN_FROM_CHARS,
 	LS_SSPAN_FROM_CSTR,
 	LS_SSPAN_INVALIDATE,
@@ -104,7 +104,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_STRING_CREATE]                = "ls_string_create",
 	[LS_STRING_CLONE]                 = "ls_string_clone",
 	[LS_STRING_FROM_SHORT_STRING]     = "ls_string_from_short_string",
-	[LS_STRING_FROM_SSO_STRING]       = "ls_string_from_sso_string",
+	[LS_STRING_FROM_SSO]       = "ls_string_from_sso",
 	[LS_STRING_FROM_SSPAN]            = "ls_string_from_sspan",
 	[LS_STRING_FROM_CHARS]            = "ls_string_from_chars",
 	[LS_STRING_FROM_CSTR]             = "ls_string_from_cstr",
@@ -114,28 +114,28 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_SHORT_STRING_GET_BYTES]       = "ls_short_string_get_bytes",
 	[LS_SHORT_STRING_CREATE]          = "ls_short_string_create",
 	[LS_SHORT_STRING_FROM_STRING]     = "ls_short_string_from_string",
-	[LS_SHORT_STRING_FROM_SSO_STRING] = "ls_short_string_from_sso_string",
+	[LS_SHORT_STRING_FROM_SSO] = "ls_short_string_from_sso",
 	[LS_SHORT_STRING_FROM_SSPAN]      = "ls_short_string_from_sspan",
 	[LS_SHORT_STRING_FROM_CHARS]      = "ls_short_string_from_chars",
 	[LS_SHORT_STRING_FROM_CSTR]       = "ls_short_string_from_cstr",
 	[LS_SHORT_STRING_INVALIDATE]      = "ls_short_string_invalidate",
-	[LS_SSO_STRING_GET_TYPE]          = "ls_sso_string_get_type",
-	[LS_SSO_STRING_IS_VALID]          = "ls_sso_string_is_valid",
-	[LS_SSO_STRING_GET_BYTES]         = "ls_sso_string_get_bytes",
-	[LS_SSO_STRING_CREATE]            = "ls_sso_string_create",
-	[LS_SSO_STRING_FROM_STRING]       = "ls_sso_string_from_string",
-	[LS_SSO_STRING_FROM_SHORT_STRING] = "ls_sso_string_from_short_string",
-	[LS_SSO_STRING_CLONE]             = "ls_sso_string_clone",
-	[LS_SSO_STRING_FROM_SSPAN]        = "ls_sso_string_from_sspan",
-	[LS_SSO_STRING_FROM_CHARS]        = "ls_sso_string_from_chars",
-	[LS_SSO_STRING_FROM_CSTR]         = "ls_sso_string_from_cstr",
-	[LS_SSO_STRING_DESTROY]           = "ls_sso_string_destroy",
-	[LS_SSO_STRING_INVALIDATE]        = "ls_sso_string_invalidate",
+	[LS_SSO_GET_TYPE]          = "ls_sso_get_type",
+	[LS_SSO_IS_VALID]          = "ls_sso_is_valid",
+	[LS_SSO_GET_BYTES]         = "ls_sso_get_bytes",
+	[LS_SSO_CREATE]            = "ls_sso_create",
+	[LS_SSO_FROM_STRING]       = "ls_sso_from_string",
+	[LS_SSO_FROM_SHORT_STRING] = "ls_sso_from_short_string",
+	[LS_SSO_CLONE]             = "ls_sso_clone",
+	[LS_SSO_FROM_SSPAN]        = "ls_sso_from_sspan",
+	[LS_SSO_FROM_CHARS]        = "ls_sso_from_chars",
+	[LS_SSO_FROM_CSTR]         = "ls_sso_from_cstr",
+	[LS_SSO_DESTROY]           = "ls_sso_destroy",
+	[LS_SSO_INVALIDATE]        = "ls_sso_invalidate",
 	[LS_SSPAN_IS_VALID]               = "ls_sspan_is_valid",
 	[LS_SSPAN_CREATE]                 = "ls_sspan_create",
 	[LS_SSPAN_FROM_STRING]            = "ls_sspan_from_string",
 	[LS_SSPAN_FROM_SHORT_STRING]      = "ls_sspan_from_short_string",
-	[LS_SSPAN_FROM_SSO_STRING]        = "ls_sspan_from_sso_string",
+	[LS_SSPAN_FROM_SSO]        = "ls_sspan_from_sso",
 	[LS_SSPAN_FROM_CHARS]             = "ls_sspan_from_chars",
 	[LS_SSPAN_FROM_CSTR]              = "ls_sspan_from_cstr",
 	[LS_SSPAN_INVALIDATE]             = "ls_sspan_invalidate",
@@ -240,7 +240,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	const LSByte *bytes = (const LSByte *)cstr;
 
 	LSShortString short_string = ls_short_string_create(bytes, len);
-	LSSSOString sso_string = ls_sso_string_create(bytes, len);
+	LSSSOString sso = ls_sso_create(bytes, len);
 	LSString string = ls_string_create(bytes, len);
 	LSStringSpan sspan = ls_sspan_create(bytes, len);
 	LSByteBuffer bbuf = ls_bbuf_from_sspan(sspan);
@@ -293,9 +293,9 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 		ls_string_destroy(iter);
 	}
 
-	BENCHMARK(LS_STRING_FROM_SSO_STRING, len_tag_idx,
+	BENCHMARK(LS_STRING_FROM_SSO, len_tag_idx,
 			FOREACH (LSString, iter, arrays.strings){
-				*iter = ls_string_from_sso_string(sso_string);
+				*iter = ls_string_from_sso(sso);
 			});
 	FOREACH (LSString, iter, arrays.strings) {
 		ls_string_destroy(iter);
@@ -361,9 +361,9 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*iter = ls_short_string_from_string(string);
 			});
 
-	BENCHMARK(LS_SHORT_STRING_FROM_SSO_STRING, len_tag_idx,
+	BENCHMARK(LS_SHORT_STRING_FROM_SSO, len_tag_idx,
 			FOREACH (LSShortString, iter, arrays.short_strings){
-				*iter = ls_short_string_from_sso_string(sso_string);
+				*iter = ls_short_string_from_sso(sso);
 			});
 
 	BENCHMARK(LS_SHORT_STRING_FROM_SSPAN, len_tag_idx,
@@ -389,93 +389,93 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 	// ### LSSSOString ###
 
 	// warm up memory
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		*iter = ls_sso_string_create(bytes, len);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		*iter = ls_sso_create(bytes, len);
 	}
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		ls_sso_string_destroy(iter);
-	}
-
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		*iter = ls_sso_string_create(bytes, len);
-	}
-	BENCHMARK(LS_SSO_STRING_GET_TYPE, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				vol_int = ls_sso_string_get_type(*iter);
-			});
-	BENCHMARK(LS_SSO_STRING_IS_VALID, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				vol_int = ls_sso_string_is_valid(*iter);
-			});
-	BENCHMARK(LS_SSO_STRING_GET_BYTES, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				ls_sso_string_get_bytes(iter);
-			});
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		ls_sso_string_destroy(iter);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
 	}
 
-	BENCHMARK(LS_SSO_STRING_CREATE, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				*iter = ls_sso_string_create(bytes, len);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		*iter = ls_sso_create(bytes, len);
+	}
+	BENCHMARK(LS_SSO_GET_TYPE, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				vol_int = ls_sso_get_type(*iter);
 			});
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		ls_sso_string_destroy(iter);
+	BENCHMARK(LS_SSO_IS_VALID, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				vol_int = ls_sso_is_valid(*iter);
+			});
+	BENCHMARK(LS_SSO_GET_BYTES, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				ls_sso_get_bytes(iter);
+			});
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
 	}
 
-	BENCHMARK(LS_SSO_STRING_FROM_STRING, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				*iter = ls_sso_string_from_string(string);
+	BENCHMARK(LS_SSO_CREATE, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				*iter = ls_sso_create(bytes, len);
 			});
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		ls_sso_string_destroy(iter);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
 	}
 
-	BENCHMARK(LS_SSO_STRING_FROM_SHORT_STRING, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				*iter = ls_sso_string_from_short_string(short_string);
+	BENCHMARK(LS_SSO_FROM_STRING, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				*iter = ls_sso_from_string(string);
 			});
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		ls_sso_string_destroy(iter);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
 	}
 
-	BENCHMARK(LS_SSO_STRING_CLONE, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				*iter = ls_sso_string_clone(sso_string);
+	BENCHMARK(LS_SSO_FROM_SHORT_STRING, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				*iter = ls_sso_from_short_string(short_string);
 			});
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		ls_sso_string_destroy(iter);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
 	}
 
-	BENCHMARK(LS_SSO_STRING_FROM_SSPAN, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				*iter = ls_sso_string_from_sspan(sspan);
+	BENCHMARK(LS_SSO_CLONE, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				*iter = ls_sso_clone(sso);
 			});
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		ls_sso_string_destroy(iter);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
 	}
 
-	BENCHMARK(LS_SSO_STRING_FROM_CHARS, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				*iter = ls_sso_string_from_chars(cstr, len);
+	BENCHMARK(LS_SSO_FROM_SSPAN, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				*iter = ls_sso_from_sspan(sspan);
 			});
-	FOREACH (LSSSOString, iter, arrays.sso_strings) {
-		ls_sso_string_destroy(iter);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
 	}
 
-	BENCHMARK(LS_SSO_STRING_FROM_CSTR, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				*iter = ls_sso_string_from_cstr(cstr);
+	BENCHMARK(LS_SSO_FROM_CHARS, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				*iter = ls_sso_from_chars(cstr, len);
+			});
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
+	}
+
+	BENCHMARK(LS_SSO_FROM_CSTR, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				*iter = ls_sso_from_cstr(cstr);
 			});
 
-	BENCHMARK(LS_SSO_STRING_DESTROY, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				ls_sso_string_destroy(iter);
+	BENCHMARK(LS_SSO_DESTROY, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				ls_sso_destroy(iter);
 			});
 
-	BENCHMARK(LS_SSO_STRING_INVALIDATE, len_tag_idx,
-			FOREACH (LSSSOString, iter, arrays.sso_strings) {
-				ls_sso_string_invalidate(iter);
+	BENCHMARK(LS_SSO_INVALIDATE, len_tag_idx,
+			FOREACH (LSSSOString, iter, arrays.ssos) {
+				ls_sso_invalidate(iter);
 			});
 
 	// ### LSStringSpan
@@ -505,9 +505,9 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*iter = ls_sspan_from_short_string(&short_string);
 			});
 
-	BENCHMARK(LS_SSPAN_FROM_SSO_STRING, len_tag_idx,
+	BENCHMARK(LS_SSPAN_FROM_SSO, len_tag_idx,
 			FOREACH (LSStringSpan, iter, arrays.sspans) {
-				*iter = ls_sspan_from_sso_string(&sso_string);
+				*iter = ls_sspan_from_sso(&sso);
 			});
 
 	BENCHMARK(LS_SSPAN_FROM_CHARS, len_tag_idx,
@@ -643,7 +643,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 			});
 
 	ls_string_destroy(&string);
-	ls_sso_string_destroy(&sso_string);
+	ls_sso_destroy(&sso);
 	ls_bbuf_destroy(&bbuf);
 }
 

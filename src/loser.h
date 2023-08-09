@@ -51,9 +51,9 @@ typedef union LSSSOString {
 
 // Indicates the contents of an `LSSSOString`.
 typedef enum LSSSOStringType {
-	LS_SSO_STRING_INVALID,
-	LS_SSO_STRING_SHORT,
-	LS_SSO_STRING_LONG
+	LS_SSO_INVALID,
+	LS_SSO_SHORT,
+	LS_SSO_LONG
 } LSSSOStringType;
 
 // A non-owning range of bytes.
@@ -81,7 +81,7 @@ extern const LSString LS_EMPTY_STRING;
 // Other empty constants.
 static const LSByte LS_EMPTY_BYTES[] = "";
 static const LSShortString LS_EMPTY_SHORT_STRING = { 0 };
-static const LSSSOString LS_EMPTY_SSO_STRING = {
+static const LSSSOString LS_EMPTY_SSO = {
 	._short = LS_EMPTY_SHORT_STRING
 };
 static const LSStringSpan LS_EMPTY_SSPAN = {
@@ -96,7 +96,7 @@ static const LSStringSpan LS_EMPTY_SSPAN = {
  * validity-checking functions.
  */
 #define LS_AN_INVALID_STRING (LSString){ .bytes = NULL }
-#define LS_AN_INVALID_SSO_STRING \
+#define LS_AN_INVALID_SSO \
 	(LSSSOString){ ._long.len = SIZE_MAX, ._long.bytes = NULL }
 #define LS_AN_INVALID_SHORT_STRING (LSShortString){ .len = SIZE_MAX }
 #define LS_AN_INVALID_SSPAN (LSStringSpan){ .start = NULL }
@@ -134,15 +134,15 @@ void ls_bbuf_destroy(LSByteBuffer *bbuf);
 
 /*
  * Fails if:
- * - `sso_string` doesn't contain a short string
+ * - `sso` doesn't contain a short string
  */
-LSShortString ls_short_string_from_sso_string(LSSSOString sso_string);
+LSShortString ls_short_string_from_sso(LSSSOString sso);
 
 /*
  * Fails if:
  * - `short_string` is invalid
  */
-LSSSOString ls_sso_string_from_short_string(LSShortString short_string);
+LSSSOString ls_sso_from_short_string(LSShortString short_string);
 
 /*
  * Fails if:
@@ -227,35 +227,35 @@ inline bool ls_bbuf_is_valid(LSByteBuffer bbuf)
 	return bbuf.bytes != NULL;
 }
 
-inline LSSSOStringType ls_sso_string_get_type(LSSSOString sso_string)
+inline LSSSOStringType ls_sso_get_type(LSSSOString sso)
 {
-	if (ls_short_string_is_valid(sso_string._short)) {
-		return LS_SSO_STRING_SHORT;
+	if (ls_short_string_is_valid(sso._short)) {
+		return LS_SSO_SHORT;
 	}
 
-	if (ls_string_is_valid(sso_string._long)) {
-		return LS_SSO_STRING_LONG;
+	if (ls_string_is_valid(sso._long)) {
+		return LS_SSO_LONG;
 	}
 
-	return LS_SSO_STRING_INVALID;
+	return LS_SSO_INVALID;
 }
 
-inline bool ls_sso_string_is_valid(LSSSOString sso_string)
+inline bool ls_sso_is_valid(LSSSOString sso)
 {
-	return ls_sso_string_get_type(sso_string) != LS_SSO_STRING_INVALID;
+	return ls_sso_get_type(sso) != LS_SSO_INVALID;
 }
 
 /*
  * Constraints:
- * `sso_string` is not `NULL`
+ * `sso` is not `NULL`
  */
-inline const LSByte *ls_sso_string_get_bytes(const LSSSOString *sso_string)
+inline const LSByte *ls_sso_get_bytes(const LSSSOString *sso)
 {
-	switch (ls_sso_string_get_type(*sso_string)) {
-	case LS_SSO_STRING_SHORT:
-		return sso_string->_short._mut_bytes;
-	case LS_SSO_STRING_LONG:
-		return sso_string->_long.bytes;
+	switch (ls_sso_get_type(*sso)) {
+	case LS_SSO_SHORT:
+		return sso->_short._mut_bytes;
+	case LS_SSO_LONG:
+		return sso->_long.bytes;
 	default:
 		return NULL;
 	}
@@ -335,7 +335,7 @@ inline void ls_short_string_invalidate(LSShortString *short_string)
  * - allocation is attempted and fails
  * - `bytes` is `NULL`
  */
-inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
+inline LSSSOString ls_sso_create(const LSByte *bytes, size_t len)
 {
 	if (len <= LS_SHORT_STRING_MAX_LEN) {
 		return (LSSSOString){
@@ -347,7 +347,7 @@ inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 			? LS_AN_INVALID_STRING
 			: ls__intern_string_create_unchecked(bytes, len);
 	if (!ls_string_is_valid(string)) {
-		return LS_AN_INVALID_SSO_STRING;
+		return LS_AN_INVALID_SSO;
 	}
 
 	return (LSSSOString){ ._long = string };
@@ -355,23 +355,23 @@ inline LSSSOString ls_sso_string_create(const LSByte *bytes, size_t len)
 
 /*
  * Constraints:
- * - `sso_string` is not `NULL`
- * - `sso_string` was not previously destroyed
+ * - `sso` is not `NULL`
+ * - `sso` was not previously destroyed
  */
-inline void ls_sso_string_destroy(LSSSOString *sso_string)
+inline void ls_sso_destroy(LSSSOString *sso)
 {
-	if (ls_sso_string_get_type(*sso_string) == LS_SSO_STRING_LONG) {
-		ls_string_destroy(&sso_string->_long);
+	if (ls_sso_get_type(*sso) == LS_SSO_LONG) {
+		ls_string_destroy(&sso->_long);
 	}
 }
 
 /*
  * Constraints:
- * - `sso_string` is not `NULL`
+ * - `sso` is not `NULL`
  */
-inline void ls_sso_string_invalidate(LSSSOString *sso_string)
+inline void ls_sso_invalidate(LSSSOString *sso)
 {
-	sso_string->_long = (LSString){
+	sso->_long = (LSString){
 		.len = SIZE_MAX,
 		.bytes = NULL
 	};
@@ -434,12 +434,12 @@ inline LSString ls_string_move(LSString *string)
 
 /*
  * Constraints:
- * `sso_string` is not `NULL`
+ * `sso` is not `NULL`
  */
-inline LSSSOString ls_sso_string_move(LSSSOString *sso_string)
+inline LSSSOString ls_sso_move(LSSSOString *sso)
 {
-	LSSSOString mv = *sso_string;
-	ls_sso_string_invalidate(sso_string);
+	LSSSOString mv = *sso;
+	ls_sso_invalidate(sso);
 
 	return mv;
 }
@@ -460,10 +460,10 @@ inline LSByteBuffer ls_bbuf_move(LSByteBuffer *bbuf)
  * Constraints:
  * `string` is not `NULL`
  */
-inline LSSSOString ls_string_move_to_sso_string(LSString *string)
+inline LSSSOString ls_string_move_to_sso(LSString *string)
 {
 	if (string->len <= LS_SHORT_STRING_MAX_LEN) {
-		LSSSOString copy = ls_sso_string_from_string(*string);
+		LSSSOString copy = ls_sso_from_string(*string);
 
 		ls_string_destroy(string);
 		ls_string_invalidate(string);
@@ -478,16 +478,16 @@ inline LSSSOString ls_string_move_to_sso_string(LSString *string)
 
 /*
  * Constraints:
- * `sso_string` is not `NULL`
+ * `sso` is not `NULL`
  */
-inline LSString ls_sso_string_move_to_string(LSSSOString *sso_string)
+inline LSString ls_sso_move_to_string(LSSSOString *sso)
 {
-	if (ls_sso_string_get_type(*sso_string) != LS_SSO_STRING_LONG) {
-		return ls_string_from_sso_string(
-				ls_sso_string_move(sso_string));
+	if (ls_sso_get_type(*sso) != LS_SSO_LONG) {
+		return ls_string_from_sso(
+				ls_sso_move(sso));
 	}
 
-	return ls_string_move(&sso_string->_long);
+	return ls_string_move(&sso->_long);
 }
 
 /*
@@ -513,7 +513,7 @@ inline LSString ls_bbuf_finalize(LSByteBuffer *bbuf)
 inline LSSSOString ls_bbuf_finalize_sso(LSByteBuffer *bbuf)
 {
 	if (bbuf->len <= LS_SHORT_STRING_MAX_LEN) {
-		LSSSOString copy = ls_sso_string_from_bbuf(*bbuf);
+		LSSSOString copy = ls_sso_from_bbuf(*bbuf);
 
 		ls_bbuf_destroy(bbuf);
 		ls_bbuf_invalidate(bbuf);
@@ -553,12 +553,12 @@ inline LSString ls_string_from_short_string(LSShortString short_string)
 /*
  * Fails if:
  * - allocation fails
- * - `sso_string` is invalid
+ * - `sso` is invalid
  */
-inline LSString ls_string_from_sso_string(LSSSOString sso_string)
+inline LSString ls_string_from_sso(LSSSOString sso)
 {
-	const LSByte *bytes = ls_sso_string_get_bytes(&sso_string);
-	return ls_string_create(bytes, sso_string.len);
+	const LSByte *bytes = ls_sso_get_bytes(&sso);
+	return ls_string_create(bytes, sso.len);
 }
 
 /*
@@ -678,19 +678,19 @@ inline LSShortString ls_short_string_from_cstr(const char *cstr)
 /*
  * Fails if:
  * - allocation is attempted and fails
- * - `sso_string` is invalid
+ * - `sso` is invalid
  */
-inline LSSSOString ls_sso_string_clone(LSSSOString sso_string)
+inline LSSSOString ls_sso_clone(LSSSOString sso)
 {
-	LSSSOStringType type = ls_sso_string_get_type(sso_string);
+	LSSSOStringType type = ls_sso_get_type(sso);
 
-	if (type == LS_SSO_STRING_SHORT || type == LS_SSO_STRING_INVALID) {
-		return sso_string;
+	if (type == LS_SSO_SHORT || type == LS_SSO_INVALID) {
+		return sso;
 	}
 
-	LSString string = ls_string_clone(sso_string._long);
+	LSString string = ls_string_clone(sso._long);
 	if (!ls_string_is_valid(string)) {
-		return LS_AN_INVALID_SSO_STRING;
+		return LS_AN_INVALID_SSO;
 	}
 
 	return (LSSSOString){ ._long = string };
@@ -701,9 +701,9 @@ inline LSSSOString ls_sso_string_clone(LSSSOString sso_string)
  * - allocation is attempted and fails
  * - `string` is invalid
  */
-inline LSSSOString ls_sso_string_from_string(LSString string)
+inline LSSSOString ls_sso_from_string(LSString string)
 {
-	return ls_sso_string_create(string.bytes, string.len);
+	return ls_sso_create(string.bytes, string.len);
 }
 
 /*
@@ -711,9 +711,9 @@ inline LSSSOString ls_sso_string_from_string(LSString string)
  * - allocation is attempted and fails
  * - `sspan` is invalid
  */
-inline LSSSOString ls_sso_string_from_sspan(LSStringSpan sspan)
+inline LSSSOString ls_sso_from_sspan(LSStringSpan sspan)
 {
-	return ls_sso_string_create(sspan.start, sspan.len);
+	return ls_sso_create(sspan.start, sspan.len);
 }
 
 /*
@@ -721,9 +721,9 @@ inline LSSSOString ls_sso_string_from_sspan(LSStringSpan sspan)
  * - allocation is attempted and fails
  * - `bbuf` is invalid
  */
-inline LSSSOString ls_sso_string_from_bbuf(LSByteBuffer bbuf)
+inline LSSSOString ls_sso_from_bbuf(LSByteBuffer bbuf)
 {
-	return ls_sso_string_create(bbuf.bytes, bbuf.len);
+	return ls_sso_create(bbuf.bytes, bbuf.len);
 }
 
 /*
@@ -735,9 +735,9 @@ inline LSSSOString ls_sso_string_from_bbuf(LSByteBuffer bbuf)
  * - allocation is attempted and fails
  * - `chars` is `NULL`
  */
-inline LSSSOString ls_sso_string_from_chars(const char *chars, size_t len)
+inline LSSSOString ls_sso_from_chars(const char *chars, size_t len)
 {
-	return ls_sso_string_create((const LSByte *)chars, len);
+	return ls_sso_create((const LSByte *)chars, len);
 }
 
 /*
@@ -749,13 +749,13 @@ inline LSSSOString ls_sso_string_from_chars(const char *chars, size_t len)
  * - allocation is attempted and fails
  * - `cstr` is invalid
  */
-inline LSSSOString ls_sso_string_from_cstr(const char *cstr)
+inline LSSSOString ls_sso_from_cstr(const char *cstr)
 {
 	if (cstr == NULL) {
-		return LS_AN_INVALID_SSO_STRING;
+		return LS_AN_INVALID_SSO;
 	}
 
-	return ls_sso_string_from_chars(cstr, strlen(cstr));
+	return ls_sso_from_chars(cstr, strlen(cstr));
 }
 
 /*
@@ -796,19 +796,19 @@ inline LSStringSpan ls_sspan_from_short_string(
 
 /*
  * Constraints:
- *  - `sso_string` is not `NULL`
+ *  - `sso` is not `NULL`
  *
  * Resulting `LSStringSpan` does not include the final null-terminator.
  *
  * Fails if:
- * - `sso_string` is invalid
+ * - `sso` is invalid
  */
-inline LSStringSpan ls_sspan_from_sso_string(const LSSSOString *sso_string)
+inline LSStringSpan ls_sspan_from_sso(const LSSSOString *sso)
 {
-	const LSByte *bytes = ls_sso_string_get_bytes(sso_string);
+	const LSByte *bytes = ls_sso_get_bytes(sso);
 
 	return (LSStringSpan){
-		.len = sso_string->len,
+		.len = sso->len,
 		.start = bytes
 	};
 }
@@ -950,15 +950,14 @@ inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
  *
  * Fails if:
  * - `bbuf` is invalid
- * - `sso_string` is invalid
+ * - `sso` is invalid
  * - reallocation is attempted and fails
  */
-inline LSStatus ls_bbuf_append_sso_string(LSByteBuffer *bbuf,
-		LSSSOString sso_string)
+inline LSStatus ls_bbuf_append_sso(LSByteBuffer *bbuf, LSSSOString sso)
 {
-	const LSByte *bytes = ls_sso_string_get_bytes(&sso_string);
+	const LSByte *bytes = ls_sso_get_bytes(&sso);
 
-	return ls_bbuf_append(bbuf, bytes, sso_string.len);
+	return ls_bbuf_append(bbuf, bytes, sso.len);
 }
 
 /*
@@ -1015,16 +1014,16 @@ inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf, size_t idx,
  *
  * Fails if:
  * - `bbuf` is invalid
- * - `sso_string` is invalid
+ * - `sso` is invalid
  * - `idx` is greater than `bbuf->len`
  * - reallocation is attempted and fails
  */
-inline LSStatus ls_bbuf_insert_sso_string(LSByteBuffer *bbuf, size_t idx,
-		LSSSOString sso_string)
+inline LSStatus ls_bbuf_insert_sso(LSByteBuffer *bbuf, size_t idx,
+		LSSSOString sso)
 {
-	const LSByte *bytes = ls_sso_string_get_bytes(&sso_string);
+	const LSByte *bytes = ls_sso_get_bytes(&sso);
 
-	return ls_bbuf_insert(bbuf, idx, bytes, sso_string.len);
+	return ls_bbuf_insert(bbuf, idx, bytes, sso.len);
 }
 
 /*

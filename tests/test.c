@@ -76,24 +76,24 @@ void test_constructors(void)
 		assert(memcmp(from_nonempty._mut_bytes, SMALL_BYTES, SMALL_LEN) == 0);
 	}
 	{
-		LSSSOString from_empty = ls_sso_string_create(LS_EMPTY_BYTES, 0);
-		LSSSOString from_small = ls_sso_string_create(SMALL_BYTES, SMALL_LEN);
-		LSSSOString from_big = ls_sso_string_create(BIG_BYTES, BIG_LEN);
-		LSSSOString from_null = ls_sso_string_create(NULL, 0);
+		LSSSOString from_empty = ls_sso_create(LS_EMPTY_BYTES, 0);
+		LSSSOString from_small = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+		LSSSOString from_big = ls_sso_create(BIG_BYTES, BIG_LEN);
+		LSSSOString from_null = ls_sso_create(NULL, 0);
 
-		assert(ls_sso_string_is_valid(from_empty));
-		assert(ls_sso_string_is_valid(from_small));
-		assert(ls_sso_string_is_valid(from_big));
-		assert(!ls_sso_string_is_valid(from_null));
+		assert(ls_sso_is_valid(from_empty));
+		assert(ls_sso_is_valid(from_small));
+		assert(ls_sso_is_valid(from_big));
+		assert(!ls_sso_is_valid(from_null));
 
 		assert(from_small.len == SMALL_LEN);
 		assert(from_big.len == BIG_LEN);
-		assert(memcmp(ls_sso_string_get_bytes(&from_small), SMALL_BYTES, SMALL_LEN) == 0);
-		assert(memcmp(ls_sso_string_get_bytes(&from_big), BIG_BYTES, BIG_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_small), SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_big), BIG_BYTES, BIG_LEN) == 0);
 
-		ls_sso_string_destroy(&from_empty);
-		ls_sso_string_destroy(&from_small);
-		ls_sso_string_destroy(&from_big);
+		ls_sso_destroy(&from_empty);
+		ls_sso_destroy(&from_small);
+		ls_sso_destroy(&from_big);
 	}
 	{
 		LSStringSpan from_empty = ls_sspan_create(LS_EMPTY_BYTES, 0);
@@ -113,8 +113,8 @@ void test_conversions(void)
 {
 	LSString nonempty_string = ls_string_create(SMALL_BYTES, SMALL_LEN);
 	LSShortString nonempty_short_string = ls_short_string_create(SMALL_BYTES, SMALL_LEN);
-	LSSSOString small_sso_string = ls_sso_string_create(SMALL_BYTES, SMALL_LEN);
-	LSSSOString big_sso_string = ls_sso_string_create(BIG_BYTES, BIG_LEN);
+	LSSSOString small_sso = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+	LSSSOString big_sso = ls_sso_create(BIG_BYTES, BIG_LEN);
 	LSStringSpan nonempty_sspan = ls_sspan_create(SMALL_BYTES, SMALL_LEN);
 
 	LSByteBuffer empty_bbuf = ls_bbuf_create();
@@ -154,10 +154,10 @@ void test_conversions(void)
 		ls_string_destroy(&from_nonempty);
 	}
 	{
-		LSString from_empty = ls_string_from_sso_string(LS_EMPTY_SSO_STRING);
-		LSString from_small = ls_string_from_sso_string(small_sso_string);
-		LSString from_big = ls_string_from_sso_string(big_sso_string);
-		LSString from_invalid = ls_string_from_sso_string(LS_AN_INVALID_SSO_STRING);
+		LSString from_empty = ls_string_from_sso(LS_EMPTY_SSO);
+		LSString from_small = ls_string_from_sso(small_sso);
+		LSString from_big = ls_string_from_sso(big_sso);
+		LSString from_invalid = ls_string_from_sso(LS_AN_INVALID_SSO);
 
 		assert(ls_string_is_valid(from_empty));
 		assert(ls_string_is_valid(from_small));
@@ -247,10 +247,10 @@ void test_conversions(void)
 		assert(memcmp(from_nonempty._mut_bytes, SMALL_BYTES, SMALL_LEN) == 0);
 	}
 	{
-		LSShortString from_empty = ls_short_string_from_sso_string(LS_EMPTY_SSO_STRING);
-		LSShortString from_small = ls_short_string_from_sso_string(small_sso_string);
-		LSShortString from_big = ls_short_string_from_sso_string(big_sso_string);
-		LSShortString from_invalid = ls_short_string_from_sso_string(LS_AN_INVALID_SSO_STRING);
+		LSShortString from_empty = ls_short_string_from_sso(LS_EMPTY_SSO);
+		LSShortString from_small = ls_short_string_from_sso(small_sso);
+		LSShortString from_big = ls_short_string_from_sso(big_sso);
+		LSShortString from_invalid = ls_short_string_from_sso(LS_AN_INVALID_SSO);
 
 		assert(ls_short_string_is_valid(from_empty));
 		assert(ls_short_string_is_valid(from_small));
@@ -310,113 +310,113 @@ void test_conversions(void)
 	}
 
 	{
-		LSSSOString from_empty = ls_sso_string_from_string(LS_EMPTY_STRING);
-		LSSSOString from_nonempty = ls_sso_string_from_string(nonempty_string);
-		LSSSOString from_invalid = ls_sso_string_from_string(LS_AN_INVALID_STRING);
+		LSSSOString from_empty = ls_sso_from_string(LS_EMPTY_STRING);
+		LSSSOString from_nonempty = ls_sso_from_string(nonempty_string);
+		LSSSOString from_invalid = ls_sso_from_string(LS_AN_INVALID_STRING);
 
-		assert(ls_sso_string_is_valid(from_empty));
-		assert(ls_sso_string_is_valid(from_nonempty));
-		assert(!ls_sso_string_is_valid(from_invalid));
-
-		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
-
-		ls_sso_string_destroy(&from_empty);
-		ls_sso_string_destroy(&from_nonempty);
-	}
-	{
-		LSSSOString from_empty = ls_sso_string_from_short_string(LS_EMPTY_SHORT_STRING);
-		LSSSOString from_nonempty = ls_sso_string_from_short_string(nonempty_short_string);
-		LSSSOString from_invalid = ls_sso_string_from_short_string(LS_AN_INVALID_SHORT_STRING);
-
-		assert(ls_sso_string_is_valid(from_empty));
-		assert(ls_sso_string_is_valid(from_nonempty));
-		assert(!ls_sso_string_is_valid(from_invalid));
+		assert(ls_sso_is_valid(from_empty));
+		assert(ls_sso_is_valid(from_nonempty));
+		assert(!ls_sso_is_valid(from_invalid));
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
 
-		ls_sso_string_destroy(&from_empty);
-		ls_sso_string_destroy(&from_nonempty);
+		ls_sso_destroy(&from_empty);
+		ls_sso_destroy(&from_nonempty);
 	}
 	{
-		LSSSOString from_empty = ls_sso_string_clone(LS_EMPTY_SSO_STRING);
-		LSSSOString from_small = ls_sso_string_clone(small_sso_string);
-		LSSSOString from_big = ls_sso_string_clone(big_sso_string);
-		LSSSOString from_invalid = ls_sso_string_clone(LS_AN_INVALID_SSO_STRING);
+		LSSSOString from_empty = ls_sso_from_short_string(LS_EMPTY_SHORT_STRING);
+		LSSSOString from_nonempty = ls_sso_from_short_string(nonempty_short_string);
+		LSSSOString from_invalid = ls_sso_from_short_string(LS_AN_INVALID_SHORT_STRING);
 
-		assert(ls_sso_string_is_valid(from_empty));
-		assert(ls_sso_string_is_valid(from_small));
-		assert(ls_sso_string_is_valid(from_big));
-		assert(!ls_sso_string_is_valid(from_invalid));
+		assert(ls_sso_is_valid(from_empty));
+		assert(ls_sso_is_valid(from_nonempty));
+		assert(!ls_sso_is_valid(from_invalid));
+
+		assert(from_nonempty.len == SMALL_LEN);
+		assert(memcmp(ls_sso_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
+
+		ls_sso_destroy(&from_empty);
+		ls_sso_destroy(&from_nonempty);
+	}
+	{
+		LSSSOString from_empty = ls_sso_clone(LS_EMPTY_SSO);
+		LSSSOString from_small = ls_sso_clone(small_sso);
+		LSSSOString from_big = ls_sso_clone(big_sso);
+		LSSSOString from_invalid = ls_sso_clone(LS_AN_INVALID_SSO);
+
+		assert(ls_sso_is_valid(from_empty));
+		assert(ls_sso_is_valid(from_small));
+		assert(ls_sso_is_valid(from_big));
+		assert(!ls_sso_is_valid(from_invalid));
 
 		assert(from_small.len == SMALL_LEN);
 		assert(from_big.len == BIG_LEN);
-		assert(memcmp(ls_sso_string_get_bytes(&from_small), SMALL_BYTES, SMALL_LEN) == 0);
-		assert(memcmp(ls_sso_string_get_bytes(&from_big), BIG_BYTES, BIG_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_small), SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_big), BIG_BYTES, BIG_LEN) == 0);
 
-		ls_sso_string_destroy(&from_empty);
-		ls_sso_string_destroy(&from_small);
-		ls_sso_string_destroy(&from_big);
+		ls_sso_destroy(&from_empty);
+		ls_sso_destroy(&from_small);
+		ls_sso_destroy(&from_big);
 	}
 	{
-		LSSSOString from_empty = ls_sso_string_from_sspan(LS_EMPTY_SSPAN);
-		LSSSOString from_nonempty = ls_sso_string_from_sspan(nonempty_sspan);
-		LSSSOString from_invalid = ls_sso_string_from_sspan(LS_AN_INVALID_SSPAN);
+		LSSSOString from_empty = ls_sso_from_sspan(LS_EMPTY_SSPAN);
+		LSSSOString from_nonempty = ls_sso_from_sspan(nonempty_sspan);
+		LSSSOString from_invalid = ls_sso_from_sspan(LS_AN_INVALID_SSPAN);
 
-		assert(ls_sso_string_is_valid(from_empty));
-		assert(ls_sso_string_is_valid(from_nonempty));
-		assert(!ls_sso_string_is_valid(from_invalid));
+		assert(ls_sso_is_valid(from_empty));
+		assert(ls_sso_is_valid(from_nonempty));
+		assert(!ls_sso_is_valid(from_invalid));
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
 
-		ls_sso_string_destroy(&from_empty);
-		ls_sso_string_destroy(&from_nonempty);
+		ls_sso_destroy(&from_empty);
+		ls_sso_destroy(&from_nonempty);
 	}
 	{
-		LSSSOString from_empty = ls_sso_string_from_bbuf(empty_bbuf);
-		LSSSOString from_nonempty = ls_sso_string_from_bbuf(nonempty_bbuf);
-		LSSSOString from_invalid = ls_sso_string_from_bbuf(LS_AN_INVALID_BBUF);
-		assert(ls_sso_string_is_valid(from_empty));
-		assert(ls_sso_string_is_valid(from_nonempty));
-		assert(!ls_sso_string_is_valid(from_invalid));
+		LSSSOString from_empty = ls_sso_from_bbuf(empty_bbuf);
+		LSSSOString from_nonempty = ls_sso_from_bbuf(nonempty_bbuf);
+		LSSSOString from_invalid = ls_sso_from_bbuf(LS_AN_INVALID_BBUF);
+		assert(ls_sso_is_valid(from_empty));
+		assert(ls_sso_is_valid(from_nonempty));
+		assert(!ls_sso_is_valid(from_invalid));
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
 
-		ls_sso_string_destroy(&from_empty);
-		ls_sso_string_destroy(&from_nonempty);
+		ls_sso_destroy(&from_empty);
+		ls_sso_destroy(&from_nonempty);
 	}
 	{
-		LSSSOString from_empty = ls_sso_string_from_chars((const char *)LS_EMPTY_BYTES, 0);
-		LSSSOString from_nonempty = ls_sso_string_from_chars((const char *)SMALL_BYTES, SMALL_LEN);
-		LSSSOString from_null = ls_sso_string_from_chars(NULL, 0);
+		LSSSOString from_empty = ls_sso_from_chars((const char *)LS_EMPTY_BYTES, 0);
+		LSSSOString from_nonempty = ls_sso_from_chars((const char *)SMALL_BYTES, SMALL_LEN);
+		LSSSOString from_null = ls_sso_from_chars(NULL, 0);
 
-		assert(ls_sso_string_is_valid(from_empty));
-		assert(ls_sso_string_is_valid(from_nonempty));
-		assert(!ls_sso_string_is_valid(from_null));
+		assert(ls_sso_is_valid(from_empty));
+		assert(ls_sso_is_valid(from_nonempty));
+		assert(!ls_sso_is_valid(from_null));
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
 
-		ls_sso_string_destroy(&from_empty);
-		ls_sso_string_destroy(&from_nonempty);
+		ls_sso_destroy(&from_empty);
+		ls_sso_destroy(&from_nonempty);
 	}
 	{
-		LSSSOString from_empty = ls_sso_string_from_cstr((const char *)LS_EMPTY_BYTES);
-		LSSSOString from_nonempty = ls_sso_string_from_cstr((const char *)SMALL_BYTES);
-		LSSSOString from_null = ls_sso_string_from_cstr(NULL);
+		LSSSOString from_empty = ls_sso_from_cstr((const char *)LS_EMPTY_BYTES);
+		LSSSOString from_nonempty = ls_sso_from_cstr((const char *)SMALL_BYTES);
+		LSSSOString from_null = ls_sso_from_cstr(NULL);
 
-		assert(ls_sso_string_is_valid(from_empty));
-		assert(ls_sso_string_is_valid(from_nonempty));
-		assert(!ls_sso_string_is_valid(from_null));
+		assert(ls_sso_is_valid(from_empty));
+		assert(ls_sso_is_valid(from_nonempty));
+		assert(!ls_sso_is_valid(from_null));
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(ls_sso_string_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(ls_sso_get_bytes(&from_nonempty), SMALL_BYTES, SMALL_LEN) == 0);
 
-		ls_sso_string_destroy(&from_empty);
-		ls_sso_string_destroy(&from_nonempty);
+		ls_sso_destroy(&from_empty);
+		ls_sso_destroy(&from_nonempty);
 	}
 
 	{
@@ -444,10 +444,10 @@ void test_conversions(void)
 		assert(memcmp(from_nonempty.start, SMALL_BYTES, SMALL_LEN) == 0);
 	}
 	{
-		LSStringSpan from_empty = ls_sspan_from_sso_string(&LS_EMPTY_SSO_STRING);
-		LSStringSpan from_small = ls_sspan_from_sso_string(&small_sso_string);
-		LSStringSpan from_big = ls_sspan_from_sso_string(&big_sso_string);
-		LSStringSpan from_invalid = ls_sspan_from_sso_string(&LS_AN_INVALID_SSO_STRING);
+		LSStringSpan from_empty = ls_sspan_from_sso(&LS_EMPTY_SSO);
+		LSStringSpan from_small = ls_sspan_from_sso(&small_sso);
+		LSStringSpan from_big = ls_sspan_from_sso(&big_sso);
+		LSStringSpan from_invalid = ls_sspan_from_sso(&LS_AN_INVALID_SSO);
 
 		assert(ls_sspan_is_valid(from_empty));
 		assert(ls_sspan_is_valid(from_small));
@@ -504,8 +504,8 @@ void test_conversions(void)
 	}
 
 	ls_string_destroy(&nonempty_string);
-	ls_sso_string_destroy(&small_sso_string);
-	ls_sso_string_destroy(&big_sso_string);
+	ls_sso_destroy(&small_sso);
+	ls_sso_destroy(&big_sso);
 
 	ls_bbuf_destroy(&empty_bbuf);
 	ls_bbuf_destroy(&nonempty_bbuf);
@@ -515,34 +515,34 @@ void test_invalidate_funcs(void)
 {
 	LSString string = ls_string_create(SMALL_BYTES, SMALL_LEN);
 	LSShortString short_string = ls_short_string_create(SMALL_BYTES, SMALL_LEN);
-	LSSSOString small_sso_string = ls_sso_string_create(SMALL_BYTES, SMALL_LEN);
-	LSSSOString big_sso_string = ls_sso_string_create(BIG_BYTES, BIG_LEN);
+	LSSSOString small_sso = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+	LSSSOString big_sso = ls_sso_create(BIG_BYTES, BIG_LEN);
 	LSStringSpan sspan = ls_sspan_create(SMALL_BYTES, SMALL_LEN);
 	LSByteBuffer bbuf = ls_bbuf_create();
 
 	assert(ls_string_is_valid(string));
 	assert(ls_short_string_is_valid(short_string));
-	assert(ls_sso_string_is_valid(small_sso_string));
-	assert(ls_sso_string_is_valid(big_sso_string));
+	assert(ls_sso_is_valid(small_sso));
+	assert(ls_sso_is_valid(big_sso));
 	assert(ls_sspan_is_valid(sspan));
 	assert(ls_bbuf_is_valid(bbuf));
 
 	ls_string_destroy(&string);
-	ls_sso_string_destroy(&small_sso_string);
-	ls_sso_string_destroy(&big_sso_string);
+	ls_sso_destroy(&small_sso);
+	ls_sso_destroy(&big_sso);
 	ls_bbuf_destroy(&bbuf);
 
 	ls_string_invalidate(&string);
 	ls_short_string_invalidate(&short_string);
-	ls_sso_string_invalidate(&small_sso_string);
-	ls_sso_string_invalidate(&big_sso_string);
+	ls_sso_invalidate(&small_sso);
+	ls_sso_invalidate(&big_sso);
 	ls_sspan_invalidate(&sspan);
 	ls_bbuf_invalidate(&bbuf);
 
 	assert(!ls_string_is_valid(string));
 	assert(!ls_short_string_is_valid(short_string));
-	assert(!ls_sso_string_is_valid(small_sso_string));
-	assert(!ls_sso_string_is_valid(big_sso_string));
+	assert(!ls_sso_is_valid(small_sso));
+	assert(!ls_sso_is_valid(big_sso));
 	assert(!ls_sspan_is_valid(sspan));
 	assert(!ls_bbuf_is_valid(bbuf));
 }
@@ -551,8 +551,8 @@ void test_append_funcs(void)
 {
 	LSString nonempty_string = ls_string_create(SMALL_BYTES, SMALL_LEN);
 	LSShortString nonempty_short_string = ls_short_string_create(SMALL_BYTES, SMALL_LEN);
-	LSSSOString small_sso_string = ls_sso_string_create(SMALL_BYTES, SMALL_LEN);
-	LSSSOString big_sso_string = ls_sso_string_create(BIG_BYTES, BIG_LEN);
+	LSSSOString small_sso = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+	LSSSOString big_sso = ls_sso_create(BIG_BYTES, BIG_LEN);
 	LSStringSpan nonempty_sspan = ls_sspan_create(SMALL_BYTES, SMALL_LEN);
 	{
 		LSByteBuffer from_empty = ls_bbuf_create();
@@ -620,10 +620,10 @@ void test_append_funcs(void)
 		LSByteBuffer from_big = ls_bbuf_create();
 		LSByteBuffer from_invalid = ls_bbuf_create();
 
-		LSStatus empty_status = ls_bbuf_append_sso_string(&from_empty, LS_EMPTY_SSO_STRING);
-		LSStatus small_status = ls_bbuf_append_sso_string(&from_small, small_sso_string);
-		LSStatus big_status = ls_bbuf_append_sso_string(&from_big, big_sso_string);
-		LSStatus invalid_status = ls_bbuf_append_sso_string(&from_invalid, LS_AN_INVALID_SSO_STRING);
+		LSStatus empty_status = ls_bbuf_append_sso(&from_empty, LS_EMPTY_SSO);
+		LSStatus small_status = ls_bbuf_append_sso(&from_small, small_sso);
+		LSStatus big_status = ls_bbuf_append_sso(&from_big, big_sso);
+		LSStatus invalid_status = ls_bbuf_append_sso(&from_invalid, LS_AN_INVALID_SSO);
 
 		assert(empty_status == LS_SUCCESS);
 		assert(small_status == LS_SUCCESS);
@@ -662,16 +662,16 @@ void test_append_funcs(void)
 	}
 
 	ls_string_destroy(&nonempty_string);
-	ls_sso_string_destroy(&small_sso_string);
-	ls_sso_string_destroy(&big_sso_string);
+	ls_sso_destroy(&small_sso);
+	ls_sso_destroy(&big_sso);
 }
 
 void test_insert_funcs(void)
 {
 	LSString nonempty_string = ls_string_create(SMALL_BYTES, SMALL_LEN);
 	LSShortString nonempty_short_string = ls_short_string_create(SMALL_BYTES, SMALL_LEN);
-	LSSSOString small_sso_string = ls_sso_string_create(SMALL_BYTES, SMALL_LEN);
-	LSSSOString big_sso_string = ls_sso_string_create(BIG_BYTES, BIG_LEN);
+	LSSSOString small_sso = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+	LSSSOString big_sso = ls_sso_create(BIG_BYTES, BIG_LEN);
 	LSStringSpan nonempty_sspan = ls_sspan_create(SMALL_BYTES, SMALL_LEN);
 
 	{
@@ -740,10 +740,10 @@ void test_insert_funcs(void)
 		LSByteBuffer from_big = ls_bbuf_create();
 		LSByteBuffer from_invalid = ls_bbuf_create();
 
-		LSStatus empty_status = ls_bbuf_insert_sso_string(&from_empty, 0, LS_EMPTY_SSO_STRING);
-		LSStatus small_status = ls_bbuf_insert_sso_string(&from_small, 0, small_sso_string);
-		LSStatus big_status = ls_bbuf_insert_sso_string(&from_big, 0, big_sso_string);
-		LSStatus invalid_status = ls_bbuf_insert_sso_string(&from_invalid, 0, LS_AN_INVALID_SSO_STRING);
+		LSStatus empty_status = ls_bbuf_insert_sso(&from_empty, 0, LS_EMPTY_SSO);
+		LSStatus small_status = ls_bbuf_insert_sso(&from_small, 0, small_sso);
+		LSStatus big_status = ls_bbuf_insert_sso(&from_big, 0, big_sso);
+		LSStatus invalid_status = ls_bbuf_insert_sso(&from_invalid, 0, LS_AN_INVALID_SSO);
 
 		assert(empty_status == LS_SUCCESS);
 		assert(small_status == LS_SUCCESS);
@@ -782,8 +782,8 @@ void test_insert_funcs(void)
 	}
 
 	ls_string_destroy(&nonempty_string);
-	ls_sso_string_destroy(&small_sso_string);
-	ls_sso_string_destroy(&big_sso_string);
+	ls_sso_destroy(&small_sso);
+	ls_sso_destroy(&big_sso);
 }
 
 void test_append_very_big(void)
@@ -876,24 +876,24 @@ void test_move_funcs(void)
 		ls_string_destroy(&mv);
 	}
 	{
-		LSSSOString small_sso_string = ls_sso_string_create(SMALL_BYTES, SMALL_LEN);
-		LSSSOString big_sso_string = ls_sso_string_create(BIG_BYTES, BIG_LEN);
-		LSSSOString invalid_sso_string = LS_AN_INVALID_SSO_STRING;
+		LSSSOString small_sso = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+		LSSSOString big_sso = ls_sso_create(BIG_BYTES, BIG_LEN);
+		LSSSOString invalid_sso = LS_AN_INVALID_SSO;
 
-		LSSSOString small_mv = ls_sso_string_move(&small_sso_string);
-		LSSSOString big_mv = ls_sso_string_move(&big_sso_string);
-		LSSSOString invalid_mv = ls_sso_string_move(&invalid_sso_string);
+		LSSSOString small_mv = ls_sso_move(&small_sso);
+		LSSSOString big_mv = ls_sso_move(&big_sso);
+		LSSSOString invalid_mv = ls_sso_move(&invalid_sso);
 
-		assert(!ls_sso_string_is_valid(small_sso_string));
-		assert(!ls_sso_string_is_valid(big_sso_string));
-		assert(ls_sso_string_is_valid(small_mv));
-		assert(ls_sso_string_is_valid(big_mv));
+		assert(!ls_sso_is_valid(small_sso));
+		assert(!ls_sso_is_valid(big_sso));
+		assert(ls_sso_is_valid(small_mv));
+		assert(ls_sso_is_valid(big_mv));
 
-		assert(!ls_sso_string_is_valid(invalid_sso_string));
-		assert(!ls_sso_string_is_valid(invalid_mv));
+		assert(!ls_sso_is_valid(invalid_sso));
+		assert(!ls_sso_is_valid(invalid_mv));
 
-		ls_sso_string_destroy(&small_mv);
-		ls_sso_string_destroy(&big_mv);
+		ls_sso_destroy(&small_mv);
+		ls_sso_destroy(&big_mv);
 	}
 	{
 		LSByteBuffer bbuf = ls_bbuf_create();
@@ -919,36 +919,36 @@ void test_move_to_funcs(void)
 		LSString big_string = ls_string_create(BIG_BYTES, BIG_LEN);
 		LSString invalid_string = LS_AN_INVALID_STRING;
 
-		LSSSOString small_mv = ls_string_move_to_sso_string(&small_string);
-		LSSSOString big_mv = ls_string_move_to_sso_string(&big_string);
-		LSSSOString invalid_mv = ls_string_move_to_sso_string(&invalid_string);
+		LSSSOString small_mv = ls_string_move_to_sso(&small_string);
+		LSSSOString big_mv = ls_string_move_to_sso(&big_string);
+		LSSSOString invalid_mv = ls_string_move_to_sso(&invalid_string);
 
 		assert(!ls_string_is_valid(small_string));
 		assert(!ls_string_is_valid(big_string));
-		assert(ls_sso_string_is_valid(small_mv));
-		assert(ls_sso_string_is_valid(big_mv));
+		assert(ls_sso_is_valid(small_mv));
+		assert(ls_sso_is_valid(big_mv));
 
 		assert(!ls_string_is_valid(invalid_string));
-		assert(!ls_sso_string_is_valid(invalid_mv));
+		assert(!ls_sso_is_valid(invalid_mv));
 
-		ls_sso_string_destroy(&small_mv);
-		ls_sso_string_destroy(&big_mv);
+		ls_sso_destroy(&small_mv);
+		ls_sso_destroy(&big_mv);
 	}
 	{
-		LSSSOString small_sso_string = ls_sso_string_create(SMALL_BYTES, SMALL_LEN);
-		LSSSOString big_sso_string = ls_sso_string_create(BIG_BYTES, BIG_LEN);
-		LSSSOString invalid_sso_string = LS_AN_INVALID_SSO_STRING;
+		LSSSOString small_sso = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+		LSSSOString big_sso = ls_sso_create(BIG_BYTES, BIG_LEN);
+		LSSSOString invalid_sso = LS_AN_INVALID_SSO;
 
-		LSString small_mv = ls_sso_string_move_to_string(&small_sso_string);
-		LSString big_mv = ls_sso_string_move_to_string(&big_sso_string);
-		LSString invalid_mv = ls_sso_string_move_to_string(&invalid_sso_string);
+		LSString small_mv = ls_sso_move_to_string(&small_sso);
+		LSString big_mv = ls_sso_move_to_string(&big_sso);
+		LSString invalid_mv = ls_sso_move_to_string(&invalid_sso);
 
-		assert(!ls_sso_string_is_valid(small_sso_string));
-		assert(!ls_sso_string_is_valid(big_sso_string));
+		assert(!ls_sso_is_valid(small_sso));
+		assert(!ls_sso_is_valid(big_sso));
 		assert(ls_string_is_valid(small_mv));
 		assert(ls_string_is_valid(big_mv));
 
-		assert(!ls_sso_string_is_valid(invalid_sso_string));
+		assert(!ls_sso_is_valid(invalid_sso));
 		assert(!ls_string_is_valid(invalid_mv));
 
 		ls_string_destroy(&small_mv);
@@ -986,13 +986,13 @@ void test_move_to_funcs(void)
 
 		assert(!ls_bbuf_is_valid(small_bbuf));
 		assert(!ls_bbuf_is_valid(big_bbuf));
-		assert(ls_sso_string_is_valid(small_mv));
-		assert(ls_sso_string_is_valid(big_mv));
+		assert(ls_sso_is_valid(small_mv));
+		assert(ls_sso_is_valid(big_mv));
 
 		assert(!ls_bbuf_is_valid(invalid_bbuf));
-		assert(!ls_sso_string_is_valid(invalid_mv));
+		assert(!ls_sso_is_valid(invalid_mv));
 
-		ls_sso_string_destroy(&small_mv);
-		ls_sso_string_destroy(&big_mv);
+		ls_sso_destroy(&small_mv);
+		ls_sso_destroy(&big_mv);
 	}
 }

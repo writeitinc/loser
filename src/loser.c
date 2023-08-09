@@ -70,19 +70,19 @@ void ls_bbuf_destroy(LSByteBuffer *bbuf)
 	tyrant_free(bbuf->bytes);
 }
 
-LSShortString ls_short_string_from_sso_string(LSSSOString sso_string)
+LSShortString ls_short_string_from_sso(LSSSOString sso)
 {
-	if (ls_sso_string_get_type(sso_string) != LS_SSO_STRING_SHORT) {
+	if (ls_sso_get_type(sso) != LS_SSO_SHORT) {
 		return LS_AN_INVALID_SHORT_STRING;
 	}
 
-	return sso_string._short;
+	return sso._short;
 }
 
-LSSSOString ls_sso_string_from_short_string(LSShortString short_string)
+LSSSOString ls_sso_from_short_string(LSShortString short_string)
 {
 	if (!ls_short_string_is_valid(short_string)) {
-		return LS_AN_INVALID_SSO_STRING;
+		return LS_AN_INVALID_SSO;
 	}
 
 	return (LSSSOString){ ._short = short_string };

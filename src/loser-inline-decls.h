@@ -26,6 +26,12 @@ LS_LINK(LSString) ls_string_move(LSString *string);
 LS_LINK(LSSSOString) ls_sso_string_move(LSSSOString *sso_string);
 LS_LINK(LSByteBuffer) ls_bbuf_move(LSByteBuffer *bbuf);
 
+LS_LINK(LSSSOString) ls_string_move_to_sso_string(LSString *string);
+LS_LINK(LSString) ls_sso_string_move_to_string(LSSSOString *sso_string);
+
+LS_LINK(LSString) ls_bbuf_finalize(LSByteBuffer *bbuf);
+LS_LINK(LSSSOString) ls_bbuf_finalize_sso(LSByteBuffer *bbuf);
+
 LS_LINK(LSString) ls_string_clone(LSString string);
 LS_LINK(LSString) ls_string_from_short_string(LSShortString short_string);
 LS_LINK(LSString) ls_string_from_sso_string(LSSSOString sso_string);

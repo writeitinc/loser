@@ -457,6 +457,76 @@ inline LSByteBuffer ls_bbuf_move(LSByteBuffer *bbuf)
 }
 
 /*
+ * Constraints:
+ * `string` is not `NULL`
+ */
+inline LSSSOString ls_string_move_to_sso_string(LSString *string)
+{
+	if (string->len <= LS_SHORT_STRING_MAX_LEN) {
+		LSSSOString copy = ls_sso_string_from_string(*string);
+
+		ls_string_destroy(string);
+		ls_string_invalidate(string);
+
+		return copy;
+	}
+
+	return (LSSSOString){
+		._long = ls_string_move(string)
+	};
+}
+
+/*
+ * Constraints:
+ * `sso_string` is not `NULL`
+ */
+inline LSString ls_sso_string_move_to_string(LSSSOString *sso_string)
+{
+	if (ls_sso_string_get_type(*sso_string) != LS_SSO_STRING_LONG) {
+		return ls_string_from_sso_string(
+				ls_sso_string_move(sso_string));
+	}
+
+	return ls_string_move(&sso_string->_long);
+}
+
+/*
+ * Constraints:
+ * `bbuf` is not `NULL`
+ */
+inline LSString ls_bbuf_finalize(LSByteBuffer *bbuf)
+{
+	LSString mv = {
+		.len = bbuf->len,
+		.bytes = bbuf->bytes
+	};
+
+	ls_bbuf_invalidate(bbuf);
+
+	return mv;
+}
+
+/*
+ * Constraints:
+ * `bbuf` is not `NULL`
+ */
+inline LSSSOString ls_bbuf_finalize_sso(LSByteBuffer *bbuf)
+{
+	if (bbuf->len <= LS_SHORT_STRING_MAX_LEN) {
+		LSSSOString copy = ls_sso_string_from_bbuf(*bbuf);
+
+		ls_bbuf_destroy(bbuf);
+		ls_bbuf_invalidate(bbuf);
+
+		return copy;
+	}
+
+	return (LSSSOString){
+		._long = ls_bbuf_finalize(bbuf)
+	};
+}
+
+/*
  * Fails if:
  * - allocation fails
  * - `string` is invalid

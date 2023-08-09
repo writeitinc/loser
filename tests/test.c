@@ -16,6 +16,7 @@ static void test_append_many(void);
 static void test_insert_many(void);
 
 static void test_move_funcs(void);
+static void test_move_to_funcs(void);
 
 static const LSByte SMALL_BYTES[] = "deadbeef";
 static size_t SMALL_LEN = sizeof(SMALL_BYTES) - 1;
@@ -40,6 +41,7 @@ int main(void)
 	test_insert_many();
 
 	test_move_funcs();
+	test_move_to_funcs();
 
 	return 0;
 }
@@ -907,5 +909,90 @@ void test_move_funcs(void)
 		assert(!ls_bbuf_is_valid(invalid_mv));
 
 		ls_bbuf_destroy(&mv);
+	}
+}
+
+void test_move_to_funcs(void)
+{
+	{
+		LSString small_string = ls_string_create(SMALL_BYTES, SMALL_LEN);
+		LSString big_string = ls_string_create(BIG_BYTES, BIG_LEN);
+		LSString invalid_string = LS_AN_INVALID_STRING;
+
+		LSSSOString small_mv = ls_string_move_to_sso_string(&small_string);
+		LSSSOString big_mv = ls_string_move_to_sso_string(&big_string);
+		LSSSOString invalid_mv = ls_string_move_to_sso_string(&invalid_string);
+
+		assert(!ls_string_is_valid(small_string));
+		assert(!ls_string_is_valid(big_string));
+		assert(ls_sso_string_is_valid(small_mv));
+		assert(ls_sso_string_is_valid(big_mv));
+
+		assert(!ls_string_is_valid(invalid_string));
+		assert(!ls_sso_string_is_valid(invalid_mv));
+
+		ls_sso_string_destroy(&small_mv);
+		ls_sso_string_destroy(&big_mv);
+	}
+	{
+		LSSSOString small_sso_string = ls_sso_string_create(SMALL_BYTES, SMALL_LEN);
+		LSSSOString big_sso_string = ls_sso_string_create(BIG_BYTES, BIG_LEN);
+		LSSSOString invalid_sso_string = LS_AN_INVALID_SSO_STRING;
+
+		LSString small_mv = ls_sso_string_move_to_string(&small_sso_string);
+		LSString big_mv = ls_sso_string_move_to_string(&big_sso_string);
+		LSString invalid_mv = ls_sso_string_move_to_string(&invalid_sso_string);
+
+		assert(!ls_sso_string_is_valid(small_sso_string));
+		assert(!ls_sso_string_is_valid(big_sso_string));
+		assert(ls_string_is_valid(small_mv));
+		assert(ls_string_is_valid(big_mv));
+
+		assert(!ls_sso_string_is_valid(invalid_sso_string));
+		assert(!ls_string_is_valid(invalid_mv));
+
+		ls_string_destroy(&small_mv);
+		ls_string_destroy(&big_mv);
+	}
+
+	{
+		LSByteBuffer small_bbuf = ls_bbuf_create();
+		LSByteBuffer big_bbuf = ls_bbuf_create();
+		LSByteBuffer invalid_bbuf = LS_AN_INVALID_BBUF;
+
+		LSString small_mv = ls_bbuf_finalize(&small_bbuf);
+		LSString big_mv = ls_bbuf_finalize(&big_bbuf);
+		LSString invalid_mv = ls_bbuf_finalize(&invalid_bbuf);
+
+		assert(!ls_bbuf_is_valid(small_bbuf));
+		assert(!ls_bbuf_is_valid(big_bbuf));
+		assert(ls_string_is_valid(small_mv));
+		assert(ls_string_is_valid(big_mv));
+
+		assert(!ls_bbuf_is_valid(invalid_bbuf));
+		assert(!ls_string_is_valid(invalid_mv));
+
+		ls_string_destroy(&small_mv);
+		ls_string_destroy(&big_mv);
+	}
+	{
+		LSByteBuffer small_bbuf = ls_bbuf_create();
+		LSByteBuffer big_bbuf = ls_bbuf_create();
+		LSByteBuffer invalid_bbuf = LS_AN_INVALID_BBUF;
+
+		LSSSOString small_mv = ls_bbuf_finalize_sso(&small_bbuf);
+		LSSSOString big_mv = ls_bbuf_finalize_sso(&big_bbuf);
+		LSSSOString invalid_mv = ls_bbuf_finalize_sso(&invalid_bbuf);
+
+		assert(!ls_bbuf_is_valid(small_bbuf));
+		assert(!ls_bbuf_is_valid(big_bbuf));
+		assert(ls_sso_string_is_valid(small_mv));
+		assert(ls_sso_string_is_valid(big_mv));
+
+		assert(!ls_bbuf_is_valid(invalid_bbuf));
+		assert(!ls_sso_string_is_valid(invalid_mv));
+
+		ls_sso_string_destroy(&small_mv);
+		ls_sso_string_destroy(&big_mv);
 	}
 }

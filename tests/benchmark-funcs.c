@@ -53,6 +53,7 @@ enum Function {
 	LS_STRING_FROM_CSTR,
 	LS_STRING_DESTROY,
 	LS_STRING_INVALIDATE,
+	LS_STRING_MOVE,
 	LS_SHORT_STRING_IS_VALID,
 	LS_SHORT_STRING_GET_BYTES,
 	LS_SHORT_STRING_CREATE,
@@ -74,6 +75,7 @@ enum Function {
 	LS_SSO_FROM_CSTR,
 	LS_SSO_DESTROY,
 	LS_SSO_INVALIDATE,
+	LS_SSO_MOVE,
 	LS_SSPAN_IS_VALID,
 	LS_SSPAN_CREATE,
 	LS_SSPAN_FROM_STRING,
@@ -95,6 +97,7 @@ enum Function {
 	CREATE_WIC_AND_INSERT,
 	LS_BBUF_DESTROY,
 	LS_BBUF_INVALIDATE,
+	LS_BBUF_MOVE,
 
 	NFUNCTIONS
 };
@@ -104,38 +107,40 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[LS_STRING_CREATE]                = "ls_string_create",
 	[LS_STRING_CLONE]                 = "ls_string_clone",
 	[LS_STRING_FROM_SHORT_STRING]     = "ls_string_from_short_string",
-	[LS_STRING_FROM_SSO]       = "ls_string_from_sso",
+	[LS_STRING_FROM_SSO]              = "ls_string_from_sso",
 	[LS_STRING_FROM_SSPAN]            = "ls_string_from_sspan",
 	[LS_STRING_FROM_CHARS]            = "ls_string_from_chars",
 	[LS_STRING_FROM_CSTR]             = "ls_string_from_cstr",
 	[LS_STRING_DESTROY]               = "ls_string_destroy",
 	[LS_STRING_INVALIDATE]            = "ls_string_invalidate",
+	[LS_STRING_MOVE]                  = "ls_string_move",
 	[LS_SHORT_STRING_IS_VALID]        = "ls_short_string_is_valid",
 	[LS_SHORT_STRING_GET_BYTES]       = "ls_short_string_get_bytes",
 	[LS_SHORT_STRING_CREATE]          = "ls_short_string_create",
 	[LS_SHORT_STRING_FROM_STRING]     = "ls_short_string_from_string",
-	[LS_SHORT_STRING_FROM_SSO] = "ls_short_string_from_sso",
+	[LS_SHORT_STRING_FROM_SSO]        = "ls_short_string_from_sso",
 	[LS_SHORT_STRING_FROM_SSPAN]      = "ls_short_string_from_sspan",
 	[LS_SHORT_STRING_FROM_CHARS]      = "ls_short_string_from_chars",
 	[LS_SHORT_STRING_FROM_CSTR]       = "ls_short_string_from_cstr",
 	[LS_SHORT_STRING_INVALIDATE]      = "ls_short_string_invalidate",
-	[LS_SSO_GET_TYPE]          = "ls_sso_get_type",
-	[LS_SSO_IS_VALID]          = "ls_sso_is_valid",
-	[LS_SSO_GET_BYTES]         = "ls_sso_get_bytes",
-	[LS_SSO_CREATE]            = "ls_sso_create",
-	[LS_SSO_FROM_STRING]       = "ls_sso_from_string",
-	[LS_SSO_FROM_SHORT_STRING] = "ls_sso_from_short_string",
-	[LS_SSO_CLONE]             = "ls_sso_clone",
-	[LS_SSO_FROM_SSPAN]        = "ls_sso_from_sspan",
-	[LS_SSO_FROM_CHARS]        = "ls_sso_from_chars",
-	[LS_SSO_FROM_CSTR]         = "ls_sso_from_cstr",
-	[LS_SSO_DESTROY]           = "ls_sso_destroy",
-	[LS_SSO_INVALIDATE]        = "ls_sso_invalidate",
+	[LS_SSO_GET_TYPE]                 = "ls_sso_get_type",
+	[LS_SSO_IS_VALID]                 = "ls_sso_is_valid",
+	[LS_SSO_GET_BYTES]                = "ls_sso_get_bytes",
+	[LS_SSO_CREATE]                   = "ls_sso_create",
+	[LS_SSO_FROM_STRING]              = "ls_sso_from_string",
+	[LS_SSO_FROM_SHORT_STRING]        = "ls_sso_from_short_string",
+	[LS_SSO_CLONE]                    = "ls_sso_clone",
+	[LS_SSO_FROM_SSPAN]               = "ls_sso_from_sspan",
+	[LS_SSO_FROM_CHARS]               = "ls_sso_from_chars",
+	[LS_SSO_FROM_CSTR]                = "ls_sso_from_cstr",
+	[LS_SSO_DESTROY]                  = "ls_sso_destroy",
+	[LS_SSO_INVALIDATE]               = "ls_sso_invalidate",
+	[LS_SSO_MOVE]                     = "ls_sso_move",
 	[LS_SSPAN_IS_VALID]               = "ls_sspan_is_valid",
 	[LS_SSPAN_CREATE]                 = "ls_sspan_create",
 	[LS_SSPAN_FROM_STRING]            = "ls_sspan_from_string",
 	[LS_SSPAN_FROM_SHORT_STRING]      = "ls_sspan_from_short_string",
-	[LS_SSPAN_FROM_SSO]        = "ls_sspan_from_sso",
+	[LS_SSPAN_FROM_SSO]               = "ls_sspan_from_sso",
 	[LS_SSPAN_FROM_CHARS]             = "ls_sspan_from_chars",
 	[LS_SSPAN_FROM_CSTR]              = "ls_sspan_from_cstr",
 	[LS_SSPAN_INVALIDATE]             = "ls_sspan_invalidate",
@@ -152,6 +157,7 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[CREATE_WIC_AND_INSERT]           = "create bbuf w/ init cap + insert",
 	[LS_BBUF_DESTROY]                 = "ls_bbuf_destroy",
 	[LS_BBUF_INVALIDATE]              = "ls_bbuf_invalidate",
+	[LS_BBUF_MOVE]                    = "ls_bbuf_move",
 };
 
 #define MAX_LEN 32
@@ -331,6 +337,23 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				ls_string_invalidate(iter);
 			});
 
+	FOREACH (LSString, iter, arrays.strings){
+		*iter = ls_string_create(bytes, len);
+	}
+	BENCHMARK(LS_STRING_MOVE, len_tag_idx,
+			LSString tmp = ls_string_move(&arrays.strings[0]);
+			for (size_t i = 0; i < NELEMS(arrays.strings) - 1; ++i){
+				LSString *dest = &arrays.strings[i];
+				LSString *src = &arrays.strings[i + 1];
+				*dest = ls_string_move(src);
+			}
+			LSString *last = &arrays.strings[NELEMS(arrays.strings) - 1];
+			*last = ls_string_move(&tmp);
+			);
+	FOREACH (LSString, iter, arrays.strings) {
+		ls_string_destroy(iter);
+	}
+
 	// ### LSShortString ###
 
 	// warm up memory
@@ -478,6 +501,23 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				ls_sso_invalidate(iter);
 			});
 
+	FOREACH (LSSSOString, iter, arrays.ssos){
+		*iter = ls_sso_create(bytes, len);
+	}
+	BENCHMARK(LS_SSO_MOVE, len_tag_idx,
+			LSSSOString tmp = ls_sso_move(&arrays.ssos[0]);
+			for (size_t i = 0; i < NELEMS(arrays.ssos) - 1; ++i){
+				LSSSOString *dest = &arrays.ssos[i];
+				LSSSOString *src = &arrays.ssos[i + 1];
+				*dest = ls_sso_move(src);
+			}
+			LSSSOString *last = &arrays.ssos[NELEMS(arrays.ssos) - 1];
+			*last = ls_sso_move(&tmp);
+			);
+	FOREACH (LSSSOString, iter, arrays.ssos) {
+		ls_sso_destroy(iter);
+	}
+
 	// ### LSStringSpan
 
 	// warm up memory
@@ -524,6 +564,23 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 			FOREACH (LSStringSpan, iter, arrays.sspans) {
 				ls_sspan_invalidate(iter);
 			});
+
+	FOREACH (LSByteBuffer, iter, arrays.bbufs){
+		*iter = ls_bbuf_create();
+	}
+	BENCHMARK(LS_BBUF_MOVE, len_tag_idx,
+			LSByteBuffer tmp = ls_bbuf_move(&arrays.bbufs[0]);
+			for (size_t i = 0; i < NELEMS(arrays.bbufs) - 1; ++i){
+				LSByteBuffer *dest = &arrays.bbufs[i];
+				LSByteBuffer *src = &arrays.bbufs[i + 1];
+				*dest = ls_bbuf_move(src);
+			}
+			LSByteBuffer *last = &arrays.bbufs[NELEMS(arrays.bbufs) - 1];
+			*last = ls_bbuf_move(&tmp);
+			);
+	FOREACH (LSByteBuffer, iter, arrays.bbufs) {
+		ls_bbuf_destroy(iter);
+	}
 
 	BENCHMARK(LS_BBUF_CREATE_WITH_INIT_CAP, len_tag_idx,
 			FOREACH (LSByteBuffer, iter, arrays.bbufs) {

@@ -471,7 +471,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*dest = ls_string_move(src);
 			}
 			LSString *last = &uoa.strings[NELEMS(uoa.strings) - 1];
-			*last = ls_string_move(&tmp);
+			*last = tmp;
 			);
 	FOREACH (LSString, iter, uoa.strings) {
 		ls_string_destroy(iter);
@@ -635,7 +635,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*dest = ls_sso_move(src);
 			}
 			LSSSOString *last = &uoa.ssos[NELEMS(uoa.ssos) - 1];
-			*last = ls_sso_move(&tmp);
+			*last = tmp;
 			);
 	FOREACH (LSSSOString, iter, uoa.ssos) {
 		ls_sso_destroy(iter);
@@ -826,7 +826,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*dest = ls_bbuf_move(src);
 			}
 			LSByteBuffer *last = &uoa.bbufs[NELEMS(uoa.bbufs) - 1];
-			*last = ls_bbuf_move(&tmp);
+			*last = tmp;
 			);
 	FOREACH (LSByteBuffer, iter, uoa.bbufs) {
 		ls_bbuf_destroy(iter);
@@ -925,7 +925,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*dest = ls_string_move(src);
 			}
 			LSString *last = &aou[NELEMS(aou) - 1].string;
-			*last = ls_string_move(&tmp);
+			*last = tmp;
 			);
 	FOREACH_AOU (StringUnion, LSString, string, iter, aou) {
 		ls_string_destroy(iter);
@@ -1076,7 +1076,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*dest = ls_sso_move(src);
 			}
 			LSSSOString *last = &aou[NELEMS(aou) - 1].sso;
-			*last = ls_sso_move(&tmp);
+			*last = tmp;
 			);
 	FOREACH_AOU (StringUnion, LSSSOString, sso, iter, aou) {
 		ls_sso_destroy(iter);
@@ -1254,7 +1254,7 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 				*dest = ls_bbuf_move(src);
 			}
 			LSByteBuffer *last = &aou[NELEMS(aou) - 1].bbuf;
-			*last = ls_bbuf_move(&tmp);
+			*last = tmp;
 			);
 	FOREACH_AOU (StringUnion, LSByteBuffer, bbuf, iter, aou) {
 		ls_bbuf_destroy(iter);

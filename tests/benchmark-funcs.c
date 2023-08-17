@@ -167,6 +167,11 @@ enum Function {
 	AOU_LS_BBUF_INVALIDATE,
 	AOU_LS_BBUF_MOVE,
 
+	AOU_LS_STRING_MOVE_TO_SSO,
+	AOU_LS_SSO_MOVE_TO_STRING,
+	AOU_LS_BBUF_FINALIZE,
+	AOU_LS_BBUF_FINALIZE_AS_SSO,
+
 	NFUNCTIONS
 };
 
@@ -282,6 +287,11 @@ static const char *FUNC_NAMES[NFUNCTIONS] = {
 	[AOU_LS_BBUF_DESTROY]                 = "[aou]ls_bbuf_destroy",
 	[AOU_LS_BBUF_INVALIDATE]              = "[aou]ls_bbuf_invalidate",
 	[AOU_LS_BBUF_MOVE]                    = "[aou]ls_bbuf_move",
+
+	[AOU_LS_STRING_MOVE_TO_SSO]           = "[aou]ls_string_move_to_sso",
+	[AOU_LS_SSO_MOVE_TO_STRING]           = "[aou]ls_sso_move_to_string",
+	[AOU_LS_BBUF_FINALIZE]                = "[aou]ls_bbuf_finalize",
+	[AOU_LS_BBUF_FINALIZE_AS_SSO]         = "[aou]ls_bbuf_finalize_as_sso",
 };
 
 #define MAX_LEN 32
@@ -1258,6 +1268,74 @@ void benchmark_text(const char *cstr, size_t len_tag_idx)
 			);
 	FOREACH_AOU (StringUnion, LSByteBuffer, bbuf, iter, aou) {
 		ls_bbuf_destroy(iter);
+	}
+
+	FOREACH_AOU (StringUnion, LSString, string, iter, aou) {
+		*iter = ls_string_create(bytes, len);
+	}
+	BENCHMARK(AOU_LS_STRING_MOVE_TO_SSO, len_tag_idx,
+			LSSSOString tmp = ls_string_move_to_sso(&aou[0].string);
+			for (size_t i = 0; i < NELEMS(aou) - 1; ++i) {
+				LSSSOString *dest = &aou[i].sso;
+				LSString *src = &aou[i + 1].string;
+				*dest = ls_string_move_to_sso(src);
+			}
+			LSSSOString *last = &aou[NELEMS(aou) - 1].sso;
+			*last = tmp;
+			);
+	FOREACH_AOU (StringUnion, LSSSOString, sso, iter, aou) {
+		ls_sso_destroy(iter);
+	}
+
+	FOREACH_AOU (StringUnion, LSSSOString, sso, iter, aou) {
+		*iter = ls_sso_create(bytes, len);
+	}
+	BENCHMARK(AOU_LS_SSO_MOVE_TO_STRING, len_tag_idx,
+			LSString tmp = ls_sso_move_to_string(&aou[0].sso);
+			for (size_t i = 0; i < NELEMS(aou) - 1; ++i) {
+				LSString *dest = &aou[i].string;
+				LSSSOString *src = &aou[i + 1].sso;
+				*dest = ls_sso_move_to_string(src);
+			}
+			LSString *last = &aou[NELEMS(aou) - 1].string;
+			*last = tmp;
+			);
+	FOREACH_AOU (StringUnion, LSString, string, iter, aou) {
+		ls_string_destroy(iter);
+	}
+
+	FOREACH_AOU (StringUnion, LSByteBuffer, bbuf, iter, aou) {
+		*iter = ls_bbuf_from_sspan(ls_sspan_create(bytes, len));
+	}
+	BENCHMARK(AOU_LS_BBUF_FINALIZE, len_tag_idx,
+			LSString tmp = ls_bbuf_finalize(&aou[0].bbuf);
+			for (size_t i = 0; i < NELEMS(aou) - 1; ++i) {
+				LSString *dest = &aou[i].string;
+				LSByteBuffer *src = &aou[i + 1].bbuf;
+				*dest = ls_bbuf_finalize(src);
+			}
+			LSString *last = &aou[NELEMS(aou) - 1].string;
+			*last = tmp;
+			);
+	FOREACH_AOU (StringUnion, LSString, string, iter, aou) {
+		ls_string_destroy(iter);
+	}
+
+	FOREACH_AOU (StringUnion, LSByteBuffer, bbuf, iter, aou) {
+		*iter = ls_bbuf_from_sspan(ls_sspan_create(bytes, len));
+	}
+	BENCHMARK(AOU_LS_BBUF_FINALIZE_AS_SSO, len_tag_idx,
+			LSSSOString tmp = ls_bbuf_finalize_as_sso(&aou[0].bbuf);
+			for (size_t i = 0; i < NELEMS(aou) - 1; ++i) {
+				LSSSOString *dest = &aou[i].sso;
+				LSByteBuffer *src = &aou[i + 1].bbuf;
+				*dest = ls_bbuf_finalize_as_sso(src);
+			}
+			LSSSOString *last = &aou[NELEMS(aou) - 1].sso;
+			*last = tmp;
+			);
+	FOREACH_AOU (StringUnion, LSSSOString, sso, iter, aou) {
+		ls_sso_destroy(iter);
 	}
 
 	ls_string_destroy(&string);

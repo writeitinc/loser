@@ -18,6 +18,8 @@ static void test_insert_many(void);
 static void test_move_funcs(void);
 static void test_move_to_funcs(void);
 
+static void test_equals_funcs(void);
+
 static const LSByte SMALL_BYTES[] = "deadbeef";
 static size_t SMALL_LEN = sizeof(SMALL_BYTES) - 1;
 
@@ -42,6 +44,8 @@ int main(void)
 
 	test_move_funcs();
 	test_move_to_funcs();
+
+	test_equals_funcs();
 
 	return 0;
 }
@@ -994,5 +998,126 @@ void test_move_to_funcs(void)
 
 		ls_sso_destroy(&small_mv);
 		ls_sso_destroy(&big_mv);
+	}
+}
+
+void test_equals_funcs(void)
+{
+	{
+		LSString small1 = ls_string_create(SMALL_BYTES, SMALL_LEN);
+		LSString small2 = ls_string_create(SMALL_BYTES, SMALL_LEN);
+		LSString big1 = ls_string_create(BIG_BYTES, BIG_LEN);
+		LSString big2 = ls_string_create(BIG_BYTES, BIG_LEN);
+		LSString empty1 = ls_string_from_cstr("");
+		LSString empty2 = ls_string_from_cstr("");
+		LSString invalid1 = LS_AN_INVALID_STRING;
+		LSString invalid2 = LS_AN_INVALID_STRING;
+
+		assert(ls_string_equals(small1, small2));
+		assert(ls_string_equals(big1, big2));
+		assert(ls_string_equals(empty1, empty2));
+		assert(!ls_string_equals(invalid1, invalid2));
+
+		assert(!ls_string_equals(small1, big1));
+		assert(!ls_string_equals(small1, empty1));
+		assert(!ls_string_equals(small1, invalid1));
+
+		assert(!ls_string_equals(big1, empty1));
+		assert(!ls_string_equals(big1, invalid1));
+
+		assert(!ls_string_equals(empty1, invalid1));
+
+		ls_string_destroy(&small1);
+		ls_string_destroy(&small2);
+		ls_string_destroy(&big1);
+		ls_string_destroy(&big2);
+		ls_string_destroy(&empty1);
+		ls_string_destroy(&empty2);
+	}
+	{
+		LSShortString short1 = ls_short_string_create(SMALL_BYTES, SMALL_LEN);
+		LSShortString short2 = ls_short_string_create(SMALL_BYTES, SMALL_LEN);
+		LSShortString empty1 = ls_short_string_from_cstr("");
+		LSShortString empty2 = ls_short_string_from_cstr("");
+		LSShortString invalid1 = LS_AN_INVALID_SHORT_STRING;
+		LSShortString invalid2 = LS_AN_INVALID_SHORT_STRING;
+
+		assert(ls_short_string_equals(short1, short2));
+		assert(ls_short_string_equals(empty1, empty2));
+		assert(!ls_short_string_equals(invalid1, invalid2));
+
+		assert(!ls_short_string_equals(short1, empty1));
+		assert(!ls_short_string_equals(short1, invalid1));
+
+		assert(!ls_short_string_equals(empty1, invalid1));
+	}
+	{
+		LSSSOString small1 = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+		LSSSOString small2 = ls_sso_create(SMALL_BYTES, SMALL_LEN);
+		LSSSOString big1 = ls_sso_create(BIG_BYTES, BIG_LEN);
+		LSSSOString big2 = ls_sso_create(BIG_BYTES, BIG_LEN);
+		LSSSOString empty1 = ls_sso_from_cstr("");
+		LSSSOString empty2 = ls_sso_from_cstr("");
+		LSSSOString invalid1 = LS_AN_INVALID_SSO;
+		LSSSOString invalid2 = LS_AN_INVALID_SSO;
+
+		assert(ls_sso_equals(small1, small2));
+		assert(ls_sso_equals(big1, big2));
+		assert(ls_sso_equals(empty1, empty2));
+		assert(!ls_sso_equals(invalid1, invalid2));
+
+		assert(!ls_sso_equals(small1, big1));
+		assert(!ls_sso_equals(small1, empty1));
+		assert(!ls_sso_equals(small1, invalid1));
+
+		assert(!ls_sso_equals(big1, empty1));
+		assert(!ls_sso_equals(big1, invalid1));
+
+		assert(!ls_sso_equals(empty1, invalid1));
+
+		ls_sso_destroy(&small1);
+		ls_sso_destroy(&small2);
+		ls_sso_destroy(&big1);
+		ls_sso_destroy(&big2);
+		ls_sso_destroy(&empty1);
+		ls_sso_destroy(&empty2);
+	}
+	{
+		LSStringSpan small1 = ls_sspan_create(SMALL_BYTES, SMALL_LEN);
+		LSStringSpan small2 = ls_sspan_create(SMALL_BYTES, SMALL_LEN);
+		LSStringSpan big1 = ls_sspan_create(BIG_BYTES, BIG_LEN);
+		LSStringSpan big2 = ls_sspan_create(BIG_BYTES, BIG_LEN);
+		LSStringSpan empty1 = ls_sspan_from_cstr("");
+		LSStringSpan empty2 = ls_sspan_from_cstr("");
+		LSStringSpan invalid1 = LS_AN_INVALID_SSPAN;
+		LSStringSpan invalid2 = LS_AN_INVALID_SSPAN;
+
+		assert(ls_sspan_equals(small1, small2));
+		assert(ls_sspan_equals(big1, big2));
+		assert(ls_sspan_equals(empty1, empty2));
+		assert(!ls_sspan_equals(invalid1, invalid2));
+
+		assert(!ls_sspan_equals(small1, big1));
+		assert(!ls_sspan_equals(small1, empty1));
+		assert(!ls_sspan_equals(small1, invalid1));
+
+		assert(!ls_sspan_equals(big1, empty1));
+		assert(!ls_sspan_equals(big1, invalid1));
+
+		assert(!ls_sspan_equals(empty1, invalid1));
+	}
+	{
+		const LSByte *small1 = SMALL_BYTES;
+		const LSByte *small2 = SMALL_BYTES;
+		const LSByte *big1 = BIG_BYTES;
+		const LSByte *big2 = BIG_BYTES;
+		const LSByte *empty1 = LS_EMPTY_BYTES;
+		const LSByte *empty2 = LS_EMPTY_BYTES;
+
+		assert(ls_bytes_equals(small1, small2, SMALL_LEN));
+		assert(ls_bytes_equals(big1, big2, BIG_LEN));
+		assert(ls_bytes_equals(empty1, empty2, 0));
+
+		assert(!ls_bytes_equals(small1, big1, SMALL_LEN));
 	}
 }

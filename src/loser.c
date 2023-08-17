@@ -193,6 +193,43 @@ LSStatus ls_bbuf_expand_by(LSByteBuffer *bbuf, size_t add_cap)
 	return ls_bbuf_expand_to(bbuf, new_cap);
 }
 
+bool ls_string_equals(LSString a, LSString b)
+{
+	return a.len == b.len
+			&& ls_string_is_valid(a) && ls_string_is_valid(b)
+			&& ls_bytes_equals(a.bytes, b.bytes, a.len);
+}
+
+bool ls_short_string_equals(LSShortString a, LSShortString b)
+{
+	return a.len == b.len
+			&& ls_short_string_is_valid(a) // implies b is valid
+			&& ls_bytes_equals(a._mut_bytes, b._mut_bytes, a.len);
+}
+
+bool ls_sso_equals(LSSSOString a, LSSSOString b)
+{
+	const LSByte *a_bytes = ls_sso_get_bytes(&a);
+	const LSByte *b_bytes = ls_sso_get_bytes(&b);
+
+	return a.len == b.len
+			&& a_bytes != NULL && b_bytes != NULL
+			&& ls_bytes_equals(a_bytes, b_bytes, a.len);
+}
+
+bool ls_sspan_equals(LSStringSpan a, LSStringSpan b)
+{
+	return a.len == b.len
+			&& ls_sspan_is_valid(a) && ls_sspan_is_valid(b)
+			&& ls_bytes_equals(a.start, b.start, a.len);
+}
+
+bool ls_bytes_equals(const LSByte a[static 1], const LSByte b[static 1],
+		size_t len)
+{
+	return memcmp(a, b, len) == 0;
+}
+
 LSStatus bbuf_reserve_space(LSByteBuffer *bbuf, size_t len)
 {
 	size_t new_len = bbuf->len + len;

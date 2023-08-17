@@ -197,6 +197,17 @@ LSStatus ls_bbuf_expand_to(LSByteBuffer *bbuf, size_t new_cap);
  */
 LSStatus ls_bbuf_expand_by(LSByteBuffer *bbuf, size_t add_cap);
 
+bool ls_string_equals(LSString a, LSString b);
+
+bool ls_short_string_equals(LSShortString a, LSShortString b);
+
+bool ls_sso_equals(LSSSOString a, LSSSOString b);
+
+bool ls_sspan_equals(LSStringSpan a, LSStringSpan b);
+
+bool ls_bytes_equals(const LSByte a[static 1], const LSByte b[static 1],
+		size_t len);
+
 inline bool ls_string_is_valid(LSString string)
 {
 	return string.bytes != NULL;

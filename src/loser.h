@@ -153,6 +153,24 @@ LSByteBuffer ls_bbuf_from_sspan(LSStringSpan sspan);
 
 /*
  * Constraints:
+ * `string` is not `NULL`
+ */
+LSSSOString ls_string_move_to_sso(LSString *string);
+
+/*
+ * Constraints:
+ * `sso` is not `NULL`
+ */
+LSString ls_sso_move_to_string(LSSSOString *sso);
+
+/*
+ * Constraints:
+ * `bbuf` is not `NULL`
+ */
+LSSSOString ls_bbuf_finalize_as_sso(LSByteBuffer *bbuf);
+
+/*
+ * Constraints:
  * - `bbuf` is not `NULL`
  *
  * Fails if:
@@ -469,40 +487,6 @@ inline LSByteBuffer ls_bbuf_move(LSByteBuffer *bbuf)
 
 /*
  * Constraints:
- * `string` is not `NULL`
- */
-inline LSSSOString ls_string_move_to_sso(LSString *string)
-{
-	if (string->len <= LS_SHORT_STRING_MAX_LEN) {
-		LSSSOString copy = ls_sso_from_string(*string);
-
-		ls_string_destroy(string);
-		ls_string_invalidate(string);
-
-		return copy;
-	}
-
-	return (LSSSOString){
-		._long = ls_string_move(string)
-	};
-}
-
-/*
- * Constraints:
- * `sso` is not `NULL`
- */
-inline LSString ls_sso_move_to_string(LSSSOString *sso)
-{
-	if (ls_sso_get_type(*sso) != LS_SSO_LONG) {
-		return ls_string_from_sso(
-				ls_sso_move(sso));
-	}
-
-	return ls_string_move(&sso->_long);
-}
-
-/*
- * Constraints:
  * `bbuf` is not `NULL`
  */
 inline LSString ls_bbuf_finalize(LSByteBuffer *bbuf)
@@ -515,26 +499,6 @@ inline LSString ls_bbuf_finalize(LSByteBuffer *bbuf)
 	ls_bbuf_invalidate(bbuf);
 
 	return mv;
-}
-
-/*
- * Constraints:
- * `bbuf` is not `NULL`
- */
-inline LSSSOString ls_bbuf_finalize_as_sso(LSByteBuffer *bbuf)
-{
-	if (bbuf->len <= LS_SHORT_STRING_MAX_LEN) {
-		LSSSOString copy = ls_sso_from_bbuf(*bbuf);
-
-		ls_bbuf_destroy(bbuf);
-		ls_bbuf_invalidate(bbuf);
-
-		return copy;
-	}
-
-	return (LSSSOString){
-		._long = ls_bbuf_finalize(bbuf)
-	};
 }
 
 /*

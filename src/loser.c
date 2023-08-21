@@ -106,6 +106,48 @@ LSByteBuffer ls_bbuf_from_sspan(LSStringSpan sspan)
 	return bbuf;
 }
 
+LSSSOString ls_string_move_to_sso(LSString *string)
+{
+	if (string->len <= LS_SHORT_STRING_MAX_LEN) {
+		LSSSOString copy = ls_sso_from_string(*string);
+
+		ls_string_destroy(string);
+		ls_string_invalidate(string);
+
+		return copy;
+	}
+
+	return (LSSSOString){
+		._long = ls_string_move(string)
+	};
+}
+
+LSString ls_sso_move_to_string(LSSSOString *sso)
+{
+	if (ls_sso_get_type(*sso) != LS_SSO_LONG) {
+		return ls_string_from_sso(
+				ls_sso_move(sso));
+	}
+
+	return ls_string_move(&sso->_long);
+}
+
+LSSSOString ls_bbuf_finalize_as_sso(LSByteBuffer *bbuf)
+{
+	if (bbuf->len <= LS_SHORT_STRING_MAX_LEN) {
+		LSSSOString copy = ls_sso_from_bbuf(*bbuf);
+
+		ls_bbuf_destroy(bbuf);
+		ls_bbuf_invalidate(bbuf);
+
+		return copy;
+	}
+
+	return (LSSSOString){
+		._long = ls_bbuf_finalize(bbuf)
+	};
+}
+
 LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 {
 	if (!ls_bbuf_is_valid(*bbuf)

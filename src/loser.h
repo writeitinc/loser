@@ -107,6 +107,17 @@ static const LSStringSpan LS_EMPTY_SSPAN = {
 #undef LS_LINKAGE
 
 /*
+ * Constraints:
+ * - `bytes` points to a array of at least `len` bytes
+ *        OR is `NULL`
+ *
+ * Fails if:
+ * - allocation fails
+ * - `bytes` is `NULL`
+ */
+LSString ls_string_create(const LSByte *bytes, size_t len);
+
+/*
  * Don't call this function directly.
  */
 LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len);
@@ -117,6 +128,35 @@ LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len);
  * - `string` was not previously destroyed
  */
 void ls_string_destroy(LSString *string);
+
+/*
+ * Constraints:
+ * - `bytes` points to an array of at least `len` bytes
+ *        OR is `NULL`
+ *
+ * Fails if:
+ * - `len` is greater than `LS_SHORT_STRING_MAX_LEN`
+ * - `bytes` is `NULL`
+ */
+LSShortString ls_short_string_create(const LSByte *bytes, size_t len);
+
+/*
+ * Constraints:
+ * - `bytes` points to an array of at least `len` bytes
+ *        OR is `NULL`
+ *
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `bytes` is `NULL`
+ */
+LSSSOString ls_sso_create(const LSByte *bytes, size_t len);
+
+/*
+ * Constraints:
+ * - `sso` is not `NULL`
+ * - `sso` was not previously destroyed
+ */
+void ls_sso_destroy(LSSSOString *sso);
 
 /*
  * Fails if:
@@ -143,6 +183,13 @@ LSShortString ls_short_string_from_sso(LSSSOString sso);
  * - `short_string` is invalid
  */
 LSSSOString ls_sso_from_short_string(LSShortString short_string);
+
+/*
+ * Fails if:
+ * - allocation is attempted and fails
+ * - `sso` is invalid
+ */
+LSSSOString ls_sso_clone(LSSSOString sso);
 
 /*
  * Fails if:
@@ -292,28 +339,6 @@ inline const LSByte *ls_sso_get_bytes(const LSSSOString *sso)
 
 /*
  * Constraints:
- * - `bytes` points to a array of at least `len` bytes
- *        OR is `NULL`
- *
- * Fails if:
- * - allocation fails
- * - `bytes` is `NULL`
- */
-inline LSString ls_string_create(const LSByte *bytes, size_t len)
-{
-	if (!bytes) {
-		return LS_AN_INVALID_STRING;
-	}
-
-	if (len == 0) {
-		return LS_EMPTY_STRING;
-	}
-
-	return ls__intern_string_create_unchecked(bytes, len);
-}
-
-/*
- * Constraints:
  * - `string` is not `NULL`
  */
 inline void ls_string_invalidate(LSString *string)
@@ -323,75 +348,11 @@ inline void ls_string_invalidate(LSString *string)
 
 /*
  * Constraints:
- * - `bytes` points to an array of at least `len` bytes
- *        OR is `NULL`
- *
- * Fails if:
- * - `len` is greater than `LS_SHORT_STRING_MAX_LEN`
- * - `bytes` is `NULL`
- */
-inline LSShortString ls_short_string_create(const LSByte *bytes, size_t len)
-{
-	// null terminator comes free
-	LSShortString short_string = LS_AN_INVALID_SHORT_STRING;
-
-	if (len > LS_SHORT_STRING_MAX_LEN
-			|| bytes == NULL) {
-		return short_string;
-	}
-
-	short_string.len = len;
-	memcpy(short_string._mut_bytes, bytes, len);
-
-	return short_string;
-}
-
-/*
- * Constraints:
  * - `short_string` is not `NULL`
  */
 inline void ls_short_string_invalidate(LSShortString *short_string)
 {
 	short_string->len = SIZE_MAX;
-}
-
-/*
- * Constraints:
- * - `bytes` points to an array of at least `len` bytes
- *        OR is `NULL`
- *
- * Fails if:
- * - allocation is attempted and fails
- * - `bytes` is `NULL`
- */
-inline LSSSOString ls_sso_create(const LSByte *bytes, size_t len)
-{
-	if (len <= LS_SHORT_STRING_MAX_LEN) {
-		return (LSSSOString){
-			._short = ls_short_string_create(bytes, len)
-		};
-	}
-
-	LSString string = bytes == NULL
-			? LS_AN_INVALID_STRING
-			: ls__intern_string_create_unchecked(bytes, len);
-	if (!ls_string_is_valid(string)) {
-		return LS_AN_INVALID_SSO;
-	}
-
-	return (LSSSOString){ ._long = string };
-}
-
-/*
- * Constraints:
- * - `sso` is not `NULL`
- * - `sso` was not previously destroyed
- */
-inline void ls_sso_destroy(LSSSOString *sso)
-{
-	if (ls_sso_get_type(*sso) == LS_SSO_LONG) {
-		ls_string_destroy(&sso->_long);
-	}
 }
 
 /*
@@ -648,27 +609,6 @@ inline LSShortString ls_short_string_from_cstr(const char *cstr)
 	}
 
 	return ls_short_string_from_chars(cstr, strlen(cstr));
-}
-
-/*
- * Fails if:
- * - allocation is attempted and fails
- * - `sso` is invalid
- */
-inline LSSSOString ls_sso_clone(LSSSOString sso)
-{
-	LSSSOStringType type = ls_sso_get_type(sso);
-
-	if (type == LS_SSO_SHORT || type == LS_SSO_INVALID) {
-		return sso;
-	}
-
-	LSString string = ls_string_clone(sso._long);
-	if (!ls_string_is_valid(string)) {
-		return LS_AN_INVALID_SSO;
-	}
-
-	return (LSSSOString){ ._long = string };
 }
 
 /*

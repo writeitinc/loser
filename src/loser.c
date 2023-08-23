@@ -21,6 +21,19 @@ static LSStatus bbuf_reserve_space(LSByteBuffer *bbuf, size_t len);
 static size_t three_halves_geom_growth(size_t cap);
 static size_t size_max(size_t a, size_t b);
 
+LSString ls_string_create(const LSByte *bytes, size_t len)
+{
+	if (!bytes) {
+		return LS_AN_INVALID_STRING;
+	}
+
+	if (len == 0) {
+		return LS_EMPTY_STRING;
+	}
+
+	return ls__intern_string_create_unchecked(bytes, len);
+}
+
 LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len)
 {
 	LSByte *bytes_cpy = tyrant_alloc(len + 1);
@@ -45,6 +58,47 @@ void ls_string_destroy(LSString *string)
 
 	LSByte *bytes_mutable = (LSByte *)string->bytes;
 	tyrant_free(bytes_mutable);
+}
+
+LSShortString ls_short_string_create(const LSByte *bytes, size_t len)
+{
+	// null terminator comes free
+	LSShortString short_string = LS_AN_INVALID_SHORT_STRING;
+
+	if (len > LS_SHORT_STRING_MAX_LEN
+			|| bytes == NULL) {
+		return short_string;
+	}
+
+	short_string.len = len;
+	memcpy(short_string._mut_bytes, bytes, len);
+
+	return short_string;
+}
+
+LSSSOString ls_sso_create(const LSByte *bytes, size_t len)
+{
+	if (len <= LS_SHORT_STRING_MAX_LEN) {
+		return (LSSSOString){
+			._short = ls_short_string_create(bytes, len)
+		};
+	}
+
+	LSString string = bytes == NULL
+			? LS_AN_INVALID_STRING
+			: ls__intern_string_create_unchecked(bytes, len);
+	if (!ls_string_is_valid(string)) {
+		return LS_AN_INVALID_SSO;
+	}
+
+	return (LSSSOString){ ._long = string };
+}
+
+void ls_sso_destroy(LSSSOString *sso)
+{
+	if (ls_sso_get_type(*sso) == LS_SSO_LONG) {
+		ls_string_destroy(&sso->_long);
+	}
 }
 
 LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap)
@@ -86,6 +140,22 @@ LSSSOString ls_sso_from_short_string(LSShortString short_string)
 	}
 
 	return (LSSSOString){ ._short = short_string };
+}
+
+LSSSOString ls_sso_clone(LSSSOString sso)
+{
+	LSSSOStringType type = ls_sso_get_type(sso);
+
+	if (type == LS_SSO_SHORT || type == LS_SSO_INVALID) {
+		return sso;
+	}
+
+	LSString string = ls_string_clone(sso._long);
+	if (!ls_string_is_valid(string)) {
+		return LS_AN_INVALID_SSO;
+	}
+
+	return (LSSSOString){ ._long = string };
 }
 
 LSByteBuffer ls_bbuf_from_sspan(LSStringSpan sspan)

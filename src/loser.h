@@ -9,6 +9,10 @@
 /*
  * NOTE: Library guarantees may not hold true for objects created or modified
  * manually.
+ *
+ * NOTE: The contents of objects which have "invalid" values should not be
+ * inspected as they may contain unspecified/trap values. This restriction is
+ * reserved by the library for the sake of speed.
  */
 
 #define LS_SHORT_STRING_LITERAL(cstr_lit) \

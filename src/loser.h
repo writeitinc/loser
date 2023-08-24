@@ -81,9 +81,7 @@ extern const LSString LS_EMPTY_STRING;
 // Other empty constants.
 static const LSByte LS_EMPTY_BYTES[] = "";
 static const LSShortString LS_EMPTY_SHORT_STRING = { 0 };
-static const LSSSOString LS_EMPTY_SSO = {
-	._short = LS_EMPTY_SHORT_STRING
-};
+static const LSSSOString LS_EMPTY_SSO = { 0 };
 static const LSStringSpan LS_EMPTY_SSPAN = {
 	.len = 0,
 	.start = LS_EMPTY_BYTES

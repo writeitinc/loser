@@ -440,17 +440,31 @@ LSStatus ls_bbuf_expand_to(LSByteBuffer *bbuf, size_t new_cap);
  */
 LSStatus ls_bbuf_expand_by(LSByteBuffer *bbuf, size_t add_cap);
 
+/*
+ * NOTE: An invalid value never compares equal to another value--not even
+ * another invalid value.
+ */
 bool ls_string_equals(LSString a, LSString b);
-
 bool ls_short_string_equals(LSShortString a, LSShortString b);
-
 bool ls_sso_equals(LSSSOString a, LSSSOString b);
-
 bool ls_sspan_equals(LSStringSpan a, LSStringSpan b);
 
+/*
+ * Constraints:
+ * - `a` and `b` each point to an array of at least `len` bytes
+ *
+ * TODO: Should this function really be exposed? Feels like a bit of a footgun.
+ */
 bool ls_bytes_equals(const LSByte a[static 1], const LSByte b[static 1],
 		size_t len);
 
+/*
+ * Constraints:
+ * - `a` and `b` each point to an array of at least `len` bytes
+ *            OR `a` or `b` is `NULL`
+ *
+ * NOTE: `NULL` will never compare equal--not even to itself.
+ */
 bool ls_bytes_equals_nullsafe(const LSByte *a, const LSByte *b, size_t len);
 
 inline bool ls_string_is_valid(LSString string)

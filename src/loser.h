@@ -817,8 +817,9 @@ inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
 inline LSStatus ls_bbuf_append_short_string(LSByteBuffer *bbuf,
 		LSShortString short_string)
 {
-	return ls_bbuf_append(bbuf, ls_short_string_get_bytes(&short_string),
-			short_string.len);
+	const LSByte *bytes = ls_short_string_get_bytes(&short_string);
+
+	return ls_bbuf_append(bbuf, bytes, short_string.len);
 }
 
 /*
@@ -850,9 +851,9 @@ inline LSStatus ls_bbuf_append_sso(LSByteBuffer *bbuf, LSSSOString sso)
 inline LSStatus ls_bbuf_insert_short_string(LSByteBuffer *bbuf, size_t idx,
 		LSShortString short_string)
 {
-	return ls_bbuf_insert(bbuf, idx,
-			ls_short_string_get_bytes(&short_string),
-			short_string.len);
+	const LSByte *bytes = ls_short_string_get_bytes(&short_string);
+
+	return ls_bbuf_insert(bbuf, idx, bytes, short_string.len);
 }
 
 /*

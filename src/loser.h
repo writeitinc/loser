@@ -465,6 +465,8 @@ bool ls_sspan_equals(LSStringSpan a, LSStringSpan b);
 bool ls_bytes_equals(const LSByte a[static 1], const LSByte b[static 1],
 		size_t len);
 
+bool ls_bytes_equals_nullsafe(const LSByte *a, const LSByte *b, size_t len);
+
 inline bool ls_string_is_valid(LSString string)
 {
 	return string.bytes != NULL;

@@ -1120,4 +1120,21 @@ void test_equals_funcs(void)
 
 		assert(!ls_bytes_equals(small1, big1, SMALL_LEN));
 	}
+	{
+		const LSByte *small1 = SMALL_BYTES;
+		const LSByte *small2 = SMALL_BYTES;
+		const LSByte *big1 = BIG_BYTES;
+		const LSByte *big2 = BIG_BYTES;
+		const LSByte *empty1 = LS_EMPTY_BYTES;
+		const LSByte *empty2 = LS_EMPTY_BYTES;
+
+		assert(ls_bytes_equals_nullsafe(small1, small2, SMALL_LEN));
+		assert(ls_bytes_equals_nullsafe(big1, big2, BIG_LEN));
+		assert(ls_bytes_equals_nullsafe(empty1, empty2, 0));
+		assert(!ls_bytes_equals_nullsafe(NULL, NULL, 0));
+
+		assert(!ls_bytes_equals_nullsafe(small1, NULL, SMALL_LEN));
+		assert(!ls_bytes_equals_nullsafe(big1, NULL, BIG_LEN));
+		assert(!ls_bytes_equals_nullsafe(empty1, NULL, 0));
+	}
 }

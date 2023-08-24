@@ -457,6 +457,12 @@ bool ls_bytes_equals(const LSByte a[static 1], const LSByte b[static 1],
 	return memcmp(a, b, len) == 0;
 }
 
+bool ls_bytes_equals_nullsafe(const LSByte *a, const LSByte *b, size_t len)
+{
+	return a != NULL && b != NULL
+		&& ls_bytes_equals(a, b, len);
+}
+
 LSString create_string_unchecked(const LSByte *bytes, size_t len)
 {
 	LSByte *bytes_cpy = tyrant_alloc(len + 1);

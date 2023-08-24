@@ -157,15 +157,6 @@ LSShortString ls_short_string_from_string(LSString string)
 	return ls_short_string_create(string.bytes, string.len);
 }
 
-LSShortString ls_short_string_from_sso(LSSSOString sso)
-{
-	if (ls_sso_get_type(sso) != LS_SSO_SHORT) {
-		return LS_AN_INVALID_SHORT_STRING;
-	}
-
-	return sso._short;
-}
-
 LSShortString ls_short_string_from_sspan(LSStringSpan sspan)
 {
 	return ls_short_string_create(sspan.start, sspan.len);

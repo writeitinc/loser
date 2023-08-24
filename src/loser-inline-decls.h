@@ -26,6 +26,8 @@ LS_LINK(LSString) ls_bbuf_finalize(LSByteBuffer *bbuf);
 
 LS_LINK(LSString) ls_string_from_sso(LSSSOString sso);
 
+LS_LINK(LSShortString) ls_short_string_from_sso(LSSSOString sso);
+
 LS_LINK(LSStringSpan) ls_sspan_from_string(LSString string);
 LS_LINK(LSStringSpan) ls_sspan_from_short_string(
 		const LSShortString *short_string);

@@ -230,12 +230,6 @@ LSShortString ls_short_string_from_string(LSString string);
 
 /*
  * Fails if:
- * - `sso` doesn't contain a short string
- */
-LSShortString ls_short_string_from_sso(LSSSOString sso);
-
-/*
- * Fails if:
  * - `sspan.len` is greater than `LS_SHORT_STRING_MAX_LEN`
  * - `sspan` is invalid
  */
@@ -654,6 +648,15 @@ inline LSString ls_string_from_sso(LSSSOString sso)
 {
 	const LSByte *bytes = ls_sso_get_bytes(&sso);
 	return ls_string_create(bytes, sso.len);
+}
+
+/*
+ * Fails if:
+ * - `sso` doesn't contain a short string
+ */
+inline LSShortString ls_short_string_from_sso(LSSSOString sso)
+{
+	return sso._short; // potential (well-defined) type-punning
 }
 
 /*

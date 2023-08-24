@@ -3,7 +3,7 @@ NAME = loser
 CFLAGS = $(WFLAGS) $(OPTIM) $(IFLAGS)
 LFLAGS = -L$(LIB_DIR) -l:lib$(NAME).a -ltyrant
 
-WFLAGS = -Wall -Wextra -pedantic -std=c99
+WFLAGS = -Wall -Wextra -pedantic -std=c99 -Winline
 IFLAGS = -I$(INCLUDE_DIR)
 
 WORKING_DIR = .

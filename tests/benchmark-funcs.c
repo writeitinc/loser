@@ -7,7 +7,7 @@
 #include "stopwatch.h"
 
 #ifndef NITERATIONS
-#define NITERATIONS 10000000
+#define NITERATIONS 1000000
 #endif
 
 #ifndef PRECISION

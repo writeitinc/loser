@@ -17,6 +17,7 @@ const LSString LS_EMPTY_STRING = {
 #include "loser-inline-decls.h"
 #undef LS_LINKAGE
 
+static LSString create_string_unchecked(const LSByte *bytes, size_t len);
 static LSStatus bbuf_reserve_space(LSByteBuffer *bbuf, size_t len);
 static size_t three_halves_geom_growth(size_t cap);
 static size_t size_max(size_t a, size_t b);
@@ -31,23 +32,7 @@ LSString ls_string_create(const LSByte *bytes, size_t len)
 		return LS_EMPTY_STRING;
 	}
 
-	return ls__intern_string_create_unchecked(bytes, len);
-}
-
-LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len)
-{
-	LSByte *bytes_cpy = tyrant_alloc(len + 1);
-	if (!bytes_cpy) {
-		return LS_AN_INVALID_STRING;
-	}
-
-	memcpy(bytes_cpy, bytes, len);
-	bytes_cpy[len] = '\0';
-
-	return (LSString){
-		.len = len,
-		.bytes = bytes_cpy
-	};
+	return create_string_unchecked(bytes, len);
 }
 
 void ls_string_destroy(LSString *string)
@@ -86,7 +71,7 @@ LSSSOString ls_sso_create(const LSByte *bytes, size_t len)
 
 	LSString string = bytes == NULL
 			? LS_AN_INVALID_STRING
-			: ls__intern_string_create_unchecked(bytes, len);
+			: create_string_unchecked(bytes, len);
 	if (!ls_string_is_valid(string)) {
 		return LS_AN_INVALID_SSO;
 	}
@@ -470,6 +455,22 @@ bool ls_bytes_equals(const LSByte a[static 1], const LSByte b[static 1],
 		size_t len)
 {
 	return memcmp(a, b, len) == 0;
+}
+
+LSString create_string_unchecked(const LSByte *bytes, size_t len)
+{
+	LSByte *bytes_cpy = tyrant_alloc(len + 1);
+	if (!bytes_cpy) {
+		return LS_AN_INVALID_STRING;
+	}
+
+	memcpy(bytes_cpy, bytes, len);
+	bytes_cpy[len] = '\0';
+
+	return (LSString){
+		.len = len,
+		.bytes = bytes_cpy
+	};
 }
 
 LSStatus bbuf_reserve_space(LSByteBuffer *bbuf, size_t len)

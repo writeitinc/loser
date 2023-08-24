@@ -118,11 +118,6 @@ static const LSStringSpan LS_EMPTY_SSPAN = {
 LSString ls_string_create(const LSByte *bytes, size_t len);
 
 /*
- * Don't call this function directly.
- */
-LSString ls__intern_string_create_unchecked(const LSByte *bytes, size_t len);
-
-/*
  * Constraints:
  * - `string` is not `NULL`
  * - `string` was not previously destroyed

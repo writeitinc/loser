@@ -186,15 +186,6 @@ LSSSOString ls_sso_from_string(LSString string)
 	return ls_sso_create(string.bytes, string.len);
 }
 
-LSSSOString ls_sso_from_short_string(LSShortString short_string)
-{
-	if (!ls_short_string_is_valid(short_string)) {
-		return LS_AN_INVALID_SSO;
-	}
-
-	return (LSSSOString){ ._short = short_string };
-}
-
 LSSSOString ls_sso_from_sspan(LSStringSpan sspan)
 {
 	return ls_sso_create(sspan.start, sspan.len);

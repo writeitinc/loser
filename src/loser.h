@@ -309,12 +309,6 @@ LSSSOString ls_sso_from_cstr(const char *cstr);
 
 /*
  * Fails if:
- * - `short_string` is invalid
- */
-LSSSOString ls_sso_from_short_string(LSShortString short_string);
-
-/*
- * Fails if:
  * - allocation is attempted and fails
  * - `sso` is invalid
  */
@@ -657,6 +651,19 @@ inline LSString ls_string_from_sso(LSSSOString sso)
 inline LSShortString ls_short_string_from_sso(LSSSOString sso)
 {
 	return sso._short; // potential (well-defined) type-punning
+}
+
+/*
+ * Fails if:
+ * - `short_string` is invalid
+ */
+inline LSSSOString ls_sso_from_short_string(LSShortString short_string)
+{
+	if (!ls_short_string_is_valid(short_string)) {
+		return LS_AN_INVALID_SSO;
+	}
+
+	return (LSSSOString){ ._short = short_string };
 }
 
 /*

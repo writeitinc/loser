@@ -101,6 +101,11 @@ void ls_sso_destroy(LSSSOString *sso)
 	}
 }
 
+LSByteBuffer ls_bbuf_create(void)
+{
+	return ls_bbuf_create_with_init_cap(16);
+}
+
 LSByteBuffer ls_bbuf_create_with_init_cap(size_t cap)
 {
 	if (cap == 0) {
@@ -124,6 +129,49 @@ void ls_bbuf_destroy(LSByteBuffer *bbuf)
 	tyrant_free(bbuf->bytes);
 }
 
+LSString ls_string_clone(LSString string)
+{
+	return ls_string_create(string.bytes, string.len);
+}
+
+LSString ls_string_from_short_string(LSShortString short_string)
+{
+	if (!ls_short_string_is_valid(short_string)) {
+		return LS_AN_INVALID_STRING;
+	}
+
+	return ls_string_create(short_string._mut_bytes, short_string.len);
+}
+
+LSString ls_string_from_sspan(LSStringSpan sspan)
+{
+	return ls_string_create(sspan.start, sspan.len);
+}
+
+LSString ls_string_from_bbuf(LSByteBuffer bbuf)
+{
+	return ls_string_create(bbuf.bytes, bbuf.len);
+}
+
+LSString ls_string_from_chars(const char *chars, size_t len)
+{
+	return ls_string_create((const LSByte *)chars, len);
+}
+
+LSString ls_string_from_cstr(const char *cstr)
+{
+	if (cstr == NULL) {
+		return LS_AN_INVALID_STRING;
+	}
+
+	return ls_string_from_chars(cstr, strlen(cstr));
+}
+
+LSShortString ls_short_string_from_string(LSString string)
+{
+	return ls_short_string_create(string.bytes, string.len);
+}
+
 LSShortString ls_short_string_from_sso(LSSSOString sso)
 {
 	if (ls_sso_get_type(sso) != LS_SSO_SHORT) {
@@ -133,6 +181,35 @@ LSShortString ls_short_string_from_sso(LSSSOString sso)
 	return sso._short;
 }
 
+LSShortString ls_short_string_from_sspan(LSStringSpan sspan)
+{
+	return ls_short_string_create(sspan.start, sspan.len);
+}
+
+LSShortString ls_short_string_from_bbuf(LSByteBuffer bbuf)
+{
+	return ls_short_string_create(bbuf.bytes, bbuf.len);
+}
+
+LSShortString ls_short_string_from_chars(const char *chars, size_t len)
+{
+	return ls_short_string_create((const LSByte *)chars, len);
+}
+
+LSShortString ls_short_string_from_cstr(const char *cstr)
+{
+	if (cstr == NULL) {
+		return LS_AN_INVALID_SHORT_STRING;
+	}
+
+	return ls_short_string_from_chars(cstr, strlen(cstr));
+}
+
+LSSSOString ls_sso_from_string(LSString string)
+{
+	return ls_sso_create(string.bytes, string.len);
+}
+
 LSSSOString ls_sso_from_short_string(LSShortString short_string)
 {
 	if (!ls_short_string_is_valid(short_string)) {
@@ -140,6 +217,30 @@ LSSSOString ls_sso_from_short_string(LSShortString short_string)
 	}
 
 	return (LSSSOString){ ._short = short_string };
+}
+
+LSSSOString ls_sso_from_sspan(LSStringSpan sspan)
+{
+	return ls_sso_create(sspan.start, sspan.len);
+}
+
+LSSSOString ls_sso_from_bbuf(LSByteBuffer bbuf)
+{
+	return ls_sso_create(bbuf.bytes, bbuf.len);
+}
+
+LSSSOString ls_sso_from_chars(const char *chars, size_t len)
+{
+	return ls_sso_create((const LSByte *)chars, len);
+}
+
+LSSSOString ls_sso_from_cstr(const char *cstr)
+{
+	if (cstr == NULL) {
+		return LS_AN_INVALID_SSO;
+	}
+
+	return ls_sso_from_chars(cstr, strlen(cstr));
 }
 
 LSSSOString ls_sso_clone(LSSSOString sso)
@@ -174,6 +275,13 @@ LSByteBuffer ls_bbuf_from_sspan(LSStringSpan sspan)
 	bbuf.len = sspan.len;
 
 	return bbuf;
+}
+
+LSByteBuffer ls_bbuf_clone(LSByteBuffer bbuf)
+{
+	LSStringSpan contents = ls_sspan_from_bbuf(bbuf);
+
+	return ls_bbuf_from_sspan(contents);
 }
 
 LSSSOString ls_string_move_to_sso(LSString *string)
@@ -235,6 +343,28 @@ LSStatus ls_bbuf_append(LSByteBuffer *bbuf, const LSByte *bytes, size_t len)
 	bbuf->len += len;
 
 	return LS_SUCCESS;
+}
+
+LSStatus ls_bbuf_append_string(LSByteBuffer *bbuf, LSString string)
+{
+	return ls_bbuf_append(bbuf, string.bytes, string.len);
+}
+
+LSStatus ls_bbuf_append_sspan(LSByteBuffer *bbuf, LSStringSpan sspan)
+{
+	return ls_bbuf_append(bbuf, sspan.start, sspan.len);
+}
+
+LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
+		LSString string)
+{
+	return ls_bbuf_insert(bbuf, idx, string.bytes, string.len);
+}
+
+LSStatus ls_bbuf_insert_sspan(LSByteBuffer *bbuf, size_t idx,
+		LSStringSpan sspan)
+{
+	return ls_bbuf_insert(bbuf, idx, sspan.start, sspan.len);
 }
 
 LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,

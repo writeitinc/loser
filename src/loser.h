@@ -66,7 +66,7 @@ typedef enum LSSSOStringType {
  */
 typedef struct LSStringSpan {
 	size_t len;
-	const LSByte *start;
+	const LSByte *bytes;
 } LSStringSpan;
 
 // A mutable array of bytes.
@@ -88,7 +88,7 @@ static const LSShortString LS_EMPTY_SHORT_STRING = { 0 };
 static const LSSSOString LS_EMPTY_SSO = { 0 };
 static const LSStringSpan LS_EMPTY_SSPAN = {
 	.len = 0,
-	.start = LS_EMPTY_BYTES
+	.bytes = LS_EMPTY_BYTES
 };
 
 /*
@@ -101,7 +101,7 @@ static const LSStringSpan LS_EMPTY_SSPAN = {
 #define LS_AN_INVALID_SSO \
 	(LSSSOString){ ._long.len = SIZE_MAX, ._long.bytes = NULL }
 #define LS_AN_INVALID_SHORT_STRING (LSShortString){ .len = SIZE_MAX }
-#define LS_AN_INVALID_SSPAN (LSStringSpan){ .start = NULL }
+#define LS_AN_INVALID_SSPAN (LSStringSpan){ .bytes = NULL }
 #define LS_AN_INVALID_BBUF (LSByteBuffer){ .bytes = NULL }
 
 #define LS_LINKAGE inline
@@ -493,7 +493,7 @@ inline const LSByte *ls_short_string_get_bytes(
 
 inline bool ls_sspan_is_valid(LSStringSpan sspan)
 {
-	return sspan.start != NULL;
+	return sspan.bytes != NULL;
 }
 
 inline bool ls_bbuf_is_valid(LSByteBuffer bbuf)
@@ -537,17 +537,17 @@ inline const LSByte *ls_sso_get_bytes(const LSSSOString *sso)
 
 /*
  * Constraints:
- * - `start` points to an array of at least `len` bytes
+ * - `bytes` points to an array of at least `len` bytes
  *        OR is `NULL`
  *
  * Fails if:
- * - `start` is `NULL`
+ * - `bytes` is `NULL`
  */
-inline LSStringSpan ls_sspan_create(const LSByte *start, size_t len)
+inline LSStringSpan ls_sspan_create(const LSByte *bytes, size_t len)
 {
 	return (LSStringSpan){
 		.len = len,
-		.start = start
+		.bytes = bytes
 	};
 }
 
@@ -587,7 +587,7 @@ inline void ls_sso_invalidate(LSSSOString *sso)
  */
 inline void ls_sspan_invalidate(LSStringSpan *sspan)
 {
-	sspan->start = NULL;
+	sspan->bytes = NULL;
 }
 
 /*
@@ -694,7 +694,7 @@ inline LSStringSpan ls_sspan_from_string(LSString string)
 {
 	return (LSStringSpan){
 		.len = string.len,
-		.start = string.bytes
+		.bytes = string.bytes
 	};
 }
 
@@ -716,7 +716,7 @@ inline LSStringSpan ls_sspan_from_short_string(
 
 	return (LSStringSpan){
 		.len = short_string->len,
-		.start = short_string->_mut_bytes
+		.bytes = short_string->_mut_bytes
 	};
 }
 
@@ -735,7 +735,7 @@ inline LSStringSpan ls_sspan_from_sso(const LSSSOString *sso)
 
 	return (LSStringSpan){
 		.len = sso->len,
-		.start = bytes
+		.bytes = bytes
 	};
 }
 
@@ -760,7 +760,7 @@ inline LSStringSpan ls_sspan_from_chars(const char *chars, size_t len)
 {
 	return (LSStringSpan){
 		.len = len,
-		.start = (const LSByte *)chars
+		.bytes = (const LSByte *)chars
 	};
 }
 
@@ -787,27 +787,27 @@ inline LSStringSpan ls_sspan_from_cstr(const char *cstr)
  * Fails if:
  * - `string` is invalid
  */
-inline LSString ls_string_substr(LSString string, size_t start, size_t len)
+inline LSString ls_string_substr(LSString string, size_t bytes, size_t len)
 {
-	return ls_string_from_sspan(ls_string_subspan(string, start, len));
+	return ls_string_from_sspan(ls_string_subspan(string, bytes, len));
 }
 
 /*
  * Fails if:
  * - `string` is invalid
  */
-inline LSStringSpan ls_string_subspan(LSString string, size_t start, size_t len)
+inline LSStringSpan ls_string_subspan(LSString string, size_t bytes, size_t len)
 {
-	return ls_sspan_subspan(ls_sspan_from_string(string), start, len);
+	return ls_sspan_subspan(ls_sspan_from_string(string), bytes, len);
 }
 
 /*
  * Fails if:
  * - `sspan` is invalid
  */
-inline LSString ls_sspan_substr(LSStringSpan sspan, size_t start, size_t len)
+inline LSString ls_sspan_substr(LSStringSpan sspan, size_t bytes, size_t len)
 {
-	return ls_string_from_sspan(ls_sspan_subspan(sspan, start, len));
+	return ls_string_from_sspan(ls_sspan_subspan(sspan, bytes, len));
 }
 
 /*
@@ -815,17 +815,17 @@ inline LSString ls_sspan_substr(LSStringSpan sspan, size_t start, size_t len)
  * - `sspan` is invalid
  * - the given range doesn't make sense
  */
-inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t start,
+inline LSStringSpan ls_sspan_subspan(LSStringSpan sspan, size_t bytes,
 		size_t len)
 {
 	if (!ls_sspan_is_valid(sspan)
-			|| start > sspan.len
+			|| bytes > sspan.len
 			|| len > sspan.len
-			|| start > sspan.len - len) {
+			|| bytes > sspan.len - len) {
 		return LS_AN_INVALID_SSPAN;
 	}
 
-	return ls_sspan_create(&sspan.start[start], len);
+	return ls_sspan_create(&sspan.bytes[bytes], len);
 }
 
 /*

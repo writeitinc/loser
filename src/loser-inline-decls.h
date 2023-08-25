@@ -10,7 +10,7 @@ LS_LINK(LSSSOStringType) ls_sso_get_type(LSSSOString sso);
 LS_LINK(bool) ls_sso_is_valid(LSSSOString sso);
 LS_LINK(const LSByte *)ls_sso_get_bytes(const LSSSOString *sso);
 
-LS_LINK(LSStringSpan) ls_sspan_create(const LSByte *start, size_t len);
+LS_LINK(LSStringSpan) ls_sspan_create(const LSByte *bytes, size_t len);
 
 LS_LINK(void) ls_string_invalidate(LSString *string);
 LS_LINK(void) ls_short_string_invalidate(LSShortString *short_string);
@@ -38,11 +38,11 @@ LS_LINK(LSStringSpan) ls_sspan_from_bbuf(LSByteBuffer bbuf);
 LS_LINK(LSStringSpan) ls_sspan_from_chars(const char *chars, size_t len);
 LS_LINK(LSStringSpan) ls_sspan_from_cstr(const char *cstr);
 
-LS_LINK(LSString) ls_string_substr(LSString string, size_t start, size_t len);
-LS_LINK(LSStringSpan) ls_string_subspan(LSString string, size_t start,
+LS_LINK(LSString) ls_string_substr(LSString string, size_t bytes, size_t len);
+LS_LINK(LSStringSpan) ls_string_subspan(LSString string, size_t bytes,
 		size_t len);
-LS_LINK(LSString) ls_sspan_substr(LSStringSpan sspan, size_t start, size_t len);
-LS_LINK(LSStringSpan) ls_sspan_subspan(LSStringSpan sspan, size_t start,
+LS_LINK(LSString) ls_sspan_substr(LSStringSpan sspan, size_t bytes, size_t len);
+LS_LINK(LSStringSpan) ls_sspan_subspan(LSStringSpan sspan, size_t bytes,
 		size_t len);
 
 LS_LINK(LSStatus) ls_bbuf_append_short_string(LSByteBuffer *bbuf,

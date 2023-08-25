@@ -130,7 +130,7 @@ LSString ls_string_from_short_string(LSShortString short_string)
 
 LSString ls_string_from_sspan(LSStringSpan sspan)
 {
-	return ls_string_create(sspan.start, sspan.len);
+	return ls_string_create(sspan.bytes, sspan.len);
 }
 
 LSString ls_string_from_bbuf(LSByteBuffer bbuf)
@@ -159,7 +159,7 @@ LSShortString ls_short_string_from_string(LSString string)
 
 LSShortString ls_short_string_from_sspan(LSStringSpan sspan)
 {
-	return ls_short_string_create(sspan.start, sspan.len);
+	return ls_short_string_create(sspan.bytes, sspan.len);
 }
 
 LSShortString ls_short_string_from_bbuf(LSByteBuffer bbuf)
@@ -188,7 +188,7 @@ LSSSOString ls_sso_from_string(LSString string)
 
 LSSSOString ls_sso_from_sspan(LSStringSpan sspan)
 {
-	return ls_sso_create(sspan.start, sspan.len);
+	return ls_sso_create(sspan.bytes, sspan.len);
 }
 
 LSSSOString ls_sso_from_bbuf(LSByteBuffer bbuf)
@@ -238,7 +238,7 @@ LSByteBuffer ls_bbuf_from_sspan(LSStringSpan sspan)
 		return LS_AN_INVALID_BBUF;
 	}
 
-	memcpy(bbuf.bytes, sspan.start, sspan.len);
+	memcpy(bbuf.bytes, sspan.bytes, sspan.len);
 	bbuf.len = sspan.len;
 
 	return bbuf;
@@ -319,7 +319,7 @@ LSStatus ls_bbuf_append_string(LSByteBuffer *bbuf, LSString string)
 
 LSStatus ls_bbuf_append_sspan(LSByteBuffer *bbuf, LSStringSpan sspan)
 {
-	return ls_bbuf_append(bbuf, sspan.start, sspan.len);
+	return ls_bbuf_append(bbuf, sspan.bytes, sspan.len);
 }
 
 LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
@@ -331,7 +331,7 @@ LSStatus ls_bbuf_insert_string(LSByteBuffer *bbuf, size_t idx,
 LSStatus ls_bbuf_insert_sspan(LSByteBuffer *bbuf, size_t idx,
 		LSStringSpan sspan)
 {
-	return ls_bbuf_insert(bbuf, idx, sspan.start, sspan.len);
+	return ls_bbuf_insert(bbuf, idx, sspan.bytes, sspan.len);
 }
 
 LSStatus ls_bbuf_insert(LSByteBuffer *bbuf, size_t idx, const LSByte *bytes,
@@ -430,7 +430,7 @@ bool ls_sspan_equals(LSStringSpan a, LSStringSpan b)
 {
 	return a.len == b.len
 			&& ls_sspan_is_valid(a) && ls_sspan_is_valid(b)
-			&& ls_bytes_equals(a.start, b.start, a.len);
+			&& ls_bytes_equals(a.bytes, b.bytes, a.len);
 }
 
 bool ls_bytes_equals(const LSByte a[static 1], const LSByte b[static 1],

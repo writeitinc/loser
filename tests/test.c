@@ -105,7 +105,7 @@ void test_constructors(void)
 		LSStringSpan from_null = ls_sspan_create(NULL, 0);
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(from_nonempty.start, SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(from_nonempty.bytes, SMALL_BYTES, SMALL_LEN) == 0);
 
 		assert(ls_sspan_is_valid(from_empty));
 		assert(ls_sspan_is_valid(from_nonempty));
@@ -433,7 +433,7 @@ void test_conversions(void)
 		assert(!ls_sspan_is_valid(from_invalid));
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(from_nonempty.start, SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(from_nonempty.bytes, SMALL_BYTES, SMALL_LEN) == 0);
 	}
 	{
 		LSStringSpan from_empty = ls_sspan_from_short_string(&LS_EMPTY_SHORT_STRING);
@@ -445,7 +445,7 @@ void test_conversions(void)
 		assert(!ls_sspan_is_valid(from_invalid));
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(from_nonempty.start, SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(from_nonempty.bytes, SMALL_BYTES, SMALL_LEN) == 0);
 	}
 	{
 		LSStringSpan from_empty = ls_sspan_from_sso(&LS_EMPTY_SSO);
@@ -460,8 +460,8 @@ void test_conversions(void)
 
 		assert(from_small.len == SMALL_LEN);
 		assert(from_big.len == BIG_LEN);
-		assert(memcmp(from_small.start, SMALL_BYTES, SMALL_LEN) == 0);
-		assert(memcmp(from_big.start, BIG_BYTES, BIG_LEN) == 0);
+		assert(memcmp(from_small.bytes, SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(from_big.bytes, BIG_BYTES, BIG_LEN) == 0);
 	}
 	{
 		LSStringSpan from_empty = ls_sspan_from_bbuf(empty_bbuf);
@@ -473,7 +473,7 @@ void test_conversions(void)
 		assert(!ls_sspan_is_valid(from_invalid));
 
 		assert(from_nonempty.len == SMALL_LEN);
-		assert(memcmp(from_nonempty.start, SMALL_BYTES, SMALL_LEN) == 0);
+		assert(memcmp(from_nonempty.bytes, SMALL_BYTES, SMALL_LEN) == 0);
 	}
 
 	{
@@ -800,7 +800,7 @@ void test_append_very_big(void)
 	assert(status == LS_SUCCESS);
 
 	assert(bbuf.len == very_big_sspan.len);
-	assert(memcmp(bbuf.bytes, very_big_sspan.start, very_big_sspan.len) == 0);
+	assert(memcmp(bbuf.bytes, very_big_sspan.bytes, very_big_sspan.len) == 0);
 
 	ls_bbuf_destroy(&bbuf);
 }
@@ -815,7 +815,7 @@ void test_insert_very_big(void)
 	assert(status == LS_SUCCESS);
 
 	assert(bbuf.len == very_big_sspan.len);
-	assert(memcmp(bbuf.bytes, very_big_sspan.start, very_big_sspan.len) == 0);
+	assert(memcmp(bbuf.bytes, very_big_sspan.bytes, very_big_sspan.len) == 0);
 
 	ls_bbuf_destroy(&bbuf);
 }
@@ -835,7 +835,7 @@ void test_append_many(void)
 	assert(bbuf.len == sspan.len * NAPPENDS);
 
 	for (size_t i = 0; i < NAPPENDS; ++i) {
-		assert(memcmp(&bbuf.bytes[i * sspan.len], sspan.start, sspan.len) == 0);
+		assert(memcmp(&bbuf.bytes[i * sspan.len], sspan.bytes, sspan.len) == 0);
 	}
 
 	ls_bbuf_destroy(&bbuf);
@@ -856,7 +856,7 @@ void test_insert_many(void)
 	assert(bbuf.len == sspan.len * NINSERTIONS);
 
 	for (size_t i = 0; i < NINSERTIONS; ++i) {
-		assert(memcmp(&bbuf.bytes[i * sspan.len], sspan.start, sspan.len) == 0);
+		assert(memcmp(&bbuf.bytes[i * sspan.len], sspan.bytes, sspan.len) == 0);
 	}
 
 	ls_bbuf_destroy(&bbuf);

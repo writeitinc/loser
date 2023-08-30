@@ -81,7 +81,7 @@ $(HEADER_DIR): $(HEADERS)
 
 TEST_HEADERS = $(wildcard $(TEST_DIR)/*.h)
 
-TEST_LDFLAGS = -L$(LIB_DIR) -l:lib$(NAME).a -ltyrant
+TEST_LDFLAGS = -L$(LIB_DIR) -l:lib$(NAME).a -l:libtyrant.a
 
 $(BIN_DIR)/%: $(TEST_OBJ_DIR)/%.o $(LIBRARIES)
 	$(CC) -o $@ $< $(TEST_LDFLAGS) $(DEBUG) $(DEFINES)
